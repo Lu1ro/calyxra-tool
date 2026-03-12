@@ -1,0 +1,145 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Agency (the customer paying €990–€3,490/mo) ───
+model Agency {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  tier      String   @default("pilot") // pilot | scale | pro
+
+  // White-label branding
+  logoUrl      String?  // uploaded logo URL
+  brandColor   String?  @default("#166534") // primary color
+  brandName    String?  // custom brand name (replaces "Calyxra" in exports)
+  reportHeader String?  // custom text at top of PDF reports
+  reportFooter String?  // custom text at bottom of PDF reports
+
+  // Custom KPI definitions (JSON string)
+  customKpis   String?  // e.g. [{ "key": "mer", "label": "MER", "formula": "revenue/spend" }]
+
+  // Klaviyo integration
+  klaviyoApiKey String?  // encrypted Klaviyo private API key
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  stores Store[]
+}
+
+
+// ─── Store (a Shopify store managed by an agency) ───
+model Store {
+  id        String   @id @default(cuid())
+  name      String   // "Abhishek's Brand"
+  domain    String   // "store.myshopify.com"
+  status    String   @default("active") // active | paused | error
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Feature Configs
+  databaseConfig  String? // JSON storing connected DB credentials/mappings
+  analyticsConfig String? // JSON storing embedded Looker/PowerBI dashboard array
+
+  agencyId String
+  agency   Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  connections Connection[]
+  reports     Report[]
+  alerts      Alert[]
+}
+
+// ─── Connection (encrypted API credentials per platform) ───
+model Connection {
+  id           String   @id @default(cuid())
+  platform     String   // shopify | meta | google | tiktok
+  credentials  String   // encrypted JSON blob (tokens, account IDs)
+  status       String   @default("connected") // connected | error | expired
+  lastSyncAt   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+}
+
+// ─── Report (a single reconciliation snapshot) ───
+model Report {
+  id              String   @id @default(cuid())
+  dateFrom        String
+  dateTo          String
+  isDemo          Boolean  @default(false)
+  
+  // Shopify data
+  grossRevenue    Float
+  netRevenue      Float
+  totalDiscounts  Float
+  totalRefunds    Float
+  chargebacks     Float
+  totalOrders     Int
+  
+  // Ad platform aggregates
+  reportedRevenue Float
+  totalSpend      Float
+  reportedRoas    Float
+  trueRoas        Float
+  
+  // Phantom revenue
+  phantomRevenue  Float
+  phantomPct      Float
+  
+  // Full JSON snapshot of the reconciliation result
+  fullReport      String   // JSON string of the complete report object
+
+  createdAt       DateTime @default(now())
+  
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  campaigns Campaign[]
+  alerts    Alert[]
+}
+
+// ─── Campaign (individual campaign snapshot within a report) ───
+model Campaign {
+  id                   String @id @default(cuid())
+  campaignName         String
+  channel              String // Meta | Google | TikTok
+  spend                Float
+  reportedRoas         Float
+  estimatedTrueRoas    Float
+  inflationRatio       Float
+  flag                 String // Unprofitable | Likely inflated | Inflated but profitable | Needs verification | Reasonable
+  flagColor            String // red | amber | green
+
+  reportId String
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+}
+
+// ─── Alert (monitoring notifications) ───
+model Alert {
+  id         String   @id @default(cuid())
+  type       String   // phantom_spike | roas_drop | unprofitable_campaign | high_phantom | stale_data | api_failure
+  severity   String   // critical | high | medium
+  title      String
+  message    String
+  resolved   Boolean  @default(false)
+  resolvedAt DateTime?
+  createdAt  DateTime @default(now())
+
+  storeId  String
+  store    Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  
+  reportId String?
+  report   Report? @relation(fields: [reportId], references: [id], onDelete: SetNull)
+}

@@ -1,0 +1,42 @@
+@import url('./design-system.css');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--c-gray-50);
+  color: var(--c-gray-900);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+input:focus {
+  outline: 2px solid rgba(22, 101, 52, 0.3);
+  outline-offset: 1px;
+}
+
+button:focus-visible {
+  outline: 2px solid rgba(22, 101, 52, 0.3);
+  outline-offset: 2px;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection color */
+::selection {
+  background: var(--c-green-light);
+  color: var(--c-green);
+}

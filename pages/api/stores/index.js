@@ -1,0 +1,63 @@
+// pages/api/stores/index.js
+// Store CRUD — list and create stores for the authenticated agency
+import { prisma } from '../../../lib/db';
+import { withAuth, withRateLimit, withErrorHandler, withMethods, sanitize, validateInput } from '../../../lib/middleware';
+
+async function handler(req, res) {
+    const agencyId = req.session.user.agencyId;
+
+    if (req.method === 'GET') {
+        const stores = await prisma.store.findMany({
+            where: { agencyId },
+            include: {
+                connections: {
+                    select: { id: true, platform: true, status: true, lastSyncAt: true },
+                },
+                reports: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 1,
+                    select: { phantomPct: true, trueRoas: true, createdAt: true },
+                },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+
+        return res.status(200).json({ stores });
+    }
+
+    if (req.method === 'POST') {
+        // Validate input
+        const { valid, errors } = validateInput(req.body, {
+            name: { type: 'string', required: true, maxLength: 100, minLength: 1 },
+            domain: { type: 'string', required: true, maxLength: 200, minLength: 3 },
+        });
+
+        if (!valid) {
+            return res.status(400).json({ error: errors.join(', ') });
+        }
+
+        const name = sanitize(req.body.name);
+        const domain = sanitize(req.body.domain).replace('https://', '').replace('http://', '');
+
+        // Check tier limits
+        const tierLimits = { pilot: 2, scale: 5, pro: 10 };
+        const agency = await prisma.agency.findUnique({ where: { id: agencyId } });
+        const storeCount = await prisma.store.count({ where: { agencyId } });
+        const maxStores = tierLimits[agency.tier] || 2;
+
+        if (storeCount >= maxStores) {
+            return res.status(403).json({ error: `Your ${agency.tier} plan allows up to ${maxStores} stores. Upgrade to add more.` });
+        }
+
+        const store = await prisma.store.create({
+            data: { name, domain, agencyId },
+        });
+
+        return res.status(201).json({ store });
+    }
+
+    return res.status(405).json({ error: 'Method not allowed' });
+}
+
+// Compose middleware: auth check → rate limit (30/min) → error handler → method filter
+export default withErrorHandler(withRateLimit(withAuth(withMethods(handler, ['GET', 'POST'])), 30));

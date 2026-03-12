@@ -1,0 +1,30 @@
+{
+  "name": "calyxra-tool",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "node --test __tests__/*.test.js",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@auth/prisma-adapter": "^2.11.1",
+    "@google-cloud/bigquery": "^8.1.1",
+    "@prisma/client": "^6.19.2",
+    "axios": "^1.13.6",
+    "bcryptjs": "^3.0.3",
+    "chart.js": "^4.5.1",
+    "date-fns": "^4.1.0",
+    "dotenv": "^17.3.1",
+    "mysql2": "^3.19.0",
+    "next": "16.1.6",
+    "next-auth": "^4.24.13",
+    "pg": "^8.20.0",
+    "prisma": "^6.19.2",
+    "react": "19.2.3",
+    "react-chartjs-2": "^5.3.1",
+    "react-dom": "19.2.3"
+  }
+}
