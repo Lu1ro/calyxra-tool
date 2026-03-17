@@ -106,9 +106,9 @@ describe('computeKPIs', () => {
 });
 
 describe('formatKPIValue', () => {
-    it('should format currency with € symbol', () => {
+    it('should format currency with $ symbol', () => {
         const result = formatKPIValue(1234, 'currency');
-        assert.ok(result.startsWith('€'));
+        assert.ok(result.startsWith('$'));
     });
 
     it('should format ratio with × symbol', () => {

@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../../auth/[...nextauth]';
 import { prisma } from '../../../../lib/db';
 import { decrypt } from '../../../../lib/crypto';
-import { fetchShopifyData } from '../../../../lib/shopify';
+import { fetchShopifyOrders, processShopifyOrders, fetchShopifySalesAnalytics } from '../../../../lib/shopify';
 import { fetchMetaCampaigns } from '../../../../lib/meta';
 import { fetchGoogleCampaigns } from '../../../../lib/google';
 import { fetchTikTokCampaigns } from '../../../../lib/tiktok';
@@ -39,6 +39,7 @@ export default async function handler(req, res) {
 
     try {
         let shopifyData, adData;
+        const warnings = [];
 
         if (useSampleData) {
             // Use demo data for testing
@@ -80,20 +81,77 @@ export default async function handler(req, res) {
             const dateTo = new Date().toISOString().split('T')[0];
             const dateFrom = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-            // Fetch data in parallel
-            const fetchers = [
-                fetchShopifyData(creds.shopify.domain || store.domain, creds.shopify.apiKey, dateFrom, dateTo),
-            ];
+            // Fetch Shopify orders and process into metrics
+            const shopifyOrders = await fetchShopifyOrders(
+                creds.shopify.domain || store.domain,
+                creds.shopify.apiKey,
+                dateFrom,
+                dateTo
+            );
+            const processedShopify = processShopifyOrders(shopifyOrders);
 
+            // Try ShopifyQL analytics for EXACT match with Shopify Analytics dashboard
+            const analyticsData = await fetchShopifySalesAnalytics(
+                creds.shopify.domain || store.domain,
+                creds.shopify.apiKey,
+                dateFrom,
+                dateTo
+            );
+
+            // If ShopifyQL is available, override REST API numbers with analytics numbers
+            if (analyticsData) {
+                console.log('[RECONCILE] Using ShopifyQL analytics (exact match with Shopify)');
+                processedShopify.grossRevenue = analyticsData.grossRevenue;
+                processedShopify.netRevenue = analyticsData.netRevenue;
+                processedShopify.totalDiscounts = analyticsData.totalDiscounts;
+                processedShopify.totalRefunds = analyticsData.totalRefunds;
+            } else {
+                console.log('[RECONCILE] Using REST API orders (ShopifyQL unavailable)');
+            }
+
+            // Fetch ad platform data — use allSettled so one failure doesn't kill everything
             const adFetchers = [];
-            if (creds.meta) adFetchers.push(fetchMetaCampaigns(creds.meta.accessToken, creds.meta.adAccountId, dateFrom, dateTo).then(c => c.map(x => ({ ...x, channel: 'Meta' }))));
-            if (creds.google) adFetchers.push(fetchGoogleCampaigns(creds.google.developerToken, creds.google.customerId, dateFrom, dateTo).then(c => c.map(x => ({ ...x, channel: 'Google' }))));
-            if (creds.tiktok) adFetchers.push(fetchTikTokCampaigns(creds.tiktok.accessToken, creds.tiktok.advertiserId, dateFrom, dateTo).then(c => c.map(x => ({ ...x, channel: 'TikTok' }))));
+            const adLabels = [];
 
-            const [shopifyResult, ...adResults] = await Promise.all([...fetchers, ...adFetchers]);
-            shopifyData = shopifyResult;
+            if (creds.meta) {
+                adFetchers.push(fetchMetaCampaigns(creds.meta.accessToken, creds.meta.adAccountId, dateFrom, dateTo).then(c => c.map(x => ({ ...x, channel: 'Meta' }))));
+                adLabels.push('Meta');
+            }
+            if (creds.google) {
+                adFetchers.push(fetchGoogleCampaigns(creds.google.developerToken, creds.google.customerId, dateFrom, dateTo).then(c => c.map(x => ({ ...x, channel: 'Google' }))));
+                adLabels.push('Google');
+            }
+            if (creds.tiktok) {
+                adFetchers.push(fetchTikTokCampaigns(creds.tiktok.accessToken, creds.tiktok.advertiserId, dateFrom, dateTo).then(c => c.map(x => ({ ...x, channel: 'TikTok' }))));
+                adLabels.push('TikTok');
+            }
 
-            const allCampaigns = adResults.flat();
+            const adResults = await Promise.allSettled(adFetchers);
+            const allCampaigns = [];
+
+            adResults.forEach((result, i) => {
+                if (result.status === 'fulfilled') {
+                    allCampaigns.push(...result.value);
+                } else {
+                    warnings.push({
+                        type: 'platform_error',
+                        platform: adLabels[i],
+                        message: `${adLabels[i]} data fetch failed: ${result.reason?.message || 'Unknown error'}`,
+                    });
+                }
+            });
+
+            // Add Shopify debug info
+            if (processedShopify._debug) {
+                if (processedShopify._debug.skippedTest > 0) {
+                    warnings.push({ type: 'info', message: `Excluded ${processedShopify._debug.skippedTest} test order(s) from revenue calculation` });
+                }
+                if (processedShopify._debug.skippedCancelled > 0) {
+                    warnings.push({ type: 'info', message: `Excluded ${processedShopify._debug.skippedCancelled} cancelled order(s) from revenue calculation` });
+                }
+            }
+
+            shopifyData = processedShopify;
             adData = {
                 totalSpend: allCampaigns.reduce((s, c) => s + c.spend, 0),
                 reportedPurchases: allCampaigns.reduce((s, c) => s + c.purchases, 0),
@@ -103,9 +161,11 @@ export default async function handler(req, res) {
             };
             adData.reportedRoas = adData.totalSpend > 0 ? +(adData.reportedRevenue / adData.totalSpend).toFixed(2) : 0;
 
-            // Update connection sync times
+            // Update connection sync times (only for successful ones)
             for (const conn of store.connections) {
-                await prisma.connection.update({ where: { id: conn.id }, data: { lastSyncAt: new Date() } });
+                try {
+                    await prisma.connection.update({ where: { id: conn.id }, data: { lastSyncAt: new Date() } });
+                } catch (e) { /* non-critical */ }
             }
         }
 
@@ -223,7 +283,7 @@ export default async function handler(req, res) {
             savedAlerts = await saveAlerts(id, savedReport.id, triggered);
         }
 
-        return res.status(200).json({ report, savedReportId: savedReport.id, alerts: triggered });
+        return res.status(200).json({ report, savedReportId: savedReport.id, alerts: triggered, warnings: warnings || [] });
     } catch (err) {
         console.error('Reconciliation error:', err);
         return res.status(500).json({ error: 'Reconciliation failed: ' + err.message });

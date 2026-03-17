@@ -111,10 +111,8 @@ export default function RegisterPage() {
                                 style={{ width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, outline: 'none', boxSizing: 'border-box' }}
                                 placeholder="Min. 8 characters"
                             />
-                            <div style={{ marginTop: 6, fontSize: 11, color: '#9ca3af', display: 'flex', gap: 10 }}>
-                                <span>✓ Min 8 characters</span>
-                                <span>✓ Include a number</span>
-                                <span>✓ Mix upper & lowercase</span>
+                            <div style={{ marginTop: 6, fontSize: 11, color: '#9ca3af' }}>
+                                <span>Minimum 8 characters</span>
                             </div>
                         </div>
                         <button

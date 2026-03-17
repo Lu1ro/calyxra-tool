@@ -145,7 +145,7 @@ export default function ProfitReconciliation() {
         return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>Loading...</div>;
     }
 
-    const fmt = v => '€' + Math.round(v || 0).toLocaleString();
+    const fmt = v => '$' + Math.round(v || 0).toLocaleString();
     const sorted = [...profitData].sort((a, b) => sortBy === 'netProfit' ? b.netProfit - a.netProfit : b.profitRoas - a.profitRoas);
 
     // Aggregate stats
@@ -274,7 +274,7 @@ export default function ProfitReconciliation() {
                                         scales: {
                                             x: { ticks: { font: { size: 11 }, maxRotation: 45, minRotation: 45 } },
                                             y: {
-                                                ticks: { font: { size: 11 }, callback: v => '€' + v.toLocaleString() },
+                                                ticks: { font: { size: 11 }, callback: v => '$' + v.toLocaleString() },
                                                 grid: { color: 'rgba(0,0,0,0.05)' },
                                             },
                                         },

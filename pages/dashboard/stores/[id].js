@@ -48,7 +48,7 @@ export default function StoreDashboard() {
     }, []);
 
     const showToast = (message, type = 'success') => setToast({ message, type });
-    const formatCurrency = (val) => '€' + (val || 0).toLocaleString('en-US', { minimumFractionDigits: 0 });
+    const formatCurrency = (val) => '$' + (val || 0).toLocaleString('en-US', { minimumFractionDigits: 0 });
     const flagEmoji = (color) => color === 'red' ? '🔴' : color === 'amber' ? '🟡' : '🟢';
 
     const fetchStoreData = async () => {
@@ -192,10 +192,12 @@ export default function StoreDashboard() {
                     ) : latestReport && (
                         <>
                             {/* Primary KPI Cards */}
-                            <div className="kpi-grid kpi-grid-4 animate-stagger">
+                            <div className="kpi-grid animate-stagger" style={{ gridTemplateColumns: 'repeat(6, 1fr)' }}>
                                 <KPICard label="Phantom Revenue" value={formatCurrency(latestReport.phantomRevenue)} subtitle={`${latestReport.phantomPct}% overstated`} color="var(--c-red)" accentBorder />
                                 <KPICard label="True ROAS" value={`${latestReport.trueRoas}×`} subtitle={`vs ${latestReport.adPlatform?.reportedRoas}× reported`} color="var(--c-green)" accentBorder />
                                 <KPICard label="Net Revenue" value={formatCurrency(latestReport.shopify?.netRevenue)} subtitle="Shopify verified" />
+                                <KPICard label="Gross Revenue" value={formatCurrency(latestReport.shopify?.grossRevenue)} subtitle="Before deductions" />
+                                <KPICard label="Total Orders" value={(latestReport.shopify?.totalOrders || 0).toLocaleString()} subtitle="Shopify orders" />
                                 <KPICard label="Total Ad Spend" value={formatCurrency(latestReport.adPlatform?.totalSpend)} subtitle="Across all channels" />
                             </div>
 
@@ -363,7 +365,7 @@ export default function StoreDashboard() {
                                     {/* Annual Impact */}
                                     {latestReport.optimizer.summary.estimatedAnnualImpact > 0 && (
                                         <KPICard label="Estimated Annual Impact of Optimization" value={`+${formatCurrency(latestReport.optimizer.summary.estimatedAnnualImpact)}`}
-                                            subtitle={`Based on reallocating €${latestReport.optimizer.summary.freedBudget} from underperformers to proven winners`}
+                                            subtitle={`Based on reallocating $${latestReport.optimizer.summary.freedBudget} from underperformers to proven winners`}
                                             color="#34d399" dark />
                                     )}
                                 </div>

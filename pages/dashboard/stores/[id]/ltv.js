@@ -227,7 +227,7 @@ export default function LtvRoas() {
                                 {ltvData.map((c, i) => (
                                     <tr key={i} style={{ borderBottom: '1px solid #f3f4f6' }}>
                                         <td style={{ padding: '10px', fontWeight: 500 }}>{c.campaignName}</td>
-                                        <td style={{ padding: '10px', textAlign: 'right', color: '#6b7280' }}>€{c.spend.toLocaleString()}</td>
+                                        <td style={{ padding: '10px', textAlign: 'right', color: '#6b7280' }}>${c.spend.toLocaleString()}</td>
                                         <td style={{ padding: '10px', textAlign: 'right', fontWeight: 600, color: parseFloat(c.immediateRoas) >= 1 ? '#111827' : RED }}>{c.immediateRoas}×</td>
                                         <td style={{ padding: '10px', textAlign: 'right', fontWeight: 700, color: parseFloat(c.ltvRoas) >= 1 ? GREEN : RED }}>{c.ltvRoas}×</td>
                                         <td style={{ padding: '10px', textAlign: 'right', color: GREEN }}>+{c.ltvLift}%</td>

@@ -113,7 +113,7 @@ export default function DashboardPage() {
 
     const tierLimits = { pilot: 2, scale: 5, pro: 10 };
     const maxStores = tierLimits[session.user.tier] || 2;
-    const fmt = (v) => '€' + (v || 0).toLocaleString('en-US', { minimumFractionDigits: 0 });
+    const fmt = (v) => '$' + (v || 0).toLocaleString('en-US', { minimumFractionDigits: 0 });
 
     return (
         <DashboardLayout title="Dashboard — Calyxra">

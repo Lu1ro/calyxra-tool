@@ -52,7 +52,11 @@ export default function AddStorePage() {
         }
     };
 
+    const [connecting, setConnecting] = useState('');
+
     const connectPlatform = async (platform, credentials) => {
+        setError('');
+        setConnecting(platform);
         try {
             const res = await fetch(`/api/stores/${storeId}/connections`, {
                 method: 'POST',
@@ -64,6 +68,8 @@ export default function AddStorePage() {
             setConnectedPlatforms([...connectedPlatforms, platform]);
         } catch (err) {
             setError(err.message);
+        } finally {
+            setConnecting('');
         }
     };
 
@@ -144,7 +150,8 @@ export default function AddStorePage() {
                                         <input type="text" value={shopifyKey} onChange={e => setShopifyKey(e.target.value)} placeholder="shpat_... (Admin API Access Token)"
                                             style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 13, marginBottom: 8, boxSizing: 'border-box' }} />
                                         <button onClick={() => connectPlatform('shopify', { apiKey: shopifyKey, domain: storeDomain })}
-                                            style={{ padding: '6px 14px', background: GREEN, color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, cursor: 'pointer' }}>Connect</button>
+                                            disabled={!shopifyKey.trim() || connecting === 'shopify'}
+                                            style={{ padding: '6px 14px', background: !shopifyKey.trim() ? '#d1d5db' : GREEN, color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, cursor: !shopifyKey.trim() ? 'not-allowed' : 'pointer', opacity: connecting === 'shopify' ? 0.7 : 1 }}>{connecting === 'shopify' ? 'Validating...' : 'Connect'}</button>
                                     </>
                                 )}
                             </div>
@@ -162,7 +169,8 @@ export default function AddStorePage() {
                                         <input type="text" value={metaAccountId} onChange={e => setMetaAccountId(e.target.value)} placeholder="Ad Account ID (act_...)"
                                             style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 13, marginBottom: 8, boxSizing: 'border-box' }} />
                                         <button onClick={() => connectPlatform('meta', { accessToken: metaToken, adAccountId: metaAccountId })}
-                                            style={{ padding: '6px 14px', background: '#1877f2', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, cursor: 'pointer' }}>Connect</button>
+                                            disabled={(!metaToken.trim() && !metaAccountId.trim()) || connecting === 'meta'}
+                                            style={{ padding: '6px 14px', background: (!metaToken.trim() && !metaAccountId.trim()) ? '#d1d5db' : '#1877f2', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, cursor: (!metaToken.trim() && !metaAccountId.trim()) ? 'not-allowed' : 'pointer', opacity: connecting === 'meta' ? 0.7 : 1 }}>{connecting === 'meta' ? 'Validating...' : 'Connect'}</button>
                                     </>
                                 )}
                             </div>
@@ -180,7 +188,8 @@ export default function AddStorePage() {
                                         <input type="text" value={googleCustomerId} onChange={e => setGoogleCustomerId(e.target.value)} placeholder="Customer ID (123-456-7890)"
                                             style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 13, marginBottom: 8, boxSizing: 'border-box' }} />
                                         <button onClick={() => connectPlatform('google', { developerToken: googleToken, customerId: googleCustomerId })}
-                                            style={{ padding: '6px 14px', background: '#ea4335', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, cursor: 'pointer' }}>Connect</button>
+                                            disabled={(!googleToken.trim() && !googleCustomerId.trim()) || connecting === 'google'}
+                                            style={{ padding: '6px 14px', background: (!googleToken.trim() && !googleCustomerId.trim()) ? '#d1d5db' : '#ea4335', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, cursor: (!googleToken.trim() && !googleCustomerId.trim()) ? 'not-allowed' : 'pointer', opacity: connecting === 'google' ? 0.7 : 1 }}>{connecting === 'google' ? 'Validating...' : 'Connect'}</button>
                                     </>
                                 )}
                             </div>
@@ -198,7 +207,8 @@ export default function AddStorePage() {
                                         <input type="text" value={tiktokAdvertiserId} onChange={e => setTiktokAdvertiserId(e.target.value)} placeholder="Advertiser ID"
                                             style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 13, marginBottom: 8, boxSizing: 'border-box' }} />
                                         <button onClick={() => connectPlatform('tiktok', { accessToken: tiktokToken, advertiserId: tiktokAdvertiserId })}
-                                            style={{ padding: '6px 14px', background: '#111', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, cursor: 'pointer' }}>Connect</button>
+                                            disabled={(!tiktokToken.trim() && !tiktokAdvertiserId.trim()) || connecting === 'tiktok'}
+                                            style={{ padding: '6px 14px', background: (!tiktokToken.trim() && !tiktokAdvertiserId.trim()) ? '#d1d5db' : '#111', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, cursor: (!tiktokToken.trim() && !tiktokAdvertiserId.trim()) ? 'not-allowed' : 'pointer', opacity: connecting === 'tiktok' ? 0.7 : 1 }}>{connecting === 'tiktok' ? 'Validating...' : 'Connect'}</button>
                                     </>
                                 )}
                             </div>
@@ -208,15 +218,19 @@ export default function AddStorePage() {
                                 🔒 All credentials are encrypted with AES-256 before storage. We never store plain-text tokens.
                             </div>
 
+                            <p style={{ fontSize: 12, color: '#9ca3af', marginBottom: 12 }}>
+                                💡 Ad platforms are optional. You can run reconciliation with just Shopify to see your order data first.
+                            </p>
+
                             <button
                                 onClick={() => setStep(3)}
-                                disabled={connectedPlatforms.length < 2}
+                                disabled={!connectedPlatforms.includes('shopify')}
                                 style={{
-                                    width: '100%', padding: '12px 0', background: connectedPlatforms.length >= 2 ? GREEN : '#d1d5db',
+                                    width: '100%', padding: '12px 0', background: connectedPlatforms.includes('shopify') ? GREEN : '#d1d5db',
                                     color: '#fff', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 600,
-                                    cursor: connectedPlatforms.length >= 2 ? 'pointer' : 'not-allowed',
+                                    cursor: connectedPlatforms.includes('shopify') ? 'pointer' : 'not-allowed',
                                 }}>
-                                Continue →
+                                {connectedPlatforms.length >= 2 ? 'Continue →' : 'Continue with Shopify only →'}
                             </button>
                         </div>
                     )}

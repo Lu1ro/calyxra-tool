@@ -2,29 +2,8 @@
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../../auth/[...nextauth]';
 import { prisma } from '../../../../lib/db';
-import crypto from 'crypto';
-
-// Simple AES-256 encryption for storing API tokens
-const ENCRYPTION_KEY = process.env.NEXTAUTH_SECRET?.padEnd(32, '0').slice(0, 32) || 'calyxra-default-key-change-this!!';
-const IV_LENGTH = 16;
-
-function encrypt(text) {
-    const iv = crypto.randomBytes(IV_LENGTH);
-    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
-    let encrypted = cipher.update(text);
-    encrypted = Buffer.concat([encrypted, cipher.final()]);
-    return iv.toString('hex') + ':' + encrypted.toString('hex');
-}
-
-function decrypt(text) {
-    const parts = text.split(':');
-    const iv = Buffer.from(parts.shift(), 'hex');
-    const encrypted = Buffer.from(parts.join(':'), 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
-    let decrypted = decipher.update(encrypted);
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
-    return decrypted.toString();
-}
+import { encrypt } from '../../../../lib/crypto';
+import { validateShopify, validateMeta, validateGoogle, validateTikTok } from '../../../../lib/validate';
 
 export default async function handler(req, res) {
     const session = await getServerSession(req, res, authOptions);
@@ -49,9 +28,39 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Platform and credentials are required' });
         }
 
+        // Validate that credentials have actual non-empty values
+        const credValues = Object.values(credentials);
+        const hasValidCreds = credValues.some(v => typeof v === 'string' && v.trim().length > 0);
+        if (!hasValidCreds) {
+            return res.status(400).json({ error: 'Please provide valid credentials. All fields are empty.' });
+        }
+
         const validPlatforms = ['shopify', 'meta', 'google', 'tiktok'];
         if (!validPlatforms.includes(platform)) {
             return res.status(400).json({ error: `Invalid platform. Must be one of: ${validPlatforms.join(', ')}` });
+        }
+
+        // ── Validate credentials by making a real test API call ──
+        try {
+            switch (platform) {
+                case 'shopify':
+                    await validateShopify(credentials.domain || store.domain, credentials.apiKey);
+                    break;
+                case 'meta':
+                    await validateMeta(credentials.accessToken, credentials.adAccountId);
+                    break;
+                case 'google':
+                    await validateGoogle(credentials.developerToken, credentials.customerId);
+                    break;
+                case 'tiktok':
+                    await validateTikTok(credentials.accessToken, credentials.advertiserId);
+                    break;
+            }
+        } catch (validationError) {
+            return res.status(400).json({
+                error: validationError.message,
+                validationFailed: true,
+            });
         }
 
         // Encrypt the credentials before storing
@@ -86,5 +95,3 @@ export default async function handler(req, res) {
 
     return res.status(405).json({ error: 'Method not allowed' });
 }
-
-export { decrypt };

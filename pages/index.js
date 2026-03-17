@@ -49,10 +49,10 @@ function CampaignTable({ campaigns }) {
                 {c.channel === 'Google' ? '🔍 Google' : c.channel === 'TikTok' ? '📱 TikTok' : '📘 Meta'}
               </td>
               <td style={{ padding: '12px', fontWeight: 500 }}>{c.campaignName}</td>
-              <td style={{ padding: '12px' }}>€{c.spend.toLocaleString()}</td>
-              <td style={{ padding: '12px' }}>€{c.purchaseValue.toLocaleString()}</td>
+              <td style={{ padding: '12px' }}>${c.spend.toLocaleString()}</td>
+              <td style={{ padding: '12px' }}>${c.purchaseValue.toLocaleString()}</td>
               <td style={{ padding: '12px', fontWeight: 600 }}>{c.reportedRoas}×</td>
-              <td style={{ padding: '12px' }}>€{(c.estimatedTrueRevenue || 0).toLocaleString()}</td>
+              <td style={{ padding: '12px' }}>${(c.estimatedTrueRevenue || 0).toLocaleString()}</td>
               <td style={{ padding: '12px', fontWeight: 600, color: GREEN }}>{c.estimatedTrueRoas}×</td>
               <td style={{ padding: '12px' }}>
                 <span style={{
@@ -65,6 +65,204 @@ function CampaignTable({ campaigns }) {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+// ─── Gap Calculator (Free, No Login) ────────────────────────────────────────
+function GapCalculator() {
+  const [inputs, setInputs] = useState({ metaRevenue: '', shopifyRevenue: '', adSpend: '' });
+  const [result, setResult] = useState(null);
+
+  const set = (k, v) => setInputs(f => ({ ...f, [k]: v }));
+  const fmt = n => '$' + Math.round(n).toLocaleString();
+
+  function calculate() {
+    const meta = parseFloat(inputs.metaRevenue) || 0;
+    const shopify = parseFloat(inputs.shopifyRevenue) || 0;
+    const spend = parseFloat(inputs.adSpend) || 0;
+    if (!meta || !shopify || !spend) return;
+    const phantom = Math.max(0, meta - shopify);
+    const gapPct = meta > 0 ? (phantom / meta) * 100 : 0;
+    const platformRoas = spend > 0 ? meta / spend : 0;
+    const realRoas = spend > 0 ? shopify / spend : 0;
+    const overpayPct = realRoas > 0 ? ((platformRoas - realRoas) / realRoas) * 100 : 0;
+    setResult({ phantom, gapPct, platformRoas, realRoas, overpayPct });
+  }
+
+  const inputStyle = {
+    width: '100%', padding: '14px 16px', border: '2px solid #e5e7eb',
+    borderRadius: 10, fontSize: 16, outline: 'none', boxSizing: 'border-box',
+    fontFamily: 'Inter, sans-serif', transition: 'border-color 0.2s',
+  };
+
+  return (
+    <div style={{ maxWidth: 560, margin: '0 auto', marginBottom: 48 }}>
+      <div style={{ background: '#fff', borderRadius: 16, padding: '36px 32px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', border: '1px solid #e5e7eb' }}>
+        <h2 style={{ margin: '0 0 6px', fontFamily: "'DM Serif Display', serif", color: GREEN, fontSize: 26, textAlign: 'center' }}>
+          Find your phantom revenue in 30 seconds
+        </h2>
+        <p style={{ color: '#6b7280', fontSize: 14, textAlign: 'center', marginBottom: 28, lineHeight: 1.5 }}>
+          Enter your last 30 days numbers. No login needed.
+        </p>
+
+        <div style={{ display: 'grid', gap: 16, marginBottom: 20 }}>
+          <div>
+            <label style={{ fontSize: 13, color: '#374151', fontWeight: 600, display: 'block', marginBottom: 6 }}>
+              📘 Meta reported revenue (last 30 days)
+            </label>
+            <input style={inputStyle} type="number" placeholder="e.g. 245000"
+              value={inputs.metaRevenue} onChange={e => set('metaRevenue', e.target.value)}
+              onFocus={e => e.target.style.borderColor = GREEN}
+              onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
+          </div>
+          <div>
+            <label style={{ fontSize: 13, color: '#374151', fontWeight: 600, display: 'block', marginBottom: 6 }}>
+              🛒 Shopify net revenue (last 30 days)
+            </label>
+            <input style={inputStyle} type="number" placeholder="e.g. 162500"
+              value={inputs.shopifyRevenue} onChange={e => set('shopifyRevenue', e.target.value)}
+              onFocus={e => e.target.style.borderColor = GREEN}
+              onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
+          </div>
+          <div>
+            <label style={{ fontSize: 13, color: '#374151', fontWeight: 600, display: 'block', marginBottom: 6 }}>
+              💰 Monthly ad spend
+            </label>
+            <input style={inputStyle} type="number" placeholder="e.g. 62000"
+              value={inputs.adSpend} onChange={e => set('adSpend', e.target.value)}
+              onFocus={e => e.target.style.borderColor = GREEN}
+              onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
+          </div>
+        </div>
+
+        <button onClick={calculate} style={{
+          width: '100%', background: GREEN, color: '#fff', border: 'none', borderRadius: 10,
+          padding: '16px', fontSize: 16, fontWeight: 700, cursor: 'pointer',
+          fontFamily: 'Inter, sans-serif', transition: 'opacity 0.2s',
+        }}>
+          Calculate My Phantom Revenue →
+        </button>
+
+        {result && (
+          <div style={{ marginTop: 24 }}>
+            {/* Results Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+              <div style={{ background: '#fee2e2', borderRadius: 10, padding: '16px', textAlign: 'center' }}>
+                <div style={{ fontSize: 11, color: '#991b1b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Phantom Revenue</div>
+                <div style={{ fontSize: 28, fontWeight: 700, color: RED, fontFamily: "'DM Serif Display', serif" }}>{fmt(result.phantom)}</div>
+              </div>
+              <div style={{ background: '#fef3c7', borderRadius: 10, padding: '16px', textAlign: 'center' }}>
+                <div style={{ fontSize: 11, color: '#92400e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Gap</div>
+                <div style={{ fontSize: 28, fontWeight: 700, color: '#b45309', fontFamily: "'DM Serif Display', serif" }}>{result.gapPct.toFixed(1)}%</div>
+              </div>
+              <div style={{ background: '#d1fae5', borderRadius: 10, padding: '16px', textAlign: 'center' }}>
+                <div style={{ fontSize: 11, color: '#065f46', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Your Real ROAS</div>
+                <div style={{ fontSize: 28, fontWeight: 700, color: GREEN, fontFamily: "'DM Serif Display', serif" }}>{result.realRoas.toFixed(2)}×</div>
+              </div>
+              <div style={{ background: '#f3f4f6', borderRadius: 10, padding: '16px', textAlign: 'center' }}>
+                <div style={{ fontSize: 11, color: '#374151', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Platform ROAS</div>
+                <div style={{ fontSize: 28, fontWeight: 700, color: '#6b7280', fontFamily: "'DM Serif Display', serif" }}>{result.platformRoas.toFixed(2)}×</div>
+              </div>
+            </div>
+
+            {/* Overpay warning */}
+            {result.overpayPct > 0 && (
+              <div style={{ background: '#fee2e2', borderRadius: 10, padding: '14px 18px', textAlign: 'center', marginBottom: 16, border: '1px solid #fecaca' }}>
+                <span style={{ color: RED, fontWeight: 700, fontSize: 15 }}>
+                  ⚠️ You may be overpaying by {result.overpayPct.toFixed(0)}% based on inflated ROAS
+                </span>
+              </div>
+            )}
+
+            {/* CTA */}
+            <a href={(process.env.NEXT_PUBLIC_MARKETING_SITE_URL || 'http://localhost:3000') + '/#pricing'} style={{
+              display: 'block', textAlign: 'center', background: GREEN, color: '#fff',
+              padding: '16px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', fontSize: 15,
+              transition: 'opacity 0.2s',
+            }}>
+              See exactly where this comes from → Get $249 Audit
+            </a>
+            <p style={{ textAlign: 'center', fontSize: 12, color: '#9ca3af', marginTop: 8 }}>
+              Full Shopify + Meta reconciliation with waterfall breakdown
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Pricing Section ────────────────────────────────────────────────────────
+function PricingSection() {
+  const cardStyle = {
+    background: '#fff', borderRadius: 16, padding: '32px 28px',
+    boxShadow: '0 4px 24px rgba(0,0,0,0.08)', border: '1px solid #e5e7eb',
+    flex: 1, minWidth: 280,
+  };
+  const checkStyle = { fontSize: 14, color: '#374151', padding: '6px 0', lineHeight: 1.5 };
+
+  return (
+    <div style={{ maxWidth: 720, margin: '0 auto 48px' }}>
+      <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 26, color: '#111827', textAlign: 'center', margin: '0 0 8px' }}>
+        Simple pricing. Real numbers.
+      </h2>
+      <p style={{ color: '#6b7280', fontSize: 14, textAlign: 'center', marginBottom: 32 }}>
+        No contracts. Cancel anytime.
+      </p>
+
+      <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+        {/* Audit */}
+        <div style={cardStyle}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: GREEN, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Source-of-Truth Audit</div>
+          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 40, fontWeight: 700, color: '#111827', marginBottom: 4 }}>$249</div>
+          <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>one-time</div>
+          <div style={{ display: 'grid', gap: 2, marginBottom: 24 }}>
+            <div style={checkStyle}>✅ Full Shopify + Meta reconciliation</div>
+            <div style={checkStyle}>✅ Exact phantom revenue breakdown</div>
+            <div style={checkStyle}>✅ PDF report with waterfall analysis</div>
+            <div style={checkStyle}>✅ 3 actionable recommendations</div>
+            <div style={checkStyle}>✅ 30-min walkthrough call</div>
+          </div>
+          <a href={(process.env.NEXT_PUBLIC_MARKETING_SITE_URL || 'http://localhost:3000') + '/#pricing'} style={{
+            display: 'block', textAlign: 'center', background: '#fff', color: GREEN,
+            padding: '14px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', fontSize: 14,
+            border: `2px solid ${GREEN}`, transition: 'all 0.2s',
+          }}>
+            Book Audit →
+          </a>
+        </div>
+
+        {/* Monthly */}
+        <div style={{ ...cardStyle, borderColor: GREEN, borderWidth: 2, position: 'relative' }}>
+          <div style={{
+            position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)',
+            background: GREEN, color: '#fff', padding: '4px 16px', borderRadius: 99,
+            fontSize: 11, fontWeight: 700, letterSpacing: '0.05em',
+          }}>
+            FIRST 5 AGENCIES ONLY
+          </div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: GREEN, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Monthly Reconciliation</div>
+          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 40, fontWeight: 700, color: '#111827', marginBottom: 4 }}>
+            $150<span style={{ fontSize: 18, fontWeight: 400, color: '#6b7280' }}>/mo</span>
+          </div>
+          <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>price increases after 5 clients</div>
+          <div style={{ display: 'grid', gap: 2, marginBottom: 24 }}>
+            <div style={checkStyle}>✅ Automated monthly reconciliation</div>
+            <div style={checkStyle}>✅ Campaign-level phantom revenue alerts</div>
+            <div style={checkStyle}>✅ White-label PDF reports for your clients</div>
+            <div style={checkStyle}>✅ Action Engine: PAUSE / SCALE recommendations</div>
+            <div style={checkStyle}>✅ Direct founder support (Slack)</div>
+          </div>
+          <a href={(process.env.NEXT_PUBLIC_MARKETING_SITE_URL || 'http://localhost:3000') + '/#pricing'} style={{
+            display: 'block', textAlign: 'center', background: GREEN, color: '#fff',
+            padding: '14px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', fontSize: 14,
+            transition: 'opacity 0.2s',
+          }}>
+            Start Free Pilot →
+          </a>
+        </div>
+      </div>
     </div>
   );
 }
@@ -209,7 +407,7 @@ function ConnectionForm({ onSubmit, loading }) {
 
 // ─── Dashboard ──────────────────────────────────────────────────────────────
 function Dashboard({ report, meta, onReset }) {
-  const fmt = n => '€' + Math.round(n).toLocaleString();
+  const fmt = n => '$' + Math.round(n).toLocaleString();
   const pct = n => n.toFixed(1) + '%';
 
   const waterfallData = {
@@ -232,7 +430,7 @@ function Dashboard({ report, meta, onReset }) {
   const chartOptions = {
     responsive: true,
     plugins: { legend: { display: false } },
-    scales: { y: { ticks: { callback: v => '€' + v.toLocaleString() } } },
+    scales: { y: { ticks: { callback: v => '$' + v.toLocaleString() } } },
   };
 
   return (
@@ -355,10 +553,10 @@ function Dashboard({ report, meta, onReset }) {
           Your actual revenue is {fmt(report.shopifyNetRevenue)} — {fmt(report.phantomRevenue)} less than reported.
         </h3>
         <p style={{ margin: '0 0 20px', opacity: 0.85, fontSize: 15 }}>Stop making scaling decisions on inflated numbers.</p>
-        <a href="https://cal.com/calyxra/15min" target="_blank" rel="noreferrer" style={{
+        <a href={(process.env.NEXT_PUBLIC_MARKETING_SITE_URL || 'http://localhost:3000') + '/#pricing'} style={{
           display: 'inline-block', background: '#fff', color: GREEN,
           padding: '14px 28px', borderRadius: 8, fontWeight: 700, textDecoration: 'none', fontSize: 15,
-        }}>→ Book a 15-min Audit</a>
+        }}>→ Book a $249 Audit</a>
       </div>
     </div>
   );
@@ -437,8 +635,16 @@ export default function Home() {
                   What's the <span style={{ color: GREEN }}>real</span> number?
                 </h1>
                 <p style={{ color: '#6b7280', fontSize: 16, maxWidth: 480, margin: '0 auto' }}>
-                  Connect your Shopify store and Ad Platforms (Meta, Google, TikTok) to see exactly how much of your reported revenue is phantom.
+                  Ad platforms overstate your revenue. Find out by how much — in 30 seconds.
                 </p>
+              </div>
+              <GapCalculator />
+              <PricingSection />
+              <div style={{ textAlign: 'center', marginBottom: 24, marginTop: 32 }}>
+                <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 22, color: '#111827', margin: '0 0 8px' }}>
+                  Already a client? Run a full reconciliation below
+                </h2>
+                <p style={{ color: '#9ca3af', fontSize: 13 }}>Connect your APIs for a detailed campaign-level breakdown</p>
               </div>
               {error && (
                 <div style={{ background: '#fee2e2', border: '1px solid #fecaca', borderRadius: 8, padding: '12px 16px', marginBottom: 16, color: RED, fontSize: 14, maxWidth: 600, margin: '0 auto 16px' }}>

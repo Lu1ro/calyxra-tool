@@ -91,7 +91,7 @@ describe('generateRecommendations', () => {
         assert.ok(pauseAction, 'Should have a PAUSE action');
         assert.ok(scaleAction, 'Should have a SCALE action');
         assert.equal(pauseAction.savedBudget, 3000);
-        // Winner should receive the freed €3000
+        // Winner should receive the freed $3000
         assert.equal(scaleAction.recommendedSpend, 2000 + 3000);
         assert.equal(scaleAction.budgetIncrease, 3000);
     });
@@ -137,7 +137,7 @@ describe('getQuickSummary', () => {
         const text = getQuickSummary(summary);
         assert.ok(text.includes('Pause 2 unprofitable'));
         assert.ok(text.includes('Scale 1 winners'));
-        assert.ok(text.includes('€5000'));
+        assert.ok(text.includes('$5000'));
     });
 
     it('should handle zero counts gracefully', () => {

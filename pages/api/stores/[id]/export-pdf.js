@@ -60,7 +60,7 @@ export default async function handler(req, res) {
 }
 
 function generateReportHTML({ store, report, fullReport, agency, brandName, brandColor, kpis }) {
-    const fmt = (v) => '€' + (v || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    const fmt = (v) => '$' + (v || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     const date = new Date(report.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
     const campaignRows = (fullReport.campaigns || report.campaigns || []).map(c => `

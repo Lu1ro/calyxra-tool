@@ -8,6 +8,15 @@ import { fetchTikTokCampaigns, processTikTokCampaigns } from '../../lib/tiktok';
 import { reconcile } from '../../lib/reconcile';
 
 export default async function handler(req, res) {
+    // Basic CORS support so the marketing app (different origin/port) can call this API
+    res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ALLOW_ORIGIN || '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
@@ -147,7 +156,14 @@ export default async function handler(req, res) {
             },
         });
     } catch (err) {
-        console.error('Report generation error:', err);
+        console.error('Report generation error:', {
+            message: err?.message,
+            stack: process.env.NODE_ENV === 'development' ? err?.stack : undefined,
+            shopifyDomain,
+            hasMeta: !!metaAccessToken,
+            hasGoogle: !!googleAdsDeveloperToken,
+            hasTikTok: !!tiktokAccessToken,
+        });
         return res.status(500).json({
             error: err.message || 'Failed to generate report',
             details: process.env.NODE_ENV === 'development' ? err.stack : undefined,
