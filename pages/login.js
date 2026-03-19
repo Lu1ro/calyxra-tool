@@ -61,7 +61,8 @@ export default function LoginPage() {
 
                     <p className="text-muted text-md" style={{ textAlign: 'center', marginTop: 'var(--space-5)' }}>
                         Don't have an account?{' '}
-                        <a href="/register" style={{ color: 'var(--c-green)', fontWeight: 600, textDecoration: 'none' }}>Create one</a>
+                        <a href="https://cal.com/calyxra/15min" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--c-green)', fontWeight: 600, textDecoration: 'none' }}>Book a call</a>
+                        {' '}to get access.
                     </p>
                 </div>
             </div>

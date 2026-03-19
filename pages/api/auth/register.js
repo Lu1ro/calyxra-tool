@@ -7,6 +7,13 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
+    // Only allow internal calls (Stripe webhook) with secret
+    const authHeader = req.headers.authorization;
+    const expectedSecret = process.env.INTERNAL_API_SECRET;
+    if (!expectedSecret || authHeader !== `Bearer ${expectedSecret}`) {
+        return res.status(403).json({ error: 'Registration is not available. Accounts are created after payment.' });
+    }
+
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
