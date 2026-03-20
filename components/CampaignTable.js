@@ -37,7 +37,7 @@ export default function CampaignTable({ campaigns, searchQuery, onSearchChange, 
                                 borderBottom: '1px solid var(--c-gray-100)',
                                 transition: 'background var(--transition-fast)',
                             }}
-                                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--c-gray-50)'}
+                                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-primary-bg)'}
                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                             >
                                 <td style={{ padding: '10px', fontWeight: 500, maxWidth: 200 }}>

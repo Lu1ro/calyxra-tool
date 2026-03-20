@@ -34,7 +34,7 @@ export default function LoginPage() {
         <DashboardLayout title="Login — Calyxra">
             <div className="flex-center" style={{
                 minHeight: '100vh',
-                background: 'linear-gradient(135deg, var(--c-green-bg) 0%, var(--c-blue-light) 100%)',
+                background: 'linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-primary-bg) 100%)',
             }}>
                 <div className="card animate-slide-up" style={{ padding: 'var(--space-10)', width: 400, boxShadow: 'var(--shadow-md)' }}>
                     <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
@@ -61,7 +61,7 @@ export default function LoginPage() {
 
                     <p className="text-muted text-md" style={{ textAlign: 'center', marginTop: 'var(--space-5)' }}>
                         Don't have an account?{' '}
-                        <a href="https://cal.com/calyxra/15min" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--c-green)', fontWeight: 600, textDecoration: 'none' }}>Book a call</a>
+                        <a href="https://cal.com/calyxra/15min" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}>Book a call</a>
                         {' '}to get access.
                     </p>
                 </div>

@@ -5,15 +5,32 @@
 
 /* ─── Color Tokens ─────────────────────────────────────────────────────── */
 :root {
-    /* Brand */
-    --c-green: #166534;
-    --c-green-light: #d1fae5;
-    --c-green-border: #bbf7d0;
-    --c-green-bg: #f0fdf4;
-    --c-red: #dc2626;
-    --c-red-light: #fee2e2;
-    --c-red-border: #fca5a5;
-    --c-amber: #f59e0b;
+    /* Brand — Calyxra green palette */
+    --color-primary: #00b894;
+    --color-primary-dark: #007a65;
+    --color-primary-light: #00d2a0;
+    --color-primary-bg: #e6f7f4;
+    --color-danger: #ff6b6b;
+    --color-warning: #ffa940;
+    --color-bg: #ffffff;
+    --color-bg-secondary: #f8f9fa;
+    --color-text: #2d3436;
+    --color-text-muted: #636e72;
+    --color-border: #dfe6e9;
+    --shadow-card: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-hover: 0 4px 16px rgba(0,184,148,0.15);
+    --radius-card: 12px;
+    --radius-button: 8px;
+
+    /* Legacy aliases — keep for backward compat */
+    --c-green: #00b894;
+    --c-green-light: #e6f7f4;
+    --c-green-border: #b2f5ea;
+    --c-green-bg: #e6f7f4;
+    --c-red: #ff6b6b;
+    --c-red-light: #fff5f5;
+    --c-red-border: #feb2b2;
+    --c-amber: #ffa940;
     --c-amber-light: #fffbeb;
     --c-amber-border: #fde68a;
     --c-blue: #1e40af;
@@ -26,16 +43,16 @@
     --c-pink-border: #fbcfe8;
 
     /* Neutrals */
-    --c-gray-50: #f9fafb;
+    --c-gray-50: #f8f9fa;
     --c-gray-100: #f3f4f6;
-    --c-gray-200: #e5e7eb;
-    --c-gray-300: #d1d5db;
-    --c-gray-400: #9ca3af;
-    --c-gray-500: #6b7280;
+    --c-gray-200: #dfe6e9;
+    --c-gray-300: #b2bec3;
+    --c-gray-400: #636e72;
+    --c-gray-500: #636e72;
     --c-gray-600: #4b5563;
-    --c-gray-700: #374151;
+    --c-gray-700: #2d3436;
     --c-gray-800: #1f2937;
-    --c-gray-900: #111827;
+    --c-gray-900: #2d3436;
     --c-white: #ffffff;
 
     /* ─── Typography ─────────────────────────────────────────────────── */
@@ -208,14 +225,14 @@
 /* ─── Utility: Cards ───────────────────────────────────────────────────── */
 .card {
     background: var(--c-white);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-card);
     padding: var(--space-5);
-    box-shadow: var(--shadow-sm);
-    transition: box-shadow var(--transition-base);
+    box-shadow: var(--shadow-card);
+    transition: all var(--transition-base);
 }
 
 .card:hover {
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-hover);
 }
 
 .card-clickable {
@@ -268,7 +285,7 @@
 }
 
 .badge-live {
-    background: #10b981;
+    background: var(--color-primary);
     color: #fff;
     padding: 2px 8px;
     border-radius: var(--radius-full);
@@ -300,12 +317,14 @@
 }
 
 .btn-primary {
-    background: var(--c-green);
+    background: var(--color-primary);
     color: var(--c-white);
+    border-radius: var(--radius-button);
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: #14532d;
+    background: var(--color-primary-dark);
+    box-shadow: var(--shadow-hover);
 }
 
 .btn-secondary {
@@ -318,12 +337,13 @@
 }
 
 .btn-danger {
-    background: var(--c-red);
+    background: var(--color-danger);
     color: var(--c-white);
+    border-radius: var(--radius-button);
 }
 
 .btn-danger:hover:not(:disabled) {
-    background: #b91c1c;
+    background: #e85656;
 }
 
 .btn-blue {
@@ -417,8 +437,8 @@
 }
 
 .input:focus {
-    border-color: var(--c-green);
-    outline: 2px solid rgba(22, 101, 52, 0.15);
+    border-color: var(--color-primary);
+    outline: 2px solid rgba(0, 184, 148, 0.15);
     outline-offset: 0;
 }
 
@@ -457,8 +477,9 @@
 /* ─── Utility: Layout ──────────────────────────────────────────────────── */
 .page-bg {
     min-height: 100vh;
-    background: var(--c-gray-50);
+    background: var(--color-bg-secondary);
     font-family: var(--font-sans);
+    color: var(--color-text);
 }
 
 .container {

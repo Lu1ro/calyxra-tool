@@ -133,7 +133,7 @@ export default function DashboardPage() {
                 <nav style={{ background: 'var(--c-white)', borderBottom: '1px solid var(--c-gray-200)', padding: 'var(--space-3) var(--space-8)' }} className="flex-between no-print">
                     <div className="flex-gap-3">
                         <img src="/logo.png" alt="Calyxra" style={{ height: 32 }} />
-                        <span className="heading-serif" style={{ fontSize: 20, color: 'var(--c-green)' }}>Calyxra</span>
+                        <span className="heading-serif" style={{ fontSize: 20, color: 'var(--color-primary)' }}>Calyxra</span>
                         <span className={`badge ${session.user.tier === 'pro' ? '' : session.user.tier === 'scale' ? 'badge-green' : 'badge-gray'}`}
                             style={session.user.tier === 'pro' ? { background: 'var(--c-gray-900)', color: '#fff' } : { textTransform: 'uppercase' }}>
                             {session.user.tier}

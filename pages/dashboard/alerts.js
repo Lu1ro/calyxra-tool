@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 
-const GREEN = '#166534';
+const GREEN = '#00b894';
 const RED = '#dc2626';
 const AMBER = '#f59e0b';
 const BLUE = '#2563eb';
@@ -134,7 +134,7 @@ export default function AlertInbox() {
                                 onClick={() => setFilter(f.key)}
                                 style={{
                                     padding: '6px 14px', borderRadius: 6, fontSize: 13,
-                                    border: filter === f.key ? '2px solid #166534' : '1px solid #d1d5db',
+                                    border: filter === f.key ? '2px solid #00b894' : '1px solid #d1d5db',
                                     background: filter === f.key ? '#d1fae5' : '#fff',
                                     color: filter === f.key ? GREEN : '#374151',
                                     fontWeight: filter === f.key ? 600 : 400,

@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 
-const GREEN = '#166534';
+const GREEN = '#00b894';
 
 export default function BrandingSettingsPage() {
     const { data: session, status } = useSession();
@@ -17,7 +17,7 @@ export default function BrandingSettingsPage() {
 
     // Form state
     const [brandName, setBrandName] = useState('');
-    const [brandColor, setBrandColor] = useState('#166534');
+    const [brandColor, setBrandColor] = useState('#00b894');
     const [logoUrl, setLogoUrl] = useState('');
     const [reportHeader, setReportHeader] = useState('');
     const [reportFooter, setReportFooter] = useState('');
@@ -37,7 +37,7 @@ export default function BrandingSettingsPage() {
         const data = await res.json();
         setSettings(data);
         setBrandName(data.brandName || '');
-        setBrandColor(data.brandColor || '#166534');
+        setBrandColor(data.brandColor || '#00b894');
         setLogoUrl(data.logoUrl || '');
         setReportHeader(data.reportHeader || '');
         setReportFooter(data.reportFooter || '');

@@ -8,7 +8,7 @@ import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
-const GREEN = '#166534';
+const GREEN = '#00b894';
 const AMBER = '#f59e0b';
 const RED = '#dc2626';
 

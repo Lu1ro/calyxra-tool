@@ -2,7 +2,7 @@
 // Client-facing guide: How to get API tokens for each platform
 import Head from 'next/head';
 
-const GREEN = '#166534';
+const GREEN = '#00b894';
 
 const steps = [
     {

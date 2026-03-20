@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 
-const GREEN = '#166534';
+const GREEN = '#00b894';
 
 export default function AddStorePage() {
     const { data: session, status } = useSession();

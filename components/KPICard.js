@@ -6,7 +6,7 @@ export default function KPICard({ label, value, subtitle, color, accentBorder = 
         <div
             className="card animate-fade-in"
             style={{
-                borderTop: accentBorder ? `3px solid ${color || 'var(--c-green)'}` : undefined,
+                borderLeft: accentBorder ? `4px solid ${color || 'var(--color-primary)'}` : undefined,
                 background: dark ? 'var(--c-gray-900)' : 'var(--c-white)',
             }}
         >
@@ -20,7 +20,7 @@ export default function KPICard({ label, value, subtitle, color, accentBorder = 
                 {label}
             </div>
             <div style={{
-                fontSize: 28,
+                fontSize: '2.5rem',
                 fontWeight: 700,
                 color: dark ? '#fff' : (color || 'var(--c-gray-900)'),
             }}>

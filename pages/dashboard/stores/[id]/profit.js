@@ -9,7 +9,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, T
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
-const GREEN = '#166534';
+const GREEN = '#00b894';
 const RED = '#dc2626';
 const AMBER = '#f59e0b';
 

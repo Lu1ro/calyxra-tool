@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 
-const GREEN = '#166534';
+const GREEN = '#00b894';
 
 const DEMO_DASHBOARDS = [
     { id: 'looker_recon', name: 'Reconciliation Layer (Looker)', type: 'looker', defaultUrl: 'https://lookerstudio.google.com/embed/reporting/demo1' },
