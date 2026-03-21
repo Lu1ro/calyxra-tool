@@ -40,10 +40,19 @@ async function handler(req, res) {
         const domain = sanitize(req.body.domain).replace('https://', '').replace('http://', '');
 
         // Check tier limits
-        const tierLimits = { pilot: 2, scale: 5, pro: 10 };
+        const tierLimits = { free: 1, pilot: 2, scale: 5, pro: 10 };
         const agency = await prisma.agency.findUnique({ where: { id: agencyId } });
+
+        // Free tier: enforce lifetime store limit
+        if (agency.tier === 'free' && agency.totalStoresEver >= 1) {
+            return res.status(403).json({
+                error: 'upgrade_required',
+                message: 'Upgrade to add more stores',
+            });
+        }
+
         const storeCount = await prisma.store.count({ where: { agencyId } });
-        const maxStores = tierLimits[agency.tier] || 2;
+        const maxStores = tierLimits[agency.tier] || 1;
 
         if (storeCount >= maxStores) {
             return res.status(403).json({ error: `Your ${agency.tier} plan allows up to ${maxStores} stores. Upgrade to add more.` });
@@ -51,6 +60,12 @@ async function handler(req, res) {
 
         const store = await prisma.store.create({
             data: { name, domain, agencyId },
+        });
+
+        // Increment lifetime store counter
+        await prisma.agency.update({
+            where: { id: agencyId },
+            data: { totalStoresEver: { increment: 1 } },
         });
 
         return res.status(201).json({ store });

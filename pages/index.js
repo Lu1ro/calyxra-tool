@@ -12,7 +12,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend,
 const GREEN = '#1a5c3a';
 const RED = '#dc2626';
 const AMBER = '#f59e0b';
-const LIGHT_GREEN = '#d1fae5';
+const LIGHT_GREEN = '#e6f7f4';
 
 // ─── KPI Card ──────────────────────────────────────────────────────────────
 function KPICard({ label, value, sub, color = GREEN, badge }) {
@@ -156,7 +156,7 @@ function GapCalculator() {
                 <div style={{ fontSize: 11, color: '#92400e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Gap</div>
                 <div style={{ fontSize: 28, fontWeight: 700, color: '#b45309', fontFamily: "'DM Serif Display', serif" }}>{result.gapPct.toFixed(1)}%</div>
               </div>
-              <div style={{ background: '#d1fae5', borderRadius: 10, padding: '16px', textAlign: 'center' }}>
+              <div style={{ background: '#e6f7f4', borderRadius: 10, padding: '16px', textAlign: 'center' }}>
                 <div style={{ fontSize: 11, color: '#065f46', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Your Real ROAS</div>
                 <div style={{ fontSize: 28, fontWeight: 700, color: GREEN, fontFamily: "'DM Serif Display', serif" }}>{result.realRoas.toFixed(2)}×</div>
               </div>
@@ -539,7 +539,7 @@ function Dashboard({ report, meta, onReset }) {
             </div>
           ))}
           {report.campaigns.filter(c => c.flagColor === 'green').slice(0, 1).map((c, i) => (
-            <div key={`green-${i}`} style={{ background: '#d1fae5', borderRadius: 8, padding: '12px 16px', borderLeft: `4px solid ${GREEN}` }}>
+            <div key={`green-${i}`} style={{ background: '#e6f7f4', borderRadius: 8, padding: '12px 16px', borderLeft: `4px solid ${GREEN}` }}>
               <span style={{ fontWeight: 600, color: GREEN, display: 'block', marginBottom: 4 }}>🟢 Safe to Scale: {c.campaignName}</span>
               <span style={{ fontSize: 14, color: '#065f46' }}>True ROAS ({c.estimatedTrueRoas}×) is healthy and reporting is accurate (inflation only {c.inflationRatio}×). This is a solid candidate for budget increases.</span>
             </div>

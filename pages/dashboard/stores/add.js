@@ -214,7 +214,7 @@ export default function AddStorePage() {
                             </div>
 
                             {/* Security note */}
-                            <div style={{ background: '#f0fdf4', borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 12, color: '#166534' }}>
+                            <div style={{ background: '#f0fdf4', borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 12, color: '#00b894' }}>
                                 🔒 All credentials are encrypted with AES-256 before storage. We never store plain-text tokens.
                             </div>
 

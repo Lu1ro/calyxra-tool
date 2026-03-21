@@ -17,11 +17,12 @@ model Agency {
   name      String
   email     String   @unique
   password  String
-  tier      String   @default("pilot") // pilot | scale | pro
+  tier             String   @default("free") // free | pilot | scale | pro
+  totalStoresEver  Int      @default(0)
 
   // White-label branding
   logoUrl      String?  // uploaded logo URL
-  brandColor   String?  @default("#166534") // primary color
+  brandColor   String?  @default("#00b894") // primary color
   brandName    String?  // custom brand name (replaces "Calyxra" in exports)
   reportHeader String?  // custom text at top of PDF reports
   reportFooter String?  // custom text at bottom of PDF reports

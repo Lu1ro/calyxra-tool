@@ -37,6 +37,7 @@ export default function StoreDashboard() {
     const [confirmModal, setConfirmModal] = useState(null);
     const [campaignSearch, setCampaignSearch] = useState('');
     const [showBackToTop, setShowBackToTop] = useState(false);
+    const [agencyTier, setAgencyTier] = useState(null);
     const topRef = useRef(null);
 
     useEffect(() => { if (status === 'unauthenticated') router.push('/login'); }, [status]);
@@ -60,6 +61,12 @@ export default function StoreDashboard() {
             const reportsData = await reportsRes.json();
             setReports(reportsData.reports || []);
             if (reportsData.reports?.length > 0) setLatestReport(JSON.parse(reportsData.reports[0].fullReport));
+            // Fetch agency tier
+            try {
+                const agencyRes = await fetch('/api/agency');
+                const agencyData = await agencyRes.json();
+                setAgencyTier(agencyData.tier || 'free');
+            } catch { setAgencyTier('free'); }
         } catch (err) { console.error(err); }
         finally { setLoading(false); }
     };
@@ -173,9 +180,15 @@ export default function StoreDashboard() {
                                 {reconciling ? '⏳ Reconciling...' : '▶ Run Reconciliation'}
                             </button>
                             {latestReport && (
-                                <button className="btn btn-blue" onClick={() => window.open(`/api/stores/${id}/export-pdf`, '_blank')}>
-                                    📄 Export PDF
-                                </button>
+                                agencyTier === 'free' ? (
+                                    <button className="btn btn-blue" disabled title="Available on paid plans" style={{ opacity: 0.5, cursor: 'not-allowed' }}>
+                                        📄 Export PDF
+                                    </button>
+                                ) : (
+                                    <button className="btn btn-blue" onClick={() => window.open(`/api/stores/${id}/export-pdf`, '_blank')}>
+                                        📄 Export PDF
+                                    </button>
+                                )
                             )}
                         </div>
                     </div>
@@ -192,13 +205,31 @@ export default function StoreDashboard() {
                     ) : latestReport && (
                         <>
                             {/* Primary KPI Cards */}
-                            <div className="kpi-grid animate-stagger" style={{ gridTemplateColumns: 'repeat(6, 1fr)' }}>
-                                <KPICard label="Phantom Revenue" value={formatCurrency(latestReport.phantomRevenue)} subtitle={`${latestReport.phantomPct}% overstated`} color="var(--c-red)" accentBorder />
-                                <KPICard label="True ROAS" value={`${latestReport.trueRoas}×`} subtitle={`vs ${latestReport.adPlatform?.reportedRoas}× reported`} color="var(--c-green)" accentBorder />
-                                <KPICard label="Net Revenue" value={formatCurrency(latestReport.shopify?.netRevenue)} subtitle="Shopify verified" />
-                                <KPICard label="Gross Revenue" value={formatCurrency(latestReport.shopify?.grossRevenue)} subtitle="Before deductions" />
-                                <KPICard label="Total Orders" value={(latestReport.shopify?.totalOrders || 0).toLocaleString()} subtitle="Shopify orders" />
-                                <KPICard label="Total Ad Spend" value={formatCurrency(latestReport.adPlatform?.totalSpend)} subtitle="Across all channels" />
+                            <div style={{ position: 'relative' }}>
+                                <div className="kpi-grid animate-stagger" style={{ gridTemplateColumns: 'repeat(6, 1fr)' }}>
+                                    <KPICard label="Phantom Revenue" value={formatCurrency(latestReport.phantomRevenue)} subtitle={`${latestReport.phantomPct}% overstated`} color="var(--c-red)" accentBorder />
+                                    <KPICard label="True ROAS" value={`${latestReport.trueRoas}×`} subtitle={`vs ${latestReport.adPlatform?.reportedRoas}× reported`} color="var(--c-green)" accentBorder />
+                                    <KPICard label="Net Revenue" value={formatCurrency(latestReport.shopify?.netRevenue)} subtitle="Shopify verified" />
+                                    <KPICard label="Gross Revenue" value={formatCurrency(latestReport.shopify?.grossRevenue)} subtitle="Before deductions" />
+                                    <KPICard label="Total Orders" value={(latestReport.shopify?.totalOrders || 0).toLocaleString()} subtitle="Shopify orders" />
+                                    <KPICard label="Total Ad Spend" value={formatCurrency(latestReport.adPlatform?.totalSpend)} subtitle="Across all channels" />
+                                </div>
+                                {agencyTier === 'free' && (
+                                    <div style={{
+                                        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                                        backdropFilter: 'blur(8px)', display: 'flex', flexDirection: 'column',
+                                        alignItems: 'center', justifyContent: 'center',
+                                        backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: '12px', zIndex: 10,
+                                    }}>
+                                        <span style={{ fontSize: '24px' }}>🔒</span>
+                                        <p style={{ fontWeight: 700, margin: '8px 0 4px' }}>Upgrade to see your results</p>
+                                        <p style={{ color: '#636e72', fontSize: '14px', marginBottom: '16px' }}>Your reconciliation ran — unlock the data</p>
+                                        <a href="https://calyxra.com/#pricing" style={{
+                                            background: '#00b894', color: 'white', padding: '10px 24px',
+                                            borderRadius: '8px', textDecoration: 'none', fontWeight: 600,
+                                        }}>Upgrade — $150/month</a>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Extended KPI Cards */}
@@ -366,7 +397,7 @@ export default function StoreDashboard() {
                                     {latestReport.optimizer.summary.estimatedAnnualImpact > 0 && (
                                         <KPICard label="Estimated Annual Impact of Optimization" value={`+${formatCurrency(latestReport.optimizer.summary.estimatedAnnualImpact)}`}
                                             subtitle={`Based on reallocating $${latestReport.optimizer.summary.freedBudget} from underperformers to proven winners`}
-                                            color="#34d399" dark />
+                                            color="#00d2a0" dark />
                                     )}
                                 </div>
                             )}

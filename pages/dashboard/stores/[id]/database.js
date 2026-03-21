@@ -208,7 +208,7 @@ export default function DatabaseConnector() {
 
                     {/* Existing connection banner */}
                     {existingConnection && (
-                        <div style={{ background: '#d1fae5', borderRadius: 10, padding: 16, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{ background: '#e6f7f4', borderRadius: 10, padding: 16, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
                             <span style={{ fontSize: 24 }}>✅</span>
                             <div>
                                 <div style={{ fontWeight: 600, color: GREEN }}>Database Connected</div>
@@ -387,7 +387,7 @@ export default function DatabaseConnector() {
                                             {testResult.tables.map(t => (
                                                 <div key={t} style={{
                                                     background: '#fff', borderRadius: 6, padding: '8px 12px',
-                                                    border: '1px solid #d1fae5', fontSize: 12,
+                                                    border: '1px solid #e6f7f4', fontSize: 12,
                                                 }}>
                                                     <div style={{ fontWeight: 600, color: '#111827' }}>{t}</div>
                                                     <div style={{ color: '#6b7280' }}>{testResult.rowCounts[t] || '—'} rows</div>

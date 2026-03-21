@@ -34,13 +34,17 @@ export default function AlertInbox() {
     const [unresolvedCount, setUnresolvedCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('unresolved'); // unresolved | all | critical
+    const [agencyTier, setAgencyTier] = useState(null);
 
     useEffect(() => {
         if (status === 'unauthenticated') router.push('/login');
     }, [status]);
 
     useEffect(() => {
-        if (session) fetchAlerts();
+        if (session) {
+            fetchAlerts();
+            fetch('/api/agency').then(r => r.json()).then(d => setAgencyTier(d.tier || 'free')).catch(() => setAgencyTier('free'));
+        }
     }, [session, filter]);
 
     const fetchAlerts = async () => {
@@ -91,6 +95,31 @@ export default function AlertInbox() {
         return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>Loading...</div>;
     }
 
+    if (agencyTier === 'free') {
+        return (
+            <>
+                <Head>
+                    <title>Alerts — Calyxra Dashboard</title>
+                    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+                </Head>
+                <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ background: '#fff', borderRadius: 12, padding: 60, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', maxWidth: 420 }}>
+                        <div style={{ fontSize: 48, marginBottom: 16 }}>🔒</div>
+                        <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 22, margin: '0 0 8px' }}>Alerts require a paid plan</h2>
+                        <p style={{ color: '#6b7280', fontSize: 14, marginBottom: 24 }}>Upgrade to get real-time monitoring alerts when phantom revenue spikes or ROAS drops.</p>
+                        <a href="https://calyxra.com/#pricing" style={{
+                            display: 'inline-block', background: '#00b894', color: 'white', padding: '10px 24px',
+                            borderRadius: '8px', textDecoration: 'none', fontWeight: 600,
+                        }}>Upgrade — $150/month</a>
+                        <div style={{ marginTop: 16 }}>
+                            <a href="/dashboard" style={{ color: '#6b7280', textDecoration: 'none', fontSize: 13 }}>← Back to Dashboard</a>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    }
+
     return (
         <>
             <Head>
@@ -135,7 +164,7 @@ export default function AlertInbox() {
                                 style={{
                                     padding: '6px 14px', borderRadius: 6, fontSize: 13,
                                     border: filter === f.key ? '2px solid #00b894' : '1px solid #d1d5db',
-                                    background: filter === f.key ? '#d1fae5' : '#fff',
+                                    background: filter === f.key ? '#e6f7f4' : '#fff',
                                     color: filter === f.key ? GREEN : '#374151',
                                     fontWeight: filter === f.key ? 600 : 400,
                                     cursor: 'pointer',
@@ -198,7 +227,7 @@ export default function AlertInbox() {
                                                 }}>View Store</a>
                                                 {!alert.resolved && (
                                                     <button onClick={() => resolveAlert(alert.id)} style={{
-                                                        padding: '4px 10px', background: '#d1fae5', border: 'none',
+                                                        padding: '4px 10px', background: '#e6f7f4', border: 'none',
                                                         borderRadius: 6, color: GREEN, fontSize: 12,
                                                         fontWeight: 600, cursor: 'pointer',
                                                     }}>Resolve</button>

@@ -34,12 +34,18 @@ export default async function handler(req, res) {
     });
 
     if (!store) return res.status(404).json({ error: 'Store not found' });
+
+    // Free tier cannot export PDF
+    if (store.agency?.tier === 'free') {
+        return res.status(403).json({ error: 'Upgrade required to download PDF' });
+    }
+
     if (!store.reports.length) return res.status(404).json({ error: 'No reports found' });
 
     const report = store.reports[0];
     const agency = store.agency;
     const brandName = agency.brandName || 'Calyxra';
-    const brandColor = agency.brandColor || '#166534';
+    const brandColor = agency.brandColor || '#00b894';
     const customKpis = agency.customKpis ? JSON.parse(agency.customKpis) : [];
 
     // Parse fullReport JSON
@@ -69,9 +75,9 @@ function generateReportHTML({ store, report, fullReport, agency, brandName, bran
             <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right">${c.channel}</td>
             <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right">${fmt(c.spend)}</td>
             <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right">${c.reportedRoas}×</td>
-            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;color:${c.flagColor === 'red' ? '#dc2626' : c.flagColor === 'amber' ? '#f59e0b' : '#166534'};font-weight:600">${(c.estimatedTrueRoas || c.trueRoas || 0).toFixed(2)}×</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;color:${c.flagColor === 'red' ? '#dc2626' : c.flagColor === 'amber' ? '#f59e0b' : '#00b894'};font-weight:600">${(c.estimatedTrueRoas || c.trueRoas || 0).toFixed(2)}×</td>
             <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:center">
-                <span style="padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:${c.flagColor === 'red' ? '#fee2e2' : c.flagColor === 'amber' ? '#fef3c7' : '#d1fae5'};color:${c.flagColor === 'red' ? '#dc2626' : c.flagColor === 'amber' ? '#92400e' : '#166534'}">${c.flag}</span>
+                <span style="padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:${c.flagColor === 'red' ? '#fee2e2' : c.flagColor === 'amber' ? '#fef3c7' : '#e6f7f4'};color:${c.flagColor === 'red' ? '#dc2626' : c.flagColor === 'amber' ? '#92400e' : '#00b894'}">${c.flag}</span>
             </td>
         </tr>
     `).join('');
@@ -79,7 +85,7 @@ function generateReportHTML({ store, report, fullReport, agency, brandName, bran
     const kpiCards = kpis.map(k => `
         <div style="flex:1;min-width:140px;background:${k.statusColor === 'green' ? '#f0fdf4' : k.statusColor === 'amber' ? '#fffbeb' : '#fef2f2'};border-radius:8px;padding:14px;text-align:center;border:1px solid ${k.statusColor === 'green' ? '#bbf7d0' : k.statusColor === 'amber' ? '#fde68a' : '#fecaca'}">
             <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;margin-bottom:6px">${k.label}</div>
-            <div style="font-size:22px;font-weight:700;color:${k.statusColor === 'green' ? '#166534' : k.statusColor === 'amber' ? '#92400e' : '#dc2626'}">${formatKPIValue(k.value, k.format)}</div>
+            <div style="font-size:22px;font-weight:700;color:${k.statusColor === 'green' ? '#00b894' : k.statusColor === 'amber' ? '#92400e' : '#dc2626'}">${formatKPIValue(k.value, k.format)}</div>
             <div style="font-size:10px;color:#9ca3af;margin-top:4px">${k.fullName}</div>
         </div>
     `).join('');
@@ -93,7 +99,7 @@ function generateReportHTML({ store, report, fullReport, agency, brandName, bran
                 <div style="display:flex;gap:16px;margin-bottom:16px">
                     <div style="flex:1;background:#f0f9ff;border-radius:8px;padding:14px;text-align:center">
                         <div style="font-size:11px;color:#6b7280;font-weight:600">GA4 Agreement</div>
-                        <div style="font-size:28px;font-weight:700;color:${fullReport.ga4.ga4AgreementPct >= 90 ? '#166534' : fullReport.ga4.ga4AgreementPct >= 70 ? '#f59e0b' : '#dc2626'}">${fullReport.ga4.ga4AgreementPct}%</div>
+                        <div style="font-size:28px;font-weight:700;color:${fullReport.ga4.ga4AgreementPct >= 90 ? '#00b894' : fullReport.ga4.ga4AgreementPct >= 70 ? '#f59e0b' : '#dc2626'}">${fullReport.ga4.ga4AgreementPct}%</div>
                     </div>
                     ${(fullReport.ga4.trustRanking || []).map((t, i) => `
                         <div style="flex:1;background:#fefce8;border-radius:8px;padding:14px">
@@ -115,7 +121,7 @@ function generateReportHTML({ store, report, fullReport, agency, brandName, bran
         const actions = opt.actions || [];
 
         const actionRows = actions.map(a => {
-            const actionColor = a.action === 'PAUSE' ? '#dc2626' : a.action === 'REDUCE' ? '#f59e0b' : a.action === 'SCALE' ? '#166534' : '#6b7280';
+            const actionColor = a.action === 'PAUSE' ? '#dc2626' : a.action === 'REDUCE' ? '#f59e0b' : a.action === 'SCALE' ? '#00b894' : '#6b7280';
             const bgColor = a.action === 'PAUSE' ? '#fef2f2' : a.action === 'REDUCE' ? '#fffbeb' : a.action === 'SCALE' ? '#f0fdf4' : '#f9fafb';
             return `
                 <tr>
@@ -147,7 +153,7 @@ function generateReportHTML({ store, report, fullReport, agency, brandName, bran
                         <div style="font-size:10px;color:#6b7280">Reduce</div>
                     </div>
                     <div style="flex:1;background:#f0fdf4;border-radius:8px;padding:12px;text-align:center">
-                        <div style="font-size:22px;font-weight:700;color:#166534">${summary.scaleCount || 0}</div>
+                        <div style="font-size:22px;font-weight:700;color:#00b894">${summary.scaleCount || 0}</div>
                         <div style="font-size:10px;color:#6b7280">Scale</div>
                     </div>
                     <div style="flex:1;background:#ede9fe;border-radius:8px;padding:12px;text-align:center">
@@ -155,11 +161,11 @@ function generateReportHTML({ store, report, fullReport, agency, brandName, bran
                         <div style="font-size:10px;color:#6b7280">Budget Freed</div>
                     </div>
                     <div style="flex:1;background:#ecfdf5;border-radius:8px;padding:12px;text-align:center">
-                        <div style="font-size:22px;font-weight:700;color:#166534">${summary.projectedRoas || 0}×</div>
+                        <div style="font-size:22px;font-weight:700;color:#00b894">${summary.projectedRoas || 0}×</div>
                         <div style="font-size:10px;color:#6b7280">Projected ROAS</div>
                     </div>
                     <div style="flex:1;background:#f0fdf4;border-radius:8px;padding:12px;text-align:center;border:1px solid #bbf7d0">
-                        <div style="font-size:22px;font-weight:700;color:#166534">+${fmt(summary.estimatedAdditionalRevenue)}</div>
+                        <div style="font-size:22px;font-weight:700;color:#00b894">+${fmt(summary.estimatedAdditionalRevenue)}</div>
                         <div style="font-size:10px;color:#6b7280">Est. Revenue Gain</div>
                     </div>
                 </div>
@@ -183,7 +189,7 @@ function generateReportHTML({ store, report, fullReport, agency, brandName, bran
                 ${summary.estimatedAnnualImpact > 0 ? `
                     <div style="margin-top:16px;background:#111827;color:#fff;border-radius:8px;padding:16px;text-align:center">
                         <div style="font-size:11px;text-transform:uppercase;opacity:0.7;margin-bottom:4px">Estimated Annual Impact of Optimization</div>
-                        <div style="font-size:28px;font-weight:700;color:#34d399">+${fmt(summary.estimatedAnnualImpact)}</div>
+                        <div style="font-size:28px;font-weight:700;color:#00d2a0">+${fmt(summary.estimatedAnnualImpact)}</div>
                         <div style="font-size:11px;opacity:0.6;margin-top:4px">Based on reallocating ${fmt(summary.freedBudget)} from underperformers to proven winners</div>
                     </div>
                 ` : ''}
@@ -232,9 +238,9 @@ function generateReportHTML({ store, report, fullReport, agency, brandName, bran
             <div style="font-size:28px;font-weight:700;color:#dc2626">${fmt(report.phantomRevenue)}</div>
             <div style="font-size:13px;color:#dc2626">${report.phantomPct}% overstated</div>
         </div>
-        <div style="flex:1;min-width:180px;background:#f0fdf4;border-radius:10px;padding:16px;border-left:4px solid #166534">
+        <div style="flex:1;min-width:180px;background:#f0fdf4;border-radius:10px;padding:16px;border-left:4px solid #00b894">
             <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase">True ROAS</div>
-            <div style="font-size:28px;font-weight:700;color:#166534">${report.trueRoas}×</div>
+            <div style="font-size:28px;font-weight:700;color:#00b894">${report.trueRoas}×</div>
             <div style="font-size:13px;color:#6b7280">vs ${report.reportedRoas}× reported</div>
         </div>
         <div style="flex:1;min-width:180px;background:#f9fafb;border-radius:10px;padding:16px;border-left:4px solid #374151">
@@ -293,8 +299,8 @@ function generateReportHTML({ store, report, fullReport, agency, brandName, bran
             </div>
         ` : ''}
         ${(fullReport.campaigns || []).filter(c => c.flagColor === 'green').length > 0 ? `
-            <div style="background:#f0fdf4;border-left:4px solid #166534;border-radius:6px;padding:14px">
-                <div style="font-weight:600;color:#166534;margin-bottom:4px">🟢 Safe to Scale</div>
+            <div style="background:#f0fdf4;border-left:4px solid #00b894;border-radius:6px;padding:14px">
+                <div style="font-weight:600;color:#00b894;margin-bottom:4px">🟢 Safe to Scale</div>
                 <ul style="margin:0;padding-left:20px;font-size:12px;color:#374151">
                     ${(fullReport.campaigns || []).filter(c => c.flagColor === 'green').map(c => `<li>${c.campaignName || c.name} — True ROAS ${(c.estimatedTrueRoas || 0).toFixed(2)}× ✅</li>`).join('')}
                 </ul>

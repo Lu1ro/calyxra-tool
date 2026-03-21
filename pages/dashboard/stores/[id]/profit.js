@@ -347,7 +347,7 @@ export default function ProfitReconciliation() {
                                                 <td style={{ padding: '10px 10px', textAlign: 'center' }}>
                                                     <span style={{
                                                         padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 600,
-                                                        background: c.isProfitable ? '#d1fae5' : '#fee2e2',
+                                                        background: c.isProfitable ? '#e6f7f4' : '#fee2e2',
                                                         color: c.isProfitable ? GREEN : RED,
                                                     }}>
                                                         {c.isProfitable ? '✅ Profitable' : '❌ Losing'}

@@ -111,8 +111,8 @@ export default function DashboardPage() {
         return <div className="page-bg flex-center" style={{ minHeight: '100vh' }}>Loading...</div>;
     }
 
-    const tierLimits = { pilot: 2, scale: 5, pro: 10 };
-    const maxStores = tierLimits[session.user.tier] || 2;
+    const tierLimits = { free: 1, pilot: 2, scale: 5, pro: 10 };
+    const maxStores = tierLimits[session.user.tier] || 1;
     const fmt = (v) => '$' + (v || 0).toLocaleString('en-US', { minimumFractionDigits: 0 });
 
     return (

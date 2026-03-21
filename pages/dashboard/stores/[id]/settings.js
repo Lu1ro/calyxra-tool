@@ -128,7 +128,7 @@ export default function StoreSettings() {
 
                 <div style={{ maxWidth: 700, margin: '0 auto', padding: '32px 24px' }}>
                     {successMsg && (
-                        <div style={{ background: '#d1fae5', color: GREEN, padding: '10px 14px', borderRadius: 8, fontSize: 14, marginBottom: 16, fontWeight: 500 }}>{successMsg}</div>
+                        <div style={{ background: '#e6f7f4', color: GREEN, padding: '10px 14px', borderRadius: 8, fontSize: 14, marginBottom: 16, fontWeight: 500 }}>{successMsg}</div>
                     )}
 
                     <h1 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, margin: '0 0 8px' }}>Platform Connections</h1>
@@ -164,7 +164,7 @@ export default function StoreSettings() {
                                                 <>
                                                     <span style={{
                                                         fontSize: 11, padding: '4px 10px', borderRadius: 6,
-                                                        background: '#d1fae5', color: GREEN, fontWeight: 600,
+                                                        background: '#e6f7f4', color: GREEN, fontWeight: 600,
                                                     }}>✓ Connected</span>
                                                     <button
                                                         onClick={() => initiateOAuth(p.id)}
