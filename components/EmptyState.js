@@ -5,7 +5,6 @@ export default function EmptyState({ store, storeId, onTrySample }) {
     const steps = [
         { label: 'Connect Store', done: true, icon: '🏪' },
         { label: 'Connect Ad Platforms', done: (store?.connections?.length || 0) > 0, icon: '📡' },
-        { label: 'Connect Database (BigQuery)', done: !!store?.databaseConfig, icon: '🗄️', link: `/dashboard/stores/${storeId}/database` },
         { label: 'Run First Reconciliation', done: false, icon: '🚀' },
     ];
 

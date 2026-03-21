@@ -10,7 +10,6 @@ export default function StoreNavbar({ store, storeId, currentPage }) {
         { href: `/dashboard/stores/${storeId}/customers`, label: '👥 Cust. Quality', cls: 'nav-pill-pink' },
         { href: `/dashboard/stores/${storeId}/ltv`, label: '💰 LTV ROAS', cls: 'nav-pill-amber' },
         { href: `/dashboard/stores/${storeId}/analytics`, label: '📈 BI Dashboards', cls: 'nav-pill-indigo' },
-        { href: `/dashboard/stores/${storeId}/database`, label: '🗄️ Database', cls: 'nav-pill-gray' },
         { href: `/dashboard/stores/${storeId}/settings`, label: '⚙️ Settings', cls: 'nav-pill-gray' },
     ];
 
