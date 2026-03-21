@@ -167,17 +167,17 @@ export default function StoreDashboard() {
                     {error && <div className="alert-error">{error}</div>}
 
                     {/* Actions bar */}
-                    <div className="flex-between animate-fade-in" style={{ marginBottom: 'var(--space-6)' }}>
+                    <div className="flex-between animate-fade-in" style={{ marginBottom: 'var(--space-6)', paddingTop: 'var(--space-2)' }}>
                         <div>
-                            <h1 className="heading-serif" style={{ fontSize: 'var(--text-2xl)', margin: 0 }}>{store?.name} Dashboard</h1>
-                            {dateRange && <p className="text-muted text-base" style={{ margin: '4px 0 0' }}>📅 Report period: {dateRange}</p>}
+                            <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0, color: 'var(--c-gray-900)', letterSpacing: '-0.02em' }}>{store?.name}</h1>
+                            {dateRange && <p style={{ margin: '6px 0 0', fontSize: 13, color: 'var(--c-gray-400)', fontWeight: 400 }}>Report period: {dateRange}</p>}
                         </div>
                         <div className="flex-gap-2 no-print">
-                            <button className="btn btn-secondary" onClick={() => runReconciliation(true)} disabled={reconciling}>
-                                {reconciling ? '⏳ Running...' : '🧪 Demo Run'}
+                            <button className="btn btn-outline btn-sm" onClick={() => runReconciliation(true)} disabled={reconciling} style={{ borderRadius: 8, fontWeight: 500 }}>
+                                {reconciling ? 'Running...' : 'Demo Run'}
                             </button>
-                            <button className="btn btn-primary" onClick={() => runReconciliation(false)} disabled={reconciling || !store?.connections?.length}>
-                                {reconciling ? '⏳ Reconciling...' : '▶ Run Reconciliation'}
+                            <button className="btn btn-primary btn-sm" onClick={() => runReconciliation(false)} disabled={reconciling || !store?.connections?.length} style={{ borderRadius: 8, fontWeight: 500 }}>
+                                {reconciling ? 'Reconciling...' : 'Run Reconciliation'}
                             </button>
                             {latestReport && (
                                 agencyTier === 'free' ? (

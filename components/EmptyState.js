@@ -3,67 +3,115 @@
 
 export default function EmptyState({ store, storeId, onTrySample }) {
     const steps = [
-        { label: 'Connect Store', done: true, icon: '🏪' },
-        { label: 'Connect Ad Platforms', done: (store?.connections?.length || 0) > 0, icon: '📡' },
-        { label: 'Run First Reconciliation', done: false, icon: '🚀' },
+        { label: 'Connect Store', done: true, icon: (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
+        )},
+        { label: 'Connect Ad Platforms', done: (store?.connections?.length || 0) > 0, icon: (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>
+        )},
+        { label: 'Run First Reconciliation', done: false, icon: (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
+        )},
     ];
 
     const completedCount = steps.filter(s => s.done).length;
+    const progressPct = (completedCount / steps.length) * 100;
 
     return (
-        <div className="card animate-fade-in" style={{ padding: 'var(--space-10)' }}>
-            <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
-                <div style={{ fontSize: 48, marginBottom: 'var(--space-3)' }}>📊</div>
-                <h2 className="heading-serif" style={{ fontSize: 'var(--text-xl)', margin: '0 0 var(--space-2)' }}>
+        <div className="animate-fade-in" style={{
+            maxWidth: 520,
+            margin: '40px auto',
+            background: 'var(--c-white)',
+            borderRadius: 16,
+            padding: '48px 40px 40px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04)',
+            border: '1px solid var(--c-gray-200)',
+        }}>
+            <div style={{ textAlign: 'center', marginBottom: 32 }}>
+                {/* Abstract illustration */}
+                <div style={{
+                    width: 64, height: 64, borderRadius: 16, margin: '0 auto 20px',
+                    background: 'linear-gradient(135deg, rgba(0,184,148,0.1) 0%, rgba(0,184,148,0.05) 100%)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    border: '1px solid rgba(0,184,148,0.12)',
+                }}>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                    </svg>
+                </div>
+                <h2 style={{
+                    fontSize: 20, fontWeight: 700, margin: '0 0 8px',
+                    color: 'var(--c-gray-900)', letterSpacing: '-0.02em',
+                }}>
                     Get Started
                 </h2>
-                <p className="text-muted text-md" style={{ margin: 0 }}>
+                <p style={{
+                    margin: 0, fontSize: 14, color: 'var(--c-gray-400)',
+                    lineHeight: 1.5, maxWidth: 340, marginLeft: 'auto', marginRight: 'auto',
+                }}>
                     Complete these steps to unlock your revenue intelligence.
                 </p>
                 {/* Progress bar */}
                 <div style={{
-                    maxWidth: 200, margin: '16px auto 0', height: 6, borderRadius: 3,
+                    maxWidth: 240, margin: '20px auto 0', height: 4, borderRadius: 2,
                     background: 'var(--c-gray-100)', overflow: 'hidden',
                 }}>
                     <div style={{
-                        width: `${(completedCount / steps.length) * 100}%`,
-                        height: '100%', borderRadius: 3,
-                        background: 'var(--c-green)',
-                        transition: 'width 0.5s ease',
+                        width: `${progressPct}%`,
+                        height: '100%', borderRadius: 2,
+                        background: 'var(--color-primary)',
+                        transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
                     }} />
                 </div>
-                <p className="text-xs text-muted" style={{ marginTop: 6 }}>
+                <p style={{
+                    marginTop: 8, fontSize: 12, color: 'var(--c-gray-400)', fontWeight: 500,
+                }}>
                     {completedCount} of {steps.length} complete
                 </p>
             </div>
 
-            <div style={{ maxWidth: 400, margin: '0 auto var(--space-6)' }}>
+            <div style={{
+                maxWidth: 420, margin: '0 auto 32px',
+                background: 'var(--c-gray-50)',
+                borderRadius: 12,
+                border: '1px solid var(--c-gray-100)',
+                overflow: 'hidden',
+            }}>
                 {steps.map((step, i) => (
                     <div key={i} style={{
-                        display: 'flex', alignItems: 'center', gap: 'var(--space-3)',
-                        padding: '12px 16px',
+                        display: 'flex', alignItems: 'center', gap: 14,
+                        padding: '14px 18px',
                         borderBottom: i < steps.length - 1 ? '1px solid var(--c-gray-100)' : 'none',
+                        transition: 'background 150ms',
                     }}>
                         <span style={{
-                            width: 28, height: 28, borderRadius: '50%',
-                            background: step.done ? 'var(--c-green-light)' : 'var(--c-gray-100)',
+                            width: 32, height: 32, borderRadius: 10,
+                            background: step.done ? 'rgba(0,184,148,0.1)' : 'var(--c-white)',
+                            border: step.done ? '1px solid rgba(0,184,148,0.2)' : '1px solid var(--c-gray-200)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 'var(--text-md)', color: step.done ? 'var(--c-green)' : 'var(--c-gray-400)',
-                            fontWeight: 700, flexShrink: 0,
+                            color: step.done ? 'var(--color-primary)' : 'var(--c-gray-300)',
+                            flexShrink: 0,
+                            transition: 'all 200ms',
                         }}>
-                            {step.done ? '✓' : (i + 1)}
+                            {step.done ? (
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                            ) : step.icon}
                         </span>
                         <span style={{
-                            fontSize: 'var(--text-md)',
-                            color: step.done ? 'var(--c-gray-500)' : 'var(--c-gray-900)',
+                            fontSize: 14,
+                            color: step.done ? 'var(--c-gray-400)' : 'var(--c-gray-800)',
                             fontWeight: step.done ? 400 : 500,
                             textDecoration: step.done ? 'line-through' : 'none',
+                            letterSpacing: '-0.01em',
                         }}>
-                            {step.icon} {step.label}
+                            {step.label}
                         </span>
                         {step.link && !step.done && (
-                            <a href={step.link} className="text-sm font-semibold" style={{ marginLeft: 'auto', color: 'var(--c-green)' }}>
-                                Set up →
+                            <a href={step.link} style={{
+                                marginLeft: 'auto', fontSize: 12, fontWeight: 600,
+                                color: 'var(--color-primary)', textDecoration: 'none',
+                            }}>
+                                Set up
                             </a>
                         )}
                     </div>
@@ -71,10 +119,15 @@ export default function EmptyState({ store, storeId, onTrySample }) {
             </div>
 
             <div style={{ textAlign: 'center' }}>
-                <button className="btn btn-primary" onClick={onTrySample}>
-                    🧪 Try with Sample Data
+                <button className="btn btn-primary" onClick={onTrySample} style={{
+                    padding: '10px 24px', fontSize: 14, borderRadius: 10,
+                    boxShadow: '0 2px 8px rgba(0,184,148,0.2)',
+                }}>
+                    Try with Sample Data
                 </button>
-                <p className="text-xs text-muted" style={{ marginTop: 'var(--space-2)' }}>
+                <p style={{
+                    marginTop: 10, fontSize: 12, color: 'var(--c-gray-400)',
+                }}>
                     No API keys needed — we generate realistic demo data.
                 </p>
             </div>

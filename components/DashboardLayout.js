@@ -33,18 +33,7 @@ const NAV_ITEMS = [
                 <rect x="14" y="14" width="7" height="7" rx="1" />
             </svg>
         ),
-        exact: true,
-    },
-    {
-        label: 'Stores',
-        href: '/dashboard',
-        icon: (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                <polyline points="9 22 9 12 15 12 15 22" />
-            </svg>
-        ),
-        matchPrefix: '/dashboard/stores',
+        matchPrefix: '/dashboard',
     },
     {
         label: 'Alerts',
@@ -284,13 +273,13 @@ export default function DashboardLayout({ title, children }) {
                     top: 0;
                     left: 0;
                     height: 100vh;
-                    background: #16162a;
+                    background: linear-gradient(180deg, #0c0c1d 0%, #0f0f1a 40%, #111125 100%);
                     display: flex;
                     flex-direction: column;
                     z-index: 100;
                     transition: width 200ms cubic-bezier(0.4, 0, 0.2, 1);
                     overflow: hidden;
-                    border-right: 1px solid rgba(255,255,255,0.06);
+                    border-right: 1px solid rgba(255,255,255,0.04);
                 }
 
                 .cx-sidebar-collapsed .cx-nav-item {
@@ -307,9 +296,11 @@ export default function DashboardLayout({ title, children }) {
                     display: flex;
                     align-items: center;
                     gap: 10px;
-                    padding: 20px 16px 16px;
+                    padding: 22px 18px 20px;
                     position: relative;
-                    min-height: 56px;
+                    min-height: 60px;
+                    border-bottom: 1px solid rgba(255,255,255,0.04);
+                    margin-bottom: 4px;
                 }
 
                 .cx-logo-mark {
@@ -322,8 +313,8 @@ export default function DashboardLayout({ title, children }) {
                 .cx-logo-text {
                     font-size: 17px;
                     font-weight: 700;
-                    color: #e8e8f0;
-                    letter-spacing: -0.3px;
+                    color: rgba(255,255,255,0.92);
+                    letter-spacing: -0.4px;
                     white-space: nowrap;
                 }
 
@@ -333,20 +324,20 @@ export default function DashboardLayout({ title, children }) {
 
                 .cx-sidebar-toggle {
                     position: absolute;
-                    right: 10px;
+                    right: 12px;
                     top: 50%;
                     transform: translateY(-50%);
                     background: transparent;
                     border: none;
-                    color: rgba(255,255,255,0.3);
+                    color: rgba(255,255,255,0.25);
                     cursor: pointer;
-                    padding: 4px;
-                    border-radius: 4px;
+                    padding: 6px;
+                    border-radius: 6px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     opacity: 0;
-                    transition: opacity 150ms, color 150ms, background 150ms;
+                    transition: opacity 200ms, color 200ms, background 200ms;
                 }
 
                 .cx-sidebar:hover .cx-sidebar-toggle {
@@ -355,7 +346,7 @@ export default function DashboardLayout({ title, children }) {
 
                 .cx-sidebar-toggle:hover {
                     background: rgba(255,255,255,0.08);
-                    color: rgba(255,255,255,0.7);
+                    color: rgba(255,255,255,0.6);
                 }
 
                 .cx-sidebar-close {
@@ -365,58 +356,64 @@ export default function DashboardLayout({ title, children }) {
                     transform: translateY(-50%);
                     background: transparent;
                     border: none;
-                    color: rgba(255,255,255,0.5);
+                    color: rgba(255,255,255,0.4);
                     cursor: pointer;
                     padding: 4px;
                     display: flex;
+                    border-radius: 6px;
+                    transition: color 150ms, background 150ms;
+                }
+
+                .cx-sidebar-close:hover {
+                    background: rgba(255,255,255,0.08);
+                    color: rgba(255,255,255,0.7);
                 }
 
                 /* ─── Nav ───────────────────────────────────────────────── */
                 .cx-nav-label {
                     padding: 0 20px;
-                    margin-bottom: 4px;
+                    margin-bottom: 6px;
+                    margin-top: 8px;
                     font-size: 10px;
                     font-weight: 600;
-                    letter-spacing: 1px;
+                    letter-spacing: 1.2px;
                     text-transform: uppercase;
-                    color: rgba(255,255,255,0.2);
+                    color: rgba(255,255,255,0.18);
                     white-space: nowrap;
                 }
 
                 .cx-nav {
                     flex: 1;
-                    padding: 0 8px;
+                    padding: 0 10px;
                     display: flex;
                     flex-direction: column;
-                    gap: 2px;
+                    gap: 1px;
                 }
 
                 .cx-nav-item {
                     display: flex;
                     align-items: center;
                     gap: 10px;
-                    padding: 9px 12px;
-                    border-radius: 6px;
-                    color: rgba(255,255,255,0.55);
+                    padding: 10px 12px;
+                    border-radius: 8px;
+                    color: rgba(255,255,255,0.45);
                     text-decoration: none;
                     font-size: 13.5px;
                     font-weight: 500;
-                    transition: all 150ms ease;
+                    transition: color 200ms ease, background 200ms ease, transform 100ms ease;
                     position: relative;
                     white-space: nowrap;
-                    border-left: 2.5px solid transparent;
-                    margin-left: 0;
+                    letter-spacing: -0.01em;
                 }
 
                 .cx-nav-item:hover {
-                    color: rgba(255,255,255,0.9);
+                    color: rgba(255,255,255,0.85);
                     background: rgba(255,255,255,0.05);
                 }
 
                 .cx-nav-item-active {
-                    color: #fff;
+                    color: rgba(255,255,255,0.95);
                     background: rgba(0,184,148,0.1);
-                    border-left-color: var(--color-primary, #00b894);
                 }
 
                 .cx-nav-item-active .cx-nav-icon {
@@ -430,6 +427,7 @@ export default function DashboardLayout({ title, children }) {
                     justify-content: center;
                     width: 20px;
                     height: 20px;
+                    transition: color 200ms ease;
                 }
 
                 .cx-nav-text {
@@ -437,7 +435,7 @@ export default function DashboardLayout({ title, children }) {
                 }
 
                 .cx-alert-badge {
-                    background: var(--color-danger, #ff6b6b);
+                    background: rgba(239,68,68,0.9);
                     color: #fff;
                     font-size: 10px;
                     font-weight: 700;
@@ -457,26 +455,27 @@ export default function DashboardLayout({ title, children }) {
                     right: 10px;
                     width: 7px;
                     height: 7px;
-                    background: var(--color-danger, #ff6b6b);
+                    background: rgba(239,68,68,0.9);
                     border-radius: 50%;
-                    border: 1.5px solid #16162a;
+                    border: 1.5px solid #0f0f1a;
                 }
 
                 .cx-coming-soon {
                     font-size: 9px;
-                    font-weight: 700;
+                    font-weight: 600;
                     letter-spacing: 0.5px;
                     text-transform: uppercase;
-                    color: rgba(255,255,255,0.25);
-                    background: rgba(255,255,255,0.06);
-                    padding: 2px 6px;
+                    color: rgba(255,255,255,0.2);
+                    background: rgba(255,255,255,0.05);
+                    padding: 2px 7px;
                     border-radius: 4px;
+                    border: 1px solid rgba(255,255,255,0.04);
                 }
 
                 /* ─── Sidebar Bottom ────────────────────────────────────── */
                 .cx-sidebar-bottom {
-                    padding: 12px;
-                    border-top: 1px solid rgba(255,255,255,0.06);
+                    padding: 14px 12px;
+                    border-top: 1px solid rgba(255,255,255,0.04);
                     display: flex;
                     flex-direction: column;
                     gap: 8px;
@@ -487,9 +486,9 @@ export default function DashboardLayout({ title, children }) {
                     align-items: center;
                     justify-content: center;
                     gap: 6px;
-                    padding: 7px 10px;
-                    border-radius: 6px;
-                    font-size: 11px;
+                    padding: 8px 10px;
+                    border-radius: 8px;
+                    font-size: 10.5px;
                     font-weight: 700;
                     letter-spacing: 0.8px;
                     white-space: nowrap;
@@ -500,20 +499,22 @@ export default function DashboardLayout({ title, children }) {
                     align-items: center;
                     justify-content: center;
                     gap: 6px;
-                    padding: 8px 12px;
-                    border-radius: 6px;
-                    background: var(--color-primary, #00b894);
+                    padding: 9px 12px;
+                    border-radius: 8px;
+                    background: linear-gradient(135deg, #00b894 0%, #00a884 100%);
                     color: #fff;
                     font-size: 12px;
                     font-weight: 600;
                     text-decoration: none;
-                    transition: background 150ms, box-shadow 150ms;
+                    transition: all 200ms ease;
                     white-space: nowrap;
+                    box-shadow: 0 2px 8px rgba(0,184,148,0.2);
                 }
 
                 .cx-upgrade-btn:hover {
-                    background: var(--color-primary-dark, #007a65);
-                    box-shadow: 0 2px 12px rgba(0,184,148,0.3);
+                    background: linear-gradient(135deg, #00a884 0%, #009975 100%);
+                    box-shadow: 0 4px 16px rgba(0,184,148,0.35);
+                    transform: translateY(-1px);
                 }
 
                 /* ─── Main area ─────────────────────────────────────────── */
@@ -528,8 +529,10 @@ export default function DashboardLayout({ title, children }) {
                 /* ─── Top Bar ───────────────────────────────────────────── */
                 .cx-topbar {
                     height: 56px;
-                    background: #fff;
-                    border-bottom: 1px solid var(--color-border, #dfe6e9);
+                    background: rgba(255,255,255,0.95);
+                    backdrop-filter: blur(12px);
+                    -webkit-backdrop-filter: blur(12px);
+                    border-bottom: 1px solid var(--color-border, #e5e7eb);
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
@@ -566,7 +569,7 @@ export default function DashboardLayout({ title, children }) {
                     align-items: center;
                     gap: 8px;
                     background: var(--c-gray-50, #f8f9fa);
-                    border: 1px solid var(--color-border, #dfe6e9);
+                    border: 1px solid var(--color-border, #e5e7eb);
                     border-radius: 8px;
                     padding: 7px 12px;
                     max-width: 320px;
@@ -574,11 +577,12 @@ export default function DashboardLayout({ title, children }) {
                     color: var(--c-gray-300, #b2bec3);
                     font-size: 13px;
                     cursor: text;
-                    transition: border-color 150ms;
+                    transition: border-color 200ms, box-shadow 200ms;
                 }
 
                 .cx-search:hover {
                     border-color: var(--c-gray-300, #b2bec3);
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
                 }
 
                 .cx-search-icon {
@@ -596,7 +600,7 @@ export default function DashboardLayout({ title, children }) {
                     font-size: 10px;
                     font-weight: 600;
                     background: #fff;
-                    border: 1px solid var(--color-border, #dfe6e9);
+                    border: 1px solid var(--color-border, #e5e7eb);
                     border-radius: 4px;
                     padding: 1px 5px;
                     color: var(--c-gray-400, #636e72);
@@ -641,7 +645,7 @@ export default function DashboardLayout({ title, children }) {
 
                 .cx-signout {
                     background: none;
-                    border: 1px solid var(--color-border, #dfe6e9);
+                    border: 1px solid var(--color-border, #e5e7eb);
                     border-radius: 6px;
                     padding: 6px 12px;
                     font-size: 12px;
@@ -700,10 +704,10 @@ export default function DashboardLayout({ title, children }) {
                     display: none;
                     position: fixed;
                     inset: 0;
-                    background: rgba(0,0,0,0.5);
+                    background: rgba(0,0,0,0.6);
                     z-index: 99;
-                    backdrop-filter: blur(2px);
-                    -webkit-backdrop-filter: blur(2px);
+                    backdrop-filter: blur(4px);
+                    -webkit-backdrop-filter: blur(4px);
                 }
 
                 .cx-overlay-visible {
