@@ -9,7 +9,7 @@ import { reconcile } from '../../lib/reconcile';
 
 export default async function handler(req, res) {
     // Basic CORS support so the marketing app (different origin/port) can call this API
-    res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ALLOW_ORIGIN || '*');
+    res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ALLOW_ORIGIN || 'https://www.calyxra.com');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 

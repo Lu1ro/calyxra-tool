@@ -176,7 +176,7 @@ function GapCalculator() {
             )}
 
             {/* CTA */}
-            <a href={(process.env.NEXT_PUBLIC_MARKETING_SITE_URL || 'http://localhost:3000') + '/#pricing'} style={{
+            <a href={(process.env.NEXT_PUBLIC_MARKETING_SITE_URL || 'https://www.calyxra.com') + '/#pricing'} style={{
               display: 'block', textAlign: 'center', background: GREEN, color: '#fff',
               padding: '16px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', fontSize: 15,
               transition: 'opacity 0.2s',
@@ -224,7 +224,7 @@ function PricingSection() {
             <div style={checkStyle}>✅ 3 actionable recommendations</div>
             <div style={checkStyle}>✅ 30-min walkthrough call</div>
           </div>
-          <a href={(process.env.NEXT_PUBLIC_MARKETING_SITE_URL || 'http://localhost:3000') + '/#pricing'} style={{
+          <a href={(process.env.NEXT_PUBLIC_MARKETING_SITE_URL || 'https://www.calyxra.com') + '/#pricing'} style={{
             display: 'block', textAlign: 'center', background: '#fff', color: GREEN,
             padding: '14px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', fontSize: 14,
             border: `2px solid ${GREEN}`, transition: 'all 0.2s',
@@ -254,7 +254,7 @@ function PricingSection() {
             <div style={checkStyle}>✅ Action Engine: PAUSE / SCALE recommendations</div>
             <div style={checkStyle}>✅ Direct founder support (Slack)</div>
           </div>
-          <a href={(process.env.NEXT_PUBLIC_MARKETING_SITE_URL || 'http://localhost:3000') + '/#pricing'} style={{
+          <a href={(process.env.NEXT_PUBLIC_MARKETING_SITE_URL || 'https://www.calyxra.com') + '/#pricing'} style={{
             display: 'block', textAlign: 'center', background: GREEN, color: '#fff',
             padding: '14px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', fontSize: 14,
             transition: 'opacity 0.2s',
@@ -553,7 +553,7 @@ function Dashboard({ report, meta, onReset }) {
           Your actual revenue is {fmt(report.shopifyNetRevenue)} — {fmt(report.phantomRevenue)} less than reported.
         </h3>
         <p style={{ margin: '0 0 20px', opacity: 0.85, fontSize: 15 }}>Stop making scaling decisions on inflated numbers.</p>
-        <a href={(process.env.NEXT_PUBLIC_MARKETING_SITE_URL || 'http://localhost:3000') + '/#pricing'} style={{
+        <a href={(process.env.NEXT_PUBLIC_MARKETING_SITE_URL || 'https://www.calyxra.com') + '/#pricing'} style={{
           display: 'inline-block', background: '#fff', color: GREEN,
           padding: '14px 28px', borderRadius: 8, fontWeight: 700, textDecoration: 'none', fontSize: 15,
         }}>→ Book a $249 Audit</a>
