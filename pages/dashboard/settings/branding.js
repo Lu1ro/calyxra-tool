@@ -23,6 +23,7 @@ export default function BrandingSettingsPage() {
     const [reportFooter, setReportFooter] = useState('');
     const [klaviyoKey, setKlaviyoKey] = useState('');
     const [hasKlaviyo, setHasKlaviyo] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
         if (status === 'unauthenticated') router.push('/login');
@@ -42,6 +43,51 @@ export default function BrandingSettingsPage() {
         setReportHeader(data.reportHeader || '');
         setReportFooter(data.reportFooter || '');
         setHasKlaviyo(data.hasKlaviyo || false);
+    };
+
+    const handleLogoUpload = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const maxSize = 2 * 1024 * 1024; // 2MB
+        if (file.size > maxSize) {
+            alert('File too large. Maximum 2MB.');
+            return;
+        }
+
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Only PNG, JPG, SVG, and WebP files are allowed.');
+            return;
+        }
+
+        setUploading(true);
+        try {
+            const reader = new FileReader();
+            reader.onload = async () => {
+                const res = await fetch('/api/agency/upload-logo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fileName: file.name,
+                        fileData: reader.result,
+                        fileType: file.type,
+                    }),
+                });
+                const data = await res.json();
+                if (res.ok && data.logoUrl) {
+                    setLogoUrl(data.logoUrl);
+                } else {
+                    alert(data.error || 'Upload failed');
+                }
+                setUploading(false);
+            };
+            reader.readAsDataURL(file);
+        } catch (err) {
+            console.error('Upload error:', err);
+            alert('Upload failed. Please try again.');
+            setUploading(false);
+        }
     };
 
     const save = async () => {
@@ -94,8 +140,26 @@ export default function BrandingSettingsPage() {
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 16 }}>
                                 <div>
-                                    <label style={labelStyle}>Logo URL</label>
-                                    <input value={logoUrl} onChange={e => setLogoUrl(e.target.value)} placeholder="https://youragency.com/logo.png" style={inputStyle} />
+                                    <label style={labelStyle}>Logo</label>
+                                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                                        <label style={{
+                                            padding: '10px 16px', background: '#f3f4f6', border: '1px solid #d1d5db',
+                                            borderRadius: 8, fontSize: 13, fontWeight: 600, color: '#374151',
+                                            cursor: uploading ? 'not-allowed' : 'pointer', display: 'inline-flex',
+                                            alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
+                                            opacity: uploading ? 0.6 : 1,
+                                        }}>
+                                            {uploading ? '⏳ Uploading...' : '📁 Upload Logo'}
+                                            <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                                                onChange={handleLogoUpload} disabled={uploading}
+                                                style={{ display: 'none' }} />
+                                        </label>
+                                        <span style={{ fontSize: 12, color: '#9ca3af' }}>or</span>
+                                        <input value={logoUrl} onChange={e => setLogoUrl(e.target.value)}
+                                            placeholder="https://youragency.com/logo.png"
+                                            style={{ ...inputStyle, flex: 1 }} />
+                                    </div>
+                                    <span style={hintStyle}>PNG, JPG, SVG, or WebP — max 2MB</span>
                                 </div>
                                 <div>
                                     <label style={labelStyle}>Brand Color</label>
