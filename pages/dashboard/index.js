@@ -129,26 +129,6 @@ export default function DashboardPage() {
             )}
 
             <div>
-                {/* Navbar */}
-                <nav style={{ background: 'var(--c-white)', borderBottom: '1px solid var(--c-gray-200)', padding: 'var(--space-3) var(--space-8)' }} className="flex-between no-print">
-                    <div className="flex-gap-3">
-                        <img src="/logo.png" alt="Calyxra" style={{ height: 32 }} />
-                        <span className="heading-serif" style={{ fontSize: 20, color: 'var(--color-primary)' }}>Calyxra</span>
-                        <span className={`badge ${session.user.tier === 'pro' ? '' : session.user.tier === 'scale' ? 'badge-green' : 'badge-gray'}`}
-                            style={session.user.tier === 'pro' ? { background: 'var(--c-gray-900)', color: '#fff' } : { textTransform: 'uppercase' }}>
-                            {session.user.tier}
-                        </span>
-                    </div>
-                    <div className="flex-gap-4">
-                        <button className={`btn btn-sm ${alertCount > 0 ? 'btn-danger' : 'btn-outline'}`} onClick={() => router.push('/dashboard/alerts')}>
-                            🔔 Alerts
-                            {alertCount > 0 && <span className="badge" style={{ background: 'var(--c-red)', color: '#fff', fontSize: 10, padding: '1px 6px', borderRadius: 8 }}>{alertCount}</span>}
-                        </button>
-                        <span className="text-muted text-md">{session.user.name}</span>
-                        <button className="btn btn-sm btn-outline" onClick={handleLogout}>Sign out</button>
-                    </div>
-                </nav>
-
                 <div className="container" style={{ maxWidth: 960 }}>
 
                     {/* Portfolio Summary */}
@@ -232,11 +212,8 @@ export default function DashboardPage() {
                         </div>
                     )}
 
-                    {/* Quick Actions */}
-                    <div className="flex-gap-4" style={{ marginTop: 'var(--space-8)' }}>
-                        <button className="btn btn-outline" onClick={() => router.push('/')}>🔍 Run Quick Audit (Free Tool)</button>
-                        <button className="btn btn-outline" onClick={() => router.push('/dashboard/settings/branding')}>⚙️ Agency Settings</button>
-                    </div>
+                    {/* Spacer */}
+                    <div style={{ height: 'var(--space-8)' }} />
                 </div>
             </div>
         </DashboardLayout>
