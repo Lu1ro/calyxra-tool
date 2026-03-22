@@ -60,16 +60,21 @@ export default function StoreDashboard() {
                 throw new Error(err.error || 'Export failed');
             }
             const html = await res.text();
-            // Create a hidden container, inject the HTML, convert to PDF
-            const container = document.createElement('div');
-            container.style.position = 'fixed';
-            container.style.left = '-9999px';
-            container.style.top = '0';
-            container.style.width = '900px';
-            container.innerHTML = html.replace(/<html[^>]*>|<\/html>|<head[^>]*>[\s\S]*?<\/head>|<body[^>]*>|<\/body>/gi, '');
-            // Remove print script and no-print elements
-            container.querySelectorAll('script, .no-print').forEach(el => el.remove());
-            document.body.appendChild(container);
+            // Use hidden iframe so styles from <head> are preserved
+            const iframe = document.createElement('iframe');
+            iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:900px;height:1200px;border:none;';
+            document.body.appendChild(iframe);
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write(html);
+            iframeDoc.close();
+            // Wait for fonts and content to load
+            await new Promise(resolve => {
+                iframe.onload = resolve;
+                setTimeout(resolve, 2000); // fallback timeout
+            });
+            // Remove print button and scripts
+            iframeDoc.querySelectorAll('script, .no-print').forEach(el => el.remove());
             const html2pdf = (await import('html2pdf.js')).default;
             await html2pdf().set({
                 margin: [10, 10, 10, 10],
@@ -77,8 +82,8 @@ export default function StoreDashboard() {
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true, logging: false },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            }).from(container).save();
-            document.body.removeChild(container);
+            }).from(iframeDoc.body).save();
+            document.body.removeChild(iframe);
             showToast('PDF downloaded!');
         } catch (err) {
             showToast(err.message || 'PDF export failed', 'error');

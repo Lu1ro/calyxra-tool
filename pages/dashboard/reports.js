@@ -54,11 +54,18 @@ export default function ReportsPage() {
             const res = await fetch(`/api/stores/${storeId}/export-pdf`);
             if (!res.ok) throw new Error('Export failed');
             const html = await res.text();
-            const container = document.createElement('div');
-            container.style.cssText = 'position:fixed;left:-9999px;top:0;width:900px';
-            container.innerHTML = html.replace(/<html[^>]*>|<\/html>|<head[^>]*>[\s\S]*?<\/head>|<body[^>]*>|<\/body>/gi, '');
-            container.querySelectorAll('script, .no-print').forEach(el => el.remove());
-            document.body.appendChild(container);
+            const iframe = document.createElement('iframe');
+            iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:900px;height:1200px;border:none;';
+            document.body.appendChild(iframe);
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write(html);
+            iframeDoc.close();
+            await new Promise(resolve => {
+                iframe.onload = resolve;
+                setTimeout(resolve, 2000);
+            });
+            iframeDoc.querySelectorAll('script, .no-print').forEach(el => el.remove());
             const html2pdf = (await import('html2pdf.js')).default;
             await html2pdf().set({
                 margin: [10, 10, 10, 10],
@@ -66,8 +73,8 @@ export default function ReportsPage() {
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true, logging: false },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            }).from(container).save();
-            document.body.removeChild(container);
+            }).from(iframeDoc.body).save();
+            document.body.removeChild(iframe);
         } catch (err) {
             console.error('PDF export failed:', err);
         }
