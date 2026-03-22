@@ -20,14 +20,18 @@ const NAV_ITEMS = [
         label: 'Dashboard',
         href: '/dashboard',
         icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>,
-        matchPrefix: '/dashboard',
         exact: true,
     },
     {
         label: 'Stores',
-        href: '/dashboard',
+        href: '/dashboard/stores',
         icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-        matchStores: true,
+        matchPrefix: '/dashboard/stores',
+    },
+    {
+        label: 'Reports',
+        href: '/dashboard/reports',
+        icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /></svg>,
     },
     {
         label: 'Alerts',
@@ -45,7 +49,6 @@ const NAV_ITEMS = [
 
 function isActive(item, pathname) {
     if (item.exact) return pathname === item.href;
-    if (item.matchStores) return pathname.startsWith('/dashboard/stores');
     if (item.matchPrefix) return pathname.startsWith(item.matchPrefix);
     return pathname === item.href;
 }
