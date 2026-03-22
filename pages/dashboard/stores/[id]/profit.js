@@ -3,9 +3,9 @@
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import Head from 'next/head';
 import { Bar, Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
+import DashboardLayout from '@/components/DashboardLayout';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
@@ -62,7 +62,6 @@ export default function ProfitReconciliation() {
     const [marginOverride, setMarginOverride] = useState('51.91');
     const [sortBy, setSortBy] = useState('netProfit');
     const [useItemizedCogs, setUseItemizedCogs] = useState(false);
-    const [isLiveQuery, setIsLiveQuery] = useState(false);
     const [dateFrom, setDateFrom] = useState(() => { const d = new Date(); d.setDate(d.getDate() - 30); return d.toISOString().split('T')[0]; });
     const [dateTo, setDateTo] = useState(() => new Date().toISOString().split('T')[0]);
 
@@ -88,43 +87,7 @@ export default function ProfitReconciliation() {
                 setReport(rp);
             }
 
-            try {
-                // Fetch live BigQuery Data
-                const bqRes = await fetch(`/api/stores/${id}/database/profit`);
-                const bqData = await bqRes.json();
-
-                if (bqData.success && rp && bqData.data?.length > 0) {
-                    const bqRows = bqData.data;
-                    const mergedData = rp.campaigns.map(c => {
-                        const bqMatch = bqRows.find(r => r.campaignName.toLowerCase() === c.campaignName.toLowerCase());
-                        const trueRev = bqMatch ? bqMatch.trueRevenue : (c.spend * (c.estimatedTrueRoas || 1));
-                        const cogs = bqMatch ? bqMatch.cogs : (trueRev * (1 - (parseFloat(marginOverride) / 100)));
-                        const grossProfit = trueRev - cogs;
-                        const netProfit = grossProfit - c.spend;
-                        const profitRoas = c.spend > 0 ? (grossProfit / c.spend) : 0;
-                        return {
-                            ...c,
-                            trueRevenue: trueRev,
-                            cogs: cogs,
-                            grossProfit,
-                            netProfit,
-                            profitRoas: profitRoas.toFixed(2),
-                            isProfitable: netProfit > 0,
-                            isLiveBq: !!bqMatch
-                        }
-                    });
-                    setProfitData(mergedData);
-                    setUseItemizedCogs(true);
-                    setIsLiveQuery(true);
-                } else {
-                    setProfitData(generateProfitData(rp, useItemizedCogs, marginOverride));
-                    setIsLiveQuery(false);
-                }
-            } catch (e) {
-                console.warn('BQ error, falling back to mock rules', e);
-                setProfitData(generateProfitData(rp, useItemizedCogs, marginOverride));
-                setIsLiveQuery(false);
-            }
+            setProfitData(generateProfitData(rp, useItemizedCogs, marginOverride));
         } catch (e) {
             console.error(e);
         }
@@ -142,7 +105,7 @@ export default function ProfitReconciliation() {
     };
 
     if (status === 'loading' || loading) {
-        return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>Loading...</div>;
+        return <DashboardLayout title="Profit Reconciliation — Calyxra"><div className="flex-center" style={{ minHeight: '60vh' }}>Loading...</div></DashboardLayout>;
     }
 
     const fmt = v => '$' + Math.round(v || 0).toLocaleString();
@@ -169,23 +132,9 @@ export default function ProfitReconciliation() {
     };
 
     return (
-        <>
-            <Head>
-                <title>Profit Reconciliation — {store?.name || 'Store'} — Calyxra</title>
-                <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-            </Head>
-            <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter', sans-serif" }}>
-                {/* Navbar */}
-                <div style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '12px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <a href={`/dashboard/stores/${id}`} style={{ color: '#6b7280', textDecoration: 'none', fontSize: 14 }}>← {store?.name}</a>
-                        <span style={{ color: '#d1d5db' }}>|</span>
-                        <span style={{ fontWeight: 600, color: '#111827' }}>📊 Profit Reconciliation</span>
-                    </div>
-                    <a href={`/dashboard/stores/${id}/database`} style={{ padding: '4px 10px', background: '#f3f4f6', borderRadius: 6, color: '#6b7280', textDecoration: 'none', fontSize: 12 }}>🗄️ Database</a>
-                </div>
-
-                <div style={{ maxWidth: 1100, margin: '0 auto', padding: '24px 24px' }}>
+        <DashboardLayout title={`Profit Reconciliation — ${store?.name || 'Store'} — Calyxra`}>
+            <div className="container" style={{ padding: '24px' }}>
+                    <a href={`/dashboard/stores/${id}`} style={{ color: 'var(--c-gray-400)', textDecoration: 'none', fontSize: 13, display: 'inline-block', marginBottom: 16 }}>← Back to {store?.name || 'Store'}</a>
                     {!report ? (
                         <div style={{ background: '#fff', borderRadius: 12, padding: 60, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
                             <div style={{ fontSize: 48, marginBottom: 16 }}>📊</div>
@@ -197,11 +146,8 @@ export default function ProfitReconciliation() {
                         <>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                                 <div>
-                                    <h1 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, margin: 0, display: 'flex', alignItems: 'center', gap: 12 }}>
+                                    <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>
                                         Profit Reconciliation
-                                        {isLiveQuery && (
-                                            <span style={{ fontSize: 11, background: '#10b981', color: '#fff', padding: '2px 8px', borderRadius: 12, fontFamily: "'Inter', sans-serif" }}>Live BigQuery Data</span>
-                                        )}
                                     </h1>
                                     <p style={{ color: '#6b7280', fontSize: 13, margin: '4px 0 0' }}>
                                         True profit per campaign after COGS — not just phantom revenue, but phantom <em>profit</em>.
@@ -378,7 +324,6 @@ export default function ProfitReconciliation() {
                         </>
                     )}
                 </div>
-            </div>
-        </>
+        </DashboardLayout>
     );
 }

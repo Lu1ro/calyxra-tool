@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import Head from 'next/head';
+import DashboardLayout from '@/components/DashboardLayout';
 
 const GREEN = '#00b894';
 
@@ -179,24 +179,13 @@ export default function DatabaseConnector() {
     };
 
     if (status === 'loading') {
-        return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>Loading...</div>;
+        return <DashboardLayout title="Database Connector — Calyxra"><div className="flex-center" style={{ minHeight: '60vh' }}>Loading...</div></DashboardLayout>;
     }
 
     return (
-        <>
-            <Head>
-                <title>Database Connector — {store?.name || 'Store'} — Calyxra</title>
-                <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-            </Head>
-            <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter', sans-serif" }}>
-                {/* Navbar */}
-                <div style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '12px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <a href={`/dashboard/stores/${id}`} style={{ color: '#6b7280', textDecoration: 'none', fontSize: 14 }}>← {store?.name}</a>
-                        <span style={{ color: '#d1d5db' }}>|</span>
-                        <span style={{ fontWeight: 600, color: '#111827' }}>🗄️ Database Connector</span>
-                    </div>
-                    <a href={`/dashboard/stores/${id}/settings`} style={{ padding: '4px 10px', background: '#f3f4f6', borderRadius: 6, color: '#6b7280', textDecoration: 'none', fontSize: 12 }}>⚙️ Settings</a>
+        <DashboardLayout title={`Database Connector — ${store?.name || 'Store'} — Calyxra`}>
+                <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 16 }}>
+                    <a href={`/dashboard/stores/${id}`} style={{ color: '#6b7280', textDecoration: 'none' }}>← Back to {store?.name || 'Store'}</a>
                 </div>
 
                 <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px' }}>
@@ -448,7 +437,6 @@ export default function DatabaseConnector() {
                         </div>
                     </div>
                 </div>
-            </div>
-        </>
+        </DashboardLayout>
     );
 }

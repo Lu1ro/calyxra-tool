@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import Head from 'next/head';
+import DashboardLayout from '@/components/DashboardLayout';
 import { Bar, Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 
@@ -74,7 +74,7 @@ export default function CustomerQuality() {
     };
 
     if (status === 'loading' || loading) {
-        return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>Loading...</div>;
+        return <DashboardLayout title="Customer Quality — Calyxra"><div className="flex-center" style={{ minHeight: '60vh' }}>Loading...</div></DashboardLayout>;
     }
 
     const totalCustomers = customerData.reduce((s, c) => s + c.totalCustomers, 0);
@@ -101,22 +101,12 @@ export default function CustomerQuality() {
     };
 
     return (
-        <>
-            <Head>
-                <title>Customer Quality — {store?.name || 'Store'} — Calyxra</title>
-                <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-            </Head>
-            <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter', sans-serif" }}>
-                {/* Navbar */}
-                <div style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '12px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <a href={`/dashboard/stores/${id}`} style={{ color: '#6b7280', textDecoration: 'none', fontSize: 14 }}>← {store?.name}</a>
-                        <span style={{ color: '#d1d5db' }}>|</span>
-                        <span style={{ fontWeight: 600, color: '#111827' }}>👥 Customer Quality</span>
-                    </div>
+        <DashboardLayout title={`Customer Quality — ${store?.name || 'Store'} — Calyxra`}>
+            <div className="container" style={{ maxWidth: 1100 }}>
+                {/* Breadcrumb */}
+                <div style={{ marginBottom: 8 }}>
+                    <a href={`/dashboard/stores/${id}`} style={{ color: 'var(--c-gray-500)', fontSize: 13, textDecoration: 'none' }}>&larr; Back to {store?.name}</a>
                 </div>
-
-                <div style={{ maxWidth: 1100, margin: '0 auto', padding: '24px 24px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 24 }}>
                         <div>
                             <h1 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, margin: '0 0 4px' }}>Customer Quality</h1>
@@ -187,7 +177,6 @@ export default function CustomerQuality() {
                     </div>
 
                 </div>
-            </div>
-        </>
+        </DashboardLayout>
     );
 }

@@ -207,8 +207,9 @@ export default function StoreDashboard() {
                         <EmptyState store={store} storeId={id} onTrySample={() => runReconciliation(true)} />
                     ) : latestReport && (
                         <>
-                            {/* Primary KPI Cards */}
+                            {/* All insights — blurred for free tier */}
                             <div style={{ position: 'relative' }}>
+                                {/* Primary KPI Cards */}
                                 <div className="kpi-grid animate-stagger" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
                                     <KPICard
                                         label="Phantom Revenue"
@@ -262,6 +263,43 @@ export default function StoreDashboard() {
                                 )}
                             </div>
 
+                            {/* Everything below is blurred for free tier */}
+                            {agencyTier === 'free' ? (
+                                <div style={{ position: 'relative', marginTop: 8 }}>
+                                    <div style={{ filter: 'blur(6px)', pointerEvents: 'none', userSelect: 'none', opacity: 0.5 }}>
+                                        {latestReport.kpis && latestReport.kpis.length > 0 && (
+                                            <div style={{ display: 'flex', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
+                                                {latestReport.kpis.slice(0, 3).map(k => (
+                                                    <div key={k.key} className="card" style={{ flex: '1 1 140px', minWidth: 140, textAlign: 'center', background: '#f0fdf4' }}>
+                                                        <div style={{ fontSize: 11, color: 'var(--c-gray-500)', fontWeight: 600, textTransform: 'uppercase' }}>{k.label}</div>
+                                                        <div style={{ fontSize: 22, fontWeight: 700 }}>***</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                        <div className="card" style={{ height: 200, marginBottom: 24 }}>
+                                            <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 16px', color: 'var(--c-gray-900)' }}>Historical Trend</h3>
+                                            <div style={{ height: 140, background: 'var(--c-gray-50)', borderRadius: 8 }} />
+                                        </div>
+                                        <div className="card" style={{ height: 150, marginBottom: 24 }}>
+                                            <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 16px', color: 'var(--c-gray-900)' }}>Campaign Profitability</h3>
+                                            <div style={{ height: 80, background: 'var(--c-gray-50)', borderRadius: 8 }} />
+                                        </div>
+                                    </div>
+                                    <div style={{
+                                        position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                                        textAlign: 'center', zIndex: 10,
+                                    }}>
+                                        <div style={{ width: 48, height: 48, borderRadius: 12, background: '#fff', boxShadow: '0 4px 24px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                                        </div>
+                                        <p style={{ fontWeight: 700, fontSize: 16, color: 'var(--c-gray-800)', margin: '0 0 4px' }}>Unlock full insights</p>
+                                        <p style={{ fontSize: 13, color: 'var(--c-gray-500)', margin: '0 0 16px' }}>KPIs, trends, campaigns & action engine</p>
+                                        <a href="https://calyxra.com/#pricing" className="btn btn-primary btn-sm" style={{ textDecoration: 'none' }}>Upgrade — $150/month</a>
+                                    </div>
+                                </div>
+                            ) : (
+                            <>
                             {/* Extended KPI Cards */}
                             {latestReport.kpis && latestReport.kpis.length > 0 && (
                                 <div className="animate-stagger" style={{ display: 'flex', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
@@ -282,7 +320,7 @@ export default function StoreDashboard() {
                             )}
 
                             {/* Trend Chart + Gap Breakdown */}
-                            <div className="animate-fade-in" style={{ display: 'grid', gridTemplateColumns: trendData ? '2fr 1fr' : '1fr', gap: 16, marginBottom: 24 }}>
+                            <div className="animate-fade-in" style={{ display: 'grid', gridTemplateColumns: trendData ? '5fr 2fr' : '1fr', gap: 16, marginBottom: 24 }}>
                                 {trendData && (
                                     <div className="card">
                                         <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 16px', color: 'var(--c-gray-900)', letterSpacing: '-0.01em' }}>Historical Trend</h3>
@@ -303,19 +341,22 @@ export default function StoreDashboard() {
                                         }} />
                                     </div>
                                 )}
-                                <div className="card">
-                                    <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 16px', color: 'var(--c-gray-900)', letterSpacing: '-0.01em' }}>Gap Decomposition</h3>
-                                    <Doughnut data={{
-                                        labels: ['Discount Leak', 'Refund Leak', 'Chargebacks'],
-                                        datasets: [{ data: [latestReport.gapBreakdown?.discountLeak || 0, latestReport.gapBreakdown?.refundLeak || 0, latestReport.gapBreakdown?.chargebacks || 0], backgroundColor: ['#f59e0b', '#ef4444', '#94a3b8'], borderWidth: 0, borderRadius: 4 }],
-                                    }} options={{
-                                        responsive: true,
-                                        cutout: '65%',
-                                        plugins: {
-                                            legend: { position: 'bottom', labels: { font: { size: 12, weight: '500', family: 'Inter' }, padding: 16, usePointStyle: true, pointStyleWidth: 8, boxHeight: 6 } },
-                                            tooltip: { backgroundColor: '#0f172a', titleFont: { size: 12, family: 'Inter' }, bodyFont: { size: 12, family: 'Inter' }, padding: 10, cornerRadius: 8 },
-                                        },
-                                    }} />
+                                <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                    <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 12px', color: 'var(--c-gray-900)', letterSpacing: '-0.01em', alignSelf: 'flex-start' }}>Gap Decomposition</h3>
+                                    <div style={{ maxWidth: 200, width: '100%' }}>
+                                        <Doughnut data={{
+                                            labels: ['Discount Leak', 'Refund Leak', 'Chargebacks'],
+                                            datasets: [{ data: [latestReport.gapBreakdown?.discountLeak || 0, latestReport.gapBreakdown?.refundLeak || 0, latestReport.gapBreakdown?.chargebacks || 0], backgroundColor: ['#f59e0b', '#ef4444', '#94a3b8'], borderWidth: 0, borderRadius: 4 }],
+                                        }} options={{
+                                            responsive: true,
+                                            maintainAspectRatio: true,
+                                            cutout: '62%',
+                                            plugins: {
+                                                legend: { position: 'bottom', labels: { font: { size: 11, weight: '500', family: 'Inter' }, padding: 10, usePointStyle: true, pointStyleWidth: 8, boxHeight: 6 } },
+                                                tooltip: { backgroundColor: '#0f172a', titleFont: { size: 12, family: 'Inter' }, bodyFont: { size: 12, family: 'Inter' }, padding: 10, cornerRadius: 8 },
+                                            },
+                                        }} />
+                                    </div>
                                 </div>
                             </div>
 
@@ -493,6 +534,8 @@ export default function StoreDashboard() {
                                         </tbody>
                                     </table>
                                 </div>
+                            )}
+                            </>
                             )}
                         </>
                     )}

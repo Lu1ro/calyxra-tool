@@ -127,7 +127,7 @@ export default function DashboardLayout({ title, children }) {
             </div>
 
             {/* Nav section label */}
-            {(sidebarOpen || isMobile) && <div className="cx-nav-label">Menu</div>}
+            {(sidebarOpen || isMobile) && <div className="cx-nav-label">Navigation</div>}
 
             {/* Nav items */}
             <nav className="cx-nav">
@@ -187,11 +187,11 @@ export default function DashboardLayout({ title, children }) {
                 /* ─── Sidebar ─── */
                 .cx-sidebar {
                     position: fixed; top: 0; left: 0; height: 100vh;
-                    background: #0f172a;
+                    background: #fff;
                     display: flex; flex-direction: column; z-index: 100;
                     transition: width 200ms cubic-bezier(0.4, 0, 0.2, 1);
                     overflow: hidden;
-                    border-right: 1px solid rgba(255,255,255,0.06);
+                    border-right: 1px solid #e2e8f0;
                 }
                 .cx-sidebar-collapsed .cx-nav-item { justify-content: center; padding: 10px 0; }
                 .cx-sidebar-collapsed .cx-nav-icon { margin-right: 0; }
@@ -200,46 +200,46 @@ export default function DashboardLayout({ title, children }) {
                 .cx-sidebar-logo {
                     display: flex; align-items: center; gap: 10px;
                     padding: 20px 16px 16px; position: relative; min-height: 56px;
-                    border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 8px;
+                    border-bottom: 1px solid #f1f5f9; margin-bottom: 8px;
                 }
                 .cx-logo-mark { flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-                .cx-logo-text { font-size: 17px; font-weight: 700; color: rgba(255,255,255,0.92); letter-spacing: -0.3px; white-space: nowrap; }
+                .cx-logo-text { font-size: 17px; font-weight: 700; color: #1e293b; letter-spacing: -0.3px; white-space: nowrap; }
                 .cx-logo-accent { color: #10b981; }
 
                 .cx-sidebar-toggle {
                     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-                    background: transparent; border: none; color: rgba(255,255,255,0.2);
+                    background: transparent; border: none; color: #94a3b8;
                     cursor: pointer; padding: 6px; border-radius: 6px; display: flex;
                     align-items: center; justify-content: center; opacity: 0;
                     transition: opacity 200ms, color 200ms, background 200ms;
                 }
                 .cx-sidebar:hover .cx-sidebar-toggle { opacity: 1; }
-                .cx-sidebar-toggle:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); }
+                .cx-sidebar-toggle:hover { background: #f1f5f9; color: #64748b; }
 
                 .cx-sidebar-close {
                     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-                    background: transparent; border: none; color: rgba(255,255,255,0.4);
+                    background: transparent; border: none; color: #94a3b8;
                     cursor: pointer; padding: 4px; display: flex; border-radius: 6px;
                     transition: color 150ms, background 150ms;
                 }
-                .cx-sidebar-close:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); }
+                .cx-sidebar-close:hover { background: #f1f5f9; color: #475569; }
 
                 /* ─── Nav ─── */
                 .cx-nav-label {
                     padding: 0 20px; margin-bottom: 4px; margin-top: 4px;
                     font-size: 10px; font-weight: 600; letter-spacing: 1px;
-                    text-transform: uppercase; color: rgba(255,255,255,0.15); white-space: nowrap;
+                    text-transform: uppercase; color: #cbd5e1; white-space: nowrap;
                 }
                 .cx-nav { flex: 1; padding: 0 8px; display: flex; flex-direction: column; gap: 2px; }
                 .cx-nav-item {
                     display: flex; align-items: center; gap: 10px; padding: 9px 12px;
-                    border-radius: 8px; color: rgba(255,255,255,0.45); text-decoration: none;
+                    border-radius: 8px; color: #64748b; text-decoration: none;
                     font-size: 13.5px; font-weight: 500; transition: all 150ms ease;
                     position: relative; white-space: nowrap;
                 }
-                .cx-nav-item:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.06); }
+                .cx-nav-item:hover { color: #1e293b; background: #f8fafc; }
                 .cx-nav-item-active {
-                    color: #fff; background: rgba(16,185,129,0.12);
+                    color: #166534; background: #f0fdf4;
                     border-left: 3px solid #10b981; margin-left: -3px;
                 }
                 .cx-nav-item-active .cx-nav-icon { color: #10b981; }
@@ -253,16 +253,16 @@ export default function DashboardLayout({ title, children }) {
                 }
                 .cx-alert-dot {
                     position: absolute; top: 8px; right: 10px; width: 7px; height: 7px;
-                    background: #ef4444; border-radius: 50%; border: 1.5px solid #0f172a;
+                    background: #ef4444; border-radius: 50%; border: 1.5px solid #fff;
                 }
                 .cx-coming-soon {
                     font-size: 9px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
-                    color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.06);
+                    color: #94a3b8; background: #f1f5f9;
                     padding: 2px 7px; border-radius: 4px;
                 }
 
                 /* ─── Sidebar Bottom ─── */
-                .cx-sidebar-bottom { padding: 12px 8px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 6px; }
+                .cx-sidebar-bottom { padding: 12px 8px; border-top: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 6px; }
                 .cx-tier-badge {
                     display: flex; align-items: center; justify-content: center; gap: 6px;
                     padding: 7px 10px; border-radius: 8px; font-size: 10.5px; font-weight: 700;
@@ -341,7 +341,11 @@ export default function DashboardLayout({ title, children }) {
                 }
                 .cx-signout:hover { background: var(--c-gray-50, #f8fafc); border-color: var(--c-gray-300, #cbd5e1); color: var(--color-text, #1e293b); }
 
-                .cx-content { flex: 1; overflow-y: auto; }
+                .cx-content { flex: 1; overflow-y: auto; animation: pageSlideIn 300ms cubic-bezier(0.4, 0, 0.2, 1); }
+                @keyframes pageSlideIn {
+                    from { opacity: 0; transform: translateY(8px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
 
                 /* ─── Free tier banner ─── */
                 .cx-free-banner {
@@ -360,7 +364,7 @@ export default function DashboardLayout({ title, children }) {
                 /* ─── Mobile overlay ─── */
                 .cx-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
                 .cx-overlay-visible { display: block; animation: fadeIn 200ms ease; }
-                .cx-sidebar-mobile { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; z-index: 200; animation: sidebarSlideIn 200ms cubic-bezier(0.4, 0, 0.2, 1); }
+                .cx-sidebar-mobile { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; z-index: 200; animation: sidebarSlideIn 200ms cubic-bezier(0.4, 0, 0.2, 1); background: #fff; }
 
                 @keyframes sidebarSlideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
 
