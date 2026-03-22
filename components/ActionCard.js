@@ -1,45 +1,45 @@
 // components/ActionCard.js
-// Single optimizer action recommendation card
+// Single optimizer action card with color-coded left border
 
 export default function ActionCard({ action, onExecute, executing, formatCurrency }) {
-    const colors = {
-        PAUSE: { bg: 'var(--c-red-light)', border: 'var(--c-red-border)', color: 'var(--c-red)', emoji: '⏸️' },
-        REDUCE: { bg: 'var(--c-amber-light)', border: 'var(--c-amber-border)', color: '#92400e', emoji: '📉' },
-        SCALE: { bg: 'var(--c-green-bg)', border: 'var(--c-green-border)', color: 'var(--c-green)', emoji: '📈' },
-        MAINTAIN: { bg: 'var(--c-gray-50)', border: 'var(--c-gray-200)', color: 'var(--c-gray-600)', emoji: '✅' },
+    const styles = {
+        PAUSE: { border: '#ef4444', bg: '#fef2f2', label: 'var(--c-red)', badge: 'badge-red' },
+        REDUCE: { border: '#f59e0b', bg: '#fffbeb', label: '#92400e', badge: 'badge-amber' },
+        SCALE: { border: '#10b981', bg: '#f0fdf4', label: '#059669', badge: 'badge-green' },
+        MAINTAIN: { border: 'var(--c-gray-300)', bg: 'var(--c-gray-50)', label: 'var(--c-gray-600)', badge: 'badge-gray' },
     };
 
-    const style = colors[action.action] || colors.MAINTAIN;
+    const s = styles[action.action] || styles.MAINTAIN;
 
     return (
         <div
             className="animate-fade-in"
             style={{
-                background: style.bg,
-                border: `1px solid ${style.border}`,
-                borderRadius: 'var(--radius-lg)',
-                padding: 'var(--space-4)',
+                background: s.bg,
+                borderLeft: `3px solid ${s.border}`,
+                borderRadius: '0 8px 8px 0',
+                padding: '14px 16px',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                gap: 'var(--space-4)',
-                transition: 'all var(--transition-fast)',
+                gap: 16,
+                transition: 'all 150ms',
             }}
         >
             <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="flex-gap-2" style={{ marginBottom: 'var(--space-1)' }}>
-                    <span style={{ fontSize: 'var(--text-md)', fontWeight: 600, color: style.color }}>
-                        {style.emoji} {action.action}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <span className={`badge ${s.badge}`} style={{ fontWeight: 700, letterSpacing: '0.03em' }}>
+                        {action.action}
                     </span>
-                    <span className={`badge badge-${action.channel === 'Meta' ? 'blue' : 'amber'}`}>
+                    <span className={`badge badge-${action.channel === 'Meta' ? 'blue' : action.channel === 'Google' ? 'amber' : 'pink'}`}>
                         {action.channel}
                     </span>
                 </div>
-                <div style={{ fontSize: 'var(--text-md)', fontWeight: 500, color: 'var(--c-gray-900)', marginBottom: 2 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-gray-900)', marginBottom: 2 }}>
                     {action.campaignName}
                 </div>
-                <div className="text-sm text-muted">{action.reason}</div>
-                <div className="text-xs" style={{ marginTop: 'var(--space-1)', color: style.color }}>
+                <div style={{ fontSize: 12, color: 'var(--c-gray-500)' }}>{action.reason}</div>
+                <div style={{ fontSize: 12, marginTop: 4, color: s.label, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
                     {formatCurrency(action.currentSpend)} → {formatCurrency(action.recommendedSpend)}
                     {action.impact && ` · ${action.impact}`}
                 </div>
@@ -51,7 +51,7 @@ export default function ActionCard({ action, onExecute, executing, formatCurrenc
                     disabled={executing}
                     style={{ flexShrink: 0 }}
                 >
-                    {executing ? '⏳' : 'Execute'}
+                    {executing ? 'Running...' : 'Execute'}
                 </button>
             )}
         </div>

@@ -1,18 +1,19 @@
 // pages/dashboard/stores/[id]/analytics.js
-// Embedded Analytics — Iframe for Looker / PowerBI dashboards
+// Embedded Analytics — BI Dashboard management with proper empty/coming soon states
+
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import Head from 'next/head';
-
-const GREEN = '#00b894';
+import DashboardLayout from '@/components/DashboardLayout';
 
 const DEMO_DASHBOARDS = [
-    { id: 'looker_recon', name: 'Reconciliation Layer (Looker)', type: 'looker', defaultUrl: 'https://lookerstudio.google.com/embed/reporting/demo1' },
-    { id: 'looker_exec', name: 'Executive KPI (Looker)', type: 'looker', defaultUrl: 'https://lookerstudio.google.com/embed/reporting/demo2' },
-    { id: 'powerbi_customer', name: 'Customer Analytics (PowerBI)', type: 'powerbi', defaultUrl: 'https://app.powerbi.com/view?r=demo3' },
-    { id: 'powerbi_channel', name: 'Channel Spend (PowerBI)', type: 'powerbi', defaultUrl: 'https://app.powerbi.com/view?r=demo4' },
+    { id: 'looker_recon', name: 'Reconciliation Layer', type: 'looker', defaultUrl: '' },
+    { id: 'looker_exec', name: 'Executive KPI', type: 'looker', defaultUrl: '' },
+    { id: 'powerbi_customer', name: 'Customer Analytics', type: 'powerbi', defaultUrl: '' },
+    { id: 'powerbi_channel', name: 'Channel Spend', type: 'powerbi', defaultUrl: '' },
 ];
+
+const ALLOWED_DOMAINS = ['lookerstudio.google.com', 'app.powerbi.com', 'tableau.com'];
 
 export default function EmbeddedAnalytics() {
     const { data: session, status } = useSession();
@@ -25,14 +26,10 @@ export default function EmbeddedAnalytics() {
     const [isConfiguring, setIsConfiguring] = useState(false);
     const [newDashName, setNewDashName] = useState('');
     const [newDashUrl, setNewDashUrl] = useState('');
+    const [urlError, setUrlError] = useState('');
 
-    useEffect(() => {
-        if (status === 'unauthenticated') router.push('/login');
-    }, [status]);
-
-    useEffect(() => {
-        if (session && id) fetchStore();
-    }, [session, id]);
+    useEffect(() => { if (status === 'unauthenticated') router.push('/login'); }, [status]);
+    useEffect(() => { if (session && id) fetchStore(); }, [session, id]);
 
     const fetchStore = async () => {
         try {
@@ -40,24 +37,14 @@ export default function EmbeddedAnalytics() {
             const data = await res.json();
             const s = data.stores?.find(st => st.id === id);
             setStore(s);
-
             let savedDashboards = [];
             if (s?.analyticsConfig) {
-                try {
-                    savedDashboards = JSON.parse(s.analyticsConfig);
-                } catch (err) {
-                    console.error("Failed to parse analytics config:", err);
-                }
+                try { savedDashboards = JSON.parse(s.analyticsConfig); } catch (err) {}
             }
-            // Add defaults if none saved
-            if (savedDashboards.length === 0) {
-                savedDashboards = DEMO_DASHBOARDS;
-            }
+            if (savedDashboards.length === 0) savedDashboards = DEMO_DASHBOARDS;
             setDashboards(savedDashboards);
             if (savedDashboards.length > 0) setSelectedDash(savedDashboards[0]);
-        } catch (e) {
-            console.error(e);
-        }
+        } catch (e) { console.error(e); }
     };
 
     const handleSaveDashboards = async (newDashboards) => {
@@ -66,142 +53,168 @@ export default function EmbeddedAnalytics() {
             await fetch(`/api/stores/${id}/settings`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    analyticsConfig: JSON.stringify(newDashboards)
-                }),
+                body: JSON.stringify({ analyticsConfig: JSON.stringify(newDashboards) }),
             });
-        } catch (e) {
-            console.error(e);
-        }
+        } catch (e) { console.error(e); }
+    };
+
+    const validateUrl = (url) => {
+        try {
+            const urlObj = new URL(url);
+            return ALLOWED_DOMAINS.some(d => urlObj.hostname === d || urlObj.hostname.endsWith('.' + d));
+        } catch { return false; }
     };
 
     const handleAddDashboard = () => {
         if (!newDashName || !newDashUrl) return;
-
-        // Iframe Sanitization
-        const allowedDomains = ['lookerstudio.google.com', 'app.powerbi.com', 'tableau.com'];
-        try {
-            const urlObj = new URL(newDashUrl);
-            const isAllowed = allowedDomains.includes(urlObj.hostname) ||
-                urlObj.hostname.endsWith('.lookerstudio.google.com') ||
-                urlObj.hostname.endsWith('.powerbi.com') ||
-                urlObj.hostname.endsWith('.tableau.com');
-
-            if (!isAllowed) {
-                alert("For security reasons, only Looker Studio, PowerBI, and Tableau URLs are allowed.");
-                return;
-            }
-        } catch (e) {
-            alert("Please enter a valid URL (starting with https://).");
+        if (!validateUrl(newDashUrl)) {
+            setUrlError('Only Looker Studio, PowerBI, and Tableau URLs are allowed.');
             return;
         }
-
-        const newDashboards = [...dashboards, { id: 'dash_' + Date.now(), name: newDashName, url: newDashUrl, type: newDashUrl.includes('powerbi') ? 'powerbi' : 'looker' }];
-        handleSaveDashboards(newDashboards);
+        setUrlError('');
+        const newDash = { id: 'dash_' + Date.now(), name: newDashName, url: newDashUrl, type: newDashUrl.includes('powerbi') ? 'powerbi' : 'looker' };
+        const updated = [...dashboards, newDash];
+        handleSaveDashboards(updated);
         setNewDashName('');
         setNewDashUrl('');
-        setSelectedDash(newDashboards[newDashboards.length - 1]);
+        setSelectedDash(newDash);
         setIsConfiguring(false);
     };
 
     const handleRemoveDashboard = (dashId) => {
-        const newDashboards = dashboards.filter(d => d.id !== dashId);
-        handleSaveDashboards(newDashboards);
-        if (selectedDash?.id === dashId && newDashboards.length > 0) {
-            setSelectedDash(newDashboards[0]);
-        }
+        const updated = dashboards.filter(d => d.id !== dashId);
+        handleSaveDashboards(updated);
+        if (selectedDash?.id === dashId && updated.length > 0) setSelectedDash(updated[0]);
+        else if (updated.length === 0) setSelectedDash(null);
+    };
+
+    const handleUpdateUrl = (dashId, url) => {
+        const updated = dashboards.map(d => d.id === dashId ? { ...d, url } : d);
+        handleSaveDashboards(updated);
+        if (selectedDash?.id === dashId) setSelectedDash({ ...selectedDash, url });
     };
 
     if (status === 'loading') {
-        return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>Loading...</div>;
+        return <DashboardLayout title="Analytics — Calyxra"><div className="flex-center" style={{ minHeight: '60vh' }}>Loading...</div></DashboardLayout>;
     }
 
+    const hasRealUrl = selectedDash?.url && selectedDash.url.startsWith('https://') && validateUrl(selectedDash.url);
+
     return (
-        <>
-            <Head>
-                <title>Embedded Analytics — {store?.name || 'Store'} — Calyxra</title>
-                <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-            </Head>
-            <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: 'column' }}>
-                {/* Navbar */}
-                <div style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '12px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <a href={`/dashboard/stores/${id}`} style={{ color: '#6b7280', textDecoration: 'none', fontSize: 14 }}>← {store?.name}</a>
-                        <span style={{ color: '#d1d5db' }}>|</span>
-                        <span style={{ fontWeight: 600, color: '#111827' }}>📈 BI Dashboards</span>
+        <DashboardLayout title={`BI Dashboards — ${store?.name || 'Store'} — Calyxra`}>
+            <div className="container" style={{ maxWidth: 1100 }}>
+                {/* Breadcrumb */}
+                <div style={{ marginBottom: 8 }}>
+                    <a href={`/dashboard/stores/${id}`} style={{ color: 'var(--c-gray-500)', fontSize: 13, textDecoration: 'none' }}>&larr; Back to {store?.name}</a>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                    <div>
+                        <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0, color: 'var(--c-gray-900)', letterSpacing: '-0.02em' }}>BI Dashboards</h1>
+                        <p style={{ color: 'var(--c-gray-500)', fontSize: 14, marginTop: 4 }}>Embed your Looker Studio or Power BI dashboards</p>
                     </div>
-                    <button onClick={() => setIsConfiguring(!isConfiguring)} style={{ padding: '6px 14px', background: isConfiguring ? '#e5e7eb' : '#f3f4f6', border: 'none', borderRadius: 6, color: '#374151', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-                        ⚙️ Configure Dashboards
+                    <button onClick={() => setIsConfiguring(!isConfiguring)} className={`btn ${isConfiguring ? 'btn-primary' : 'btn-secondary'} btn-sm`}>
+                        {isConfiguring ? 'Done' : 'Configure'}
                     </button>
                 </div>
 
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: 'calc(100vh - 57px)' }}>
-                    {/* Dashboard Tabs */}
-                    <div style={{ background: '#fff', padding: '0 32px', borderBottom: '1px solid #e5e7eb', display: 'flex', gap: 24, overflowX: 'auto' }}>
-                        {dashboards.map(dash => (
-                            <div
-                                key={dash.id}
-                                onClick={() => setSelectedDash(dash)}
-                                style={{
-                                    padding: '16px 0', fontSize: 14, fontWeight: selectedDash?.id === dash.id ? 600 : 500,
-                                    color: selectedDash?.id === dash.id ? GREEN : '#6b7280', cursor: 'pointer',
-                                    borderBottom: selectedDash?.id === dash.id ? `3px solid ${GREEN}` : '3px solid transparent',
-                                    whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 8,
-                                }}
-                            >
-                                <span>{dash.type === 'powerbi' ? '📊' : '📈'}</span>
-                                {dash.name}
-                                {isConfiguring && (
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); handleRemoveDashboard(dash.id); }}
-                                        style={{ background: 'transparent', border: 'none', color: '#ef4444', fontSize: 12, cursor: 'pointer', padding: 2, marginLeft: 4 }}
-                                        title="Remove dashboard"
-                                    >✕</button>
+                {/* Dashboard Tabs */}
+                <div style={{ display: 'flex', gap: 6, marginBottom: 20, overflowX: 'auto', paddingBottom: 4 }}>
+                    {dashboards.map(dash => (
+                        <button key={dash.id} onClick={() => setSelectedDash(dash)}
+                            style={{
+                                padding: '8px 16px', borderRadius: 8, fontSize: 13, border: 'none',
+                                background: selectedDash?.id === dash.id ? '#f0fdf4' : '#fff',
+                                color: selectedDash?.id === dash.id ? '#166534' : 'var(--c-gray-600)',
+                                fontWeight: selectedDash?.id === dash.id ? 600 : 500, cursor: 'pointer',
+                                boxShadow: selectedDash?.id === dash.id ? 'inset 0 0 0 1.5px #a7f3d0' : 'inset 0 0 0 1px var(--c-gray-200)',
+                                transition: 'all 150ms', whiteSpace: 'nowrap',
+                                display: 'flex', alignItems: 'center', gap: 6,
+                            }}
+                        >
+                            {dash.type === 'powerbi' ? (
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="12" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="12" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg>
+                            ) : (
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                            )}
+                            {dash.name}
+                            {isConfiguring && (
+                                <span onClick={(e) => { e.stopPropagation(); handleRemoveDashboard(dash.id); }}
+                                    style={{ color: '#ef4444', cursor: 'pointer', marginLeft: 4, fontSize: 11 }}>
+                                    &times;
+                                </span>
+                            )}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Add Dashboard (when configuring) */}
+                {isConfiguring && (
+                    <div className="card" style={{ marginBottom: 20, padding: 18 }}>
+                        <h4 style={{ fontSize: 14, fontWeight: 600, margin: '0 0 12px', color: 'var(--c-gray-800)' }}>Add Dashboard</h4>
+                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                            <input value={newDashName} onChange={e => setNewDashName(e.target.value)}
+                                placeholder="Dashboard name" className="input" style={{ flex: '1 1 140px', minWidth: 140 }} />
+                            <input value={newDashUrl} onChange={e => { setNewDashUrl(e.target.value); setUrlError(''); }}
+                                placeholder="https://lookerstudio.google.com/embed/..." className="input" style={{ flex: '2 1 240px', minWidth: 240 }} />
+                            <button onClick={handleAddDashboard} className="btn btn-primary btn-sm" disabled={!newDashName || !newDashUrl}>Add</button>
+                        </div>
+                        {urlError && <p style={{ color: '#ef4444', fontSize: 12, marginTop: 6 }}>{urlError}</p>}
+                        <p style={{ color: 'var(--c-gray-400)', fontSize: 12, marginTop: 8 }}>Allowed: Looker Studio, PowerBI, Tableau embed URLs only.</p>
+                    </div>
+                )}
+
+                {/* Dashboard Content */}
+                {selectedDash ? (
+                    hasRealUrl ? (
+                        <div className="card" style={{ padding: 0, overflow: 'hidden', height: 600 }}>
+                            <iframe src={selectedDash.url} style={{ width: '100%', height: '100%', border: 'none' }} allowFullScreen title={selectedDash.name} />
+                        </div>
+                    ) : (
+                        /* Coming Soon / Not configured state */
+                        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+                            <div style={{ padding: '60px 40px', textAlign: 'center', background: 'linear-gradient(180deg, var(--c-gray-50) 0%, #fff 100%)' }}>
+                                <div style={{
+                                    width: 64, height: 64, borderRadius: 16,
+                                    background: selectedDash.type === 'powerbi' ? '#fff7ed' : '#f0fdf4',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    margin: '0 auto 20px',
+                                }}>
+                                    {selectedDash.type === 'powerbi' ? (
+                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="1.5"><rect x="3" y="12" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="12" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg>
+                                    ) : (
+                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                                    )}
+                                </div>
+                                <h3 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 8px', color: 'var(--c-gray-800)' }}>{selectedDash.name}</h3>
+                                <p style={{ color: 'var(--c-gray-500)', fontSize: 14, maxWidth: 420, margin: '0 auto 24px', lineHeight: 1.6 }}>
+                                    Connect your {selectedDash.type === 'powerbi' ? 'Power BI' : 'Looker Studio'} dashboard to see reconciliation data in your preferred BI tool.
+                                </p>
+
+                                {isConfiguring ? (
+                                    <div style={{ maxWidth: 400, margin: '0 auto' }}>
+                                        <input
+                                            value={selectedDash.url || ''}
+                                            onChange={e => handleUpdateUrl(selectedDash.id, e.target.value)}
+                                            placeholder={`Paste your ${selectedDash.type === 'powerbi' ? 'Power BI' : 'Looker Studio'} embed URL`}
+                                            className="input" style={{ width: '100%', textAlign: 'center' }}
+                                        />
+                                    </div>
+                                ) : (
+                                    <button onClick={() => setIsConfiguring(true)} className="btn btn-primary">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9"/></svg>
+                                        Configure Dashboard
+                                    </button>
                                 )}
                             </div>
-                        ))}
-                        {isConfiguring && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 0' }}>
-                                <input
-                                    type="text" value={newDashName} onChange={e => setNewDashName(e.target.value)}
-                                    placeholder="Dashboard Name" style={{ padding: '6px 10px', fontSize: 12, borderRadius: 4, border: '1px solid #d1d5db', width: 140 }}
-                                />
-                                <input
-                                    type="text" value={newDashUrl} onChange={e => setNewDashUrl(e.target.value)}
-                                    placeholder="Embed URL" style={{ padding: '6px 10px', fontSize: 12, borderRadius: 4, border: '1px solid #d1d5db', width: 200 }}
-                                />
-                                <button onClick={handleAddDashboard} style={{ background: GREEN, color: '#fff', border: 'none', borderRadius: 4, padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Add</button>
-                            </div>
-                        )}
+                        </div>
+                    )
+                ) : (
+                    <div className="card" style={{ padding: 48, textAlign: 'center' }}>
+                        <p style={{ color: 'var(--c-gray-500)', fontSize: 14 }}>No dashboards configured. Click &quot;Configure&quot; to add one.</p>
                     </div>
-
-                    {/* Iframe Container */}
-                    <div style={{ flex: 1, padding: 24, display: 'flex', flexDirection: 'column' }}>
-                        {selectedDash ? (
-                            <div style={{ flex: 1, background: '#fff', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', overflow: 'hidden', border: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column' }}>
-                                {/* Fake placeholder for demo since we can't iframe the actual powerbi links in this environment without real tokens */}
-                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111827', color: '#fff' }}>
-                                    <div style={{ textAlign: 'center' }}>
-                                        <div style={{ fontSize: 64, marginBottom: 16 }}>{selectedDash.type === 'powerbi' ? '📊' : '📈'}</div>
-                                        <h2 style={{ margin: '0 0 8px', fontFamily: "'DM Serif Display', serif" }}>{selectedDash.name}</h2>
-                                        <p style={{ color: '#9ca3af', fontSize: 14 }}>Embedded {selectedDash.type === 'powerbi' ? 'PowerBI' : 'Looker Studio'} dashboard via iframe</p>
-                                        <div style={{ marginTop: 24, padding: '12px 20px', background: 'rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 12, fontFamily: 'monospace', color: '#d1d5db' }}>
-                                            src: {selectedDash.url || selectedDash.defaultUrl}
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* The actual iframe code would be here:
-                                <iframe src={selectedDash.url || selectedDash.defaultUrl} style={{ width: '100%', height: '100%', border: 'none' }} allowFullScreen />
-                                */}
-                            </div>
-                        ) : (
-                            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}>
-                                No dashboards configured. Click "Configure Dashboards" to add one.
-                            </div>
-                        )}
-                    </div>
-                </div>
+                )}
             </div>
-        </>
+        </DashboardLayout>
     );
 }

@@ -1,44 +1,39 @@
 // pages/dashboard/stores/[id]/settings.js
-// Store connection settings — manage OAuth-based platform connections
+// Store connection settings — with manual credential fallback when OAuth is not configured
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import Head from 'next/head';
+import DashboardLayout from '@/components/DashboardLayout';
 
-const GREEN = '#00b894';
 const PLATFORMS = [
     {
-        id: 'shopify',
-        name: 'Shopify',
-        icon: '🛍️',
+        id: 'shopify', name: 'Shopify',
         description: 'Connect your Shopify store to pull order, revenue, and refund data.',
-        color: '#95bf47',
-        setup: 'oauth',
+        color: '#16a34a', setup: 'oauth',
+        icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>,
+        fields: [{ key: 'domain', label: 'Shopify Domain', placeholder: 'your-store.myshopify.com' }, { key: 'accessToken', label: 'Admin API Access Token', placeholder: 'shpat_...' }],
     },
     {
-        id: 'meta',
-        name: 'Meta Ads',
-        icon: '📘',
+        id: 'meta', name: 'Meta Ads',
         description: 'Connect Meta (Facebook/Instagram) to pull campaign data and reported conversions.',
-        color: '#1877f2',
-        setup: 'oauth',
+        color: '#2563eb', setup: 'oauth',
+        icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>,
+        fields: [{ key: 'accessToken', label: 'Access Token', placeholder: 'EAA...' }, { key: 'accountId', label: 'Ad Account ID', placeholder: 'act_123456789' }],
     },
     {
-        id: 'google',
-        name: 'Google Ads',
-        icon: '🔍',
+        id: 'google', name: 'Google Ads',
         description: 'Connect Google Ads to pull PMax, Search, Shopping campaign data.',
-        color: '#4285f4',
-        setup: 'oauth',
+        color: '#ea4335', setup: 'oauth',
+        icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+        fields: [{ key: 'developerToken', label: 'Developer Token', placeholder: 'AbCdEfGhIjKl...' }, { key: 'customerId', label: 'Customer ID', placeholder: '123-456-7890' }],
     },
     {
-        id: 'tiktok',
-        name: 'TikTok Ads',
-        icon: '🎵',
+        id: 'tiktok', name: 'TikTok Ads',
         description: 'Connect TikTok for Business to pull campaign metrics.',
-        color: '#000000',
-        setup: 'oauth',
+        color: '#000000', setup: 'oauth',
+        icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M9 12a4 4 0 104 4V4a5 5 0 005 5"/></svg>,
+        fields: [{ key: 'accessToken', label: 'Access Token', placeholder: 'tok_...' }, { key: 'advertiserId', label: 'Advertiser ID', placeholder: '7123456789' }],
     },
 ];
 
@@ -50,23 +45,18 @@ export default function StoreSettings() {
     const [store, setStore] = useState(null);
     const [connections, setConnections] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [shopDomain, setShopDomain] = useState('');
-    const [showShopifyInput, setShowShopifyInput] = useState(false);
     const [successMsg, setSuccessMsg] = useState('');
+    const [manualModal, setManualModal] = useState(null); // platform id
+    const [manualFields, setManualFields] = useState({});
+    const [saving, setSaving] = useState(false);
+
+    useEffect(() => { if (status === 'unauthenticated') router.push('/login'); }, [status]);
+    useEffect(() => { if (session && id) fetchData(); }, [session, id]);
 
     useEffect(() => {
-        if (status === 'unauthenticated') router.push('/login');
-    }, [status]);
-
-    useEffect(() => {
-        if (session && id) fetchData();
-    }, [session, id]);
-
-    useEffect(() => {
-        // Check for success query params
         const { connected } = router.query;
         if (connected) {
-            setSuccessMsg(`✅ ${connected} connected successfully!`);
+            setSuccessMsg(`${connected} connected successfully!`);
             setTimeout(() => setSuccessMsg(''), 5000);
         }
     }, [router.query]);
@@ -78,162 +68,197 @@ export default function StoreSettings() {
             const s = data.stores?.find(s => s.id === id);
             setStore(s);
             setConnections(s?.connections || []);
+        } catch (err) { console.error(err); } finally { setLoading(false); }
+    };
+
+    const initiateOAuth = async (platform) => {
+        // Try OAuth first, fall back to manual if not configured
+        try {
+            const url = platform === 'shopify'
+                ? `/api/oauth/shopify/install?storeId=${id}`
+                : `/api/oauth/${platform}/connect?storeId=${id}`;
+
+            const res = await fetch(url, { method: 'GET', redirect: 'manual' });
+
+            // If the response is JSON with an error, OAuth is not configured
+            if (res.type === 'opaqueredirect') {
+                window.location.href = url;
+                return;
+            }
+
+            const data = await res.json().catch(() => null);
+            if (data?.error) {
+                // OAuth not configured — open manual modal
+                setManualModal(platform);
+                setManualFields({});
+                return;
+            }
+
+            // If we got a redirect URL
+            if (data?.url) {
+                window.location.href = data.url;
+            } else {
+                window.location.href = url;
+            }
+        } catch (err) {
+            // Network error or OAuth not available — fall back to manual
+            setManualModal(platform);
+            setManualFields({});
+        }
+    };
+
+    const handleManualConnect = async () => {
+        if (!manualModal) return;
+        const platform = PLATFORMS.find(p => p.id === manualModal);
+        if (!platform) return;
+
+        // Validate all fields filled
+        const allFilled = platform.fields.every(f => manualFields[f.key]?.trim());
+        if (!allFilled) return;
+
+        setSaving(true);
+        try {
+            await fetch(`/api/stores/${id}/connections`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ platform: manualModal, credentials: manualFields }),
+            });
+            setSuccessMsg(`${platform.name} connected successfully!`);
+            setTimeout(() => setSuccessMsg(''), 5000);
+            setManualModal(null);
+            setManualFields({});
+            fetchData();
         } catch (err) {
             console.error(err);
         } finally {
-            setLoading(false);
+            setSaving(false);
         }
     };
 
-    const initiateOAuth = (platform) => {
-        if (platform === 'shopify') {
-            if (!shopDomain) {
-                setShowShopifyInput(true);
-                return;
-            }
-            window.location.href = `/api/oauth/shopify/install?shop=${encodeURIComponent(shopDomain)}&storeId=${id}`;
-        } else {
-            window.location.href = `/api/oauth/${platform}/connect?storeId=${id}`;
-        }
-    };
-
-    const connectShopify = () => {
-        if (!shopDomain) return;
-        window.location.href = `/api/oauth/shopify/install?shop=${encodeURIComponent(shopDomain)}&storeId=${id}`;
-    };
-
-    const getConnectionStatus = (platformId) => {
-        return connections.find(c => c.platform === platformId);
-    };
+    const getConnectionStatus = (platformId) => connections.find(c => c.platform === platformId);
 
     if (status === 'loading' || loading) {
-        return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>Loading...</div>;
+        return <DashboardLayout title="Settings — Calyxra"><div className="flex-center" style={{ minHeight: '60vh' }}>Loading...</div></DashboardLayout>;
     }
 
     return (
-        <>
-            <Head>
-                <title>Settings — {store?.name || 'Store'} — Calyxra</title>
-                <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-            </Head>
-            <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter', sans-serif" }}>
-                {/* Navbar */}
-                <div style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '12px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <a href={`/dashboard/stores/${id}`} style={{ color: '#6b7280', textDecoration: 'none', fontSize: 14 }}>← {store?.name}</a>
-                        <span style={{ color: '#d1d5db' }}>|</span>
-                        <span style={{ fontWeight: 600, color: '#111827' }}>Settings</span>
-                    </div>
+        <DashboardLayout title={`Settings — ${store?.name || 'Store'} — Calyxra`}>
+            <div className="container" style={{ maxWidth: 720 }}>
+                {successMsg && <div className="alert-success">{successMsg}</div>}
+
+                {/* Breadcrumb */}
+                <div style={{ marginBottom: 8 }}>
+                    <a href={`/dashboard/stores/${id}`} style={{ color: 'var(--c-gray-500)', fontSize: 13, textDecoration: 'none' }}>
+                        &larr; Back to {store?.name}
+                    </a>
                 </div>
 
-                <div style={{ maxWidth: 700, margin: '0 auto', padding: '32px 24px' }}>
-                    {successMsg && (
-                        <div style={{ background: '#e6f7f4', color: GREEN, padding: '10px 14px', borderRadius: 8, fontSize: 14, marginBottom: 16, fontWeight: 500 }}>{successMsg}</div>
-                    )}
+                <h1 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 4px', color: 'var(--c-gray-900)', letterSpacing: '-0.02em' }}>Platform Connections</h1>
+                <p style={{ color: 'var(--c-gray-500)', fontSize: 14, marginBottom: 24 }}>Connect your platforms to enable automated reconciliation.</p>
 
-                    <h1 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, margin: '0 0 8px' }}>Platform Connections</h1>
-                    <p style={{ color: '#6b7280', fontSize: 14, marginBottom: 24 }}>Connect your platforms to enable automated reconciliation. One click — we handle the rest.</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {PLATFORMS.map(p => {
+                        const conn = getConnectionStatus(p.id);
+                        const isConnected = conn?.status === 'connected';
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                        {PLATFORMS.map(p => {
-                            const conn = getConnectionStatus(p.id);
-                            const isConnected = conn?.status === 'connected';
-
-                            return (
-                                <div key={p.id} style={{
-                                    background: '#fff', borderRadius: 12, padding: 20,
-                                    boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-                                    border: isConnected ? `2px solid ${GREEN}` : '2px solid transparent',
-                                }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                            <div style={{
-                                                width: 44, height: 44, borderRadius: 10,
-                                                background: `${p.color}15`, display: 'flex',
-                                                alignItems: 'center', justifyContent: 'center',
-                                                fontSize: 22,
-                                            }}>{p.icon}</div>
-                                            <div>
-                                                <div style={{ fontWeight: 600, color: '#111827', fontSize: 15 }}>{p.name}</div>
-                                                <div style={{ color: '#6b7280', fontSize: 13, marginTop: 2 }}>{p.description}</div>
-                                            </div>
-                                        </div>
-
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                            {isConnected ? (
-                                                <>
-                                                    <span style={{
-                                                        fontSize: 11, padding: '4px 10px', borderRadius: 6,
-                                                        background: '#e6f7f4', color: GREEN, fontWeight: 600,
-                                                    }}>✓ Connected</span>
-                                                    <button
-                                                        onClick={() => initiateOAuth(p.id)}
-                                                        style={{
-                                                            padding: '6px 12px', background: '#f3f4f6', border: 'none',
-                                                            borderRadius: 6, fontSize: 12, cursor: 'pointer', color: '#6b7280',
-                                                        }}
-                                                    >Reconnect</button>
-                                                </>
-                                            ) : (
-                                                <button
-                                                    onClick={() => initiateOAuth(p.id)}
-                                                    style={{
-                                                        padding: '8px 18px', background: p.color, color: '#fff',
-                                                        border: 'none', borderRadius: 8, fontSize: 13,
-                                                        fontWeight: 600, cursor: 'pointer',
-                                                    }}
-                                                >Connect {p.name}</button>
-                                            )}
+                        return (
+                            <div key={p.id} className="card" style={{ padding: '18px 20px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                                        <div style={{
+                                            width: 42, height: 42, borderRadius: 10,
+                                            background: `${p.color}10`,
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            color: p.color, flexShrink: 0,
+                                        }}>{p.icon}</div>
+                                        <div>
+                                            <div style={{ fontWeight: 600, color: 'var(--c-gray-800)', fontSize: 15 }}>{p.name}</div>
+                                            <div style={{ color: 'var(--c-gray-500)', fontSize: 13, marginTop: 2 }}>{p.description}</div>
                                         </div>
                                     </div>
 
-                                    {/* Shopify domain input */}
-                                    {p.id === 'shopify' && showShopifyInput && !isConnected && (
-                                        <div style={{ marginTop: 14, display: 'flex', gap: 8 }}>
-                                            <input
-                                                type="text"
-                                                value={shopDomain}
-                                                onChange={e => setShopDomain(e.target.value)}
-                                                placeholder="your-store.myshopify.com"
-                                                style={{
-                                                    flex: 1, padding: '8px 12px', borderRadius: 6,
-                                                    border: '1px solid #d1d5db', fontSize: 13,
-                                                    fontFamily: "'Inter', sans-serif",
-                                                }}
-                                            />
-                                            <button
-                                                onClick={connectShopify}
-                                                disabled={!shopDomain}
-                                                style={{
-                                                    padding: '8px 16px', background: '#95bf47', color: '#fff',
-                                                    border: 'none', borderRadius: 6, fontSize: 13,
-                                                    fontWeight: 600, cursor: 'pointer',
-                                                    opacity: shopDomain ? 1 : 0.5,
-                                                }}
-                                            >Connect</button>
-                                        </div>
-                                    )}
-
-                                    {isConnected && conn.lastSyncAt && (
-                                        <div style={{ marginTop: 8, fontSize: 11, color: '#9ca3af' }}>
-                                            Last synced: {new Date(conn.lastSyncAt).toLocaleString()}
-                                        </div>
-                                    )}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                                        {isConnected ? (
+                                            <>
+                                                <span className="badge badge-green" style={{ gap: 4 }}>
+                                                    <span className="status-dot status-dot-green" style={{ width: 6, height: 6 }} /> Connected
+                                                </span>
+                                                <button onClick={() => initiateOAuth(p.id)} className="btn btn-ghost btn-xs">Reconnect</button>
+                                            </>
+                                        ) : (
+                                            <button onClick={() => initiateOAuth(p.id)} className="btn btn-primary btn-sm">Connect</button>
+                                        )}
+                                    </div>
                                 </div>
-                            );
-                        })}
-                    </div>
 
-                    {/* Manual connection fallback */}
-                    <div style={{ marginTop: 32, padding: 20, background: '#f9fafb', borderRadius: 12, border: '1px dashed #d1d5db' }}>
-                        <h3 style={{ margin: '0 0 8px', fontSize: 14, fontWeight: 600, color: '#374151' }}>💡 Don't have OAuth credentials yet?</h3>
-                        <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>
-                            You can still use the <a href={`/dashboard/stores/add`} style={{ color: GREEN, fontWeight: 500 }}>manual connection wizard</a> to
-                            enter API keys directly. OAuth is recommended for production — it's more secure and handles token refresh automatically.
-                        </p>
-                    </div>
+                                {isConnected && conn.lastSyncAt && (
+                                    <div style={{ marginTop: 8, fontSize: 12, color: 'var(--c-gray-400)' }}>
+                                        Last synced: {timeAgo(conn.lastSyncAt)}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Manual fallback note */}
+                <div style={{ marginTop: 24, padding: 18, background: 'var(--c-gray-50)', borderRadius: 12, border: '1px dashed var(--c-gray-200)' }}>
+                    <h3 style={{ margin: '0 0 6px', fontSize: 14, fontWeight: 600, color: 'var(--c-gray-700)' }}>Manual connection</h3>
+                    <p style={{ margin: 0, fontSize: 13, color: 'var(--c-gray-500)', lineHeight: 1.5 }}>
+                        If OAuth is unavailable, click Connect and enter your API credentials manually. You can also use the{' '}
+                        <a href="/dashboard/stores/add" style={{ color: '#10b981', fontWeight: 500 }}>setup wizard</a> for guided onboarding.
+                    </p>
                 </div>
             </div>
-        </>
+
+            {/* Manual Credential Modal */}
+            {manualModal && (() => {
+                const platform = PLATFORMS.find(p => p.id === manualModal);
+                if (!platform) return null;
+                return (
+                    <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }} onClick={() => setManualModal(null)} />
+                        <div className="card animate-scale-in" style={{ position: 'relative', width: '100%', maxWidth: 440, padding: 28, zIndex: 1 }}>
+                            <h3 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 4px', color: 'var(--c-gray-900)' }}>Connect {platform.name}</h3>
+                            <p style={{ color: 'var(--c-gray-500)', fontSize: 13, marginBottom: 20 }}>
+                                Enter your API credentials manually. Your data is encrypted with AES-256.
+                            </p>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                                {platform.fields.map(f => (
+                                    <div key={f.key}>
+                                        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--c-gray-700)', marginBottom: 4 }}>{f.label}</label>
+                                        <input
+                                            type={f.key.toLowerCase().includes('token') || f.key.toLowerCase().includes('secret') ? 'password' : 'text'}
+                                            value={manualFields[f.key] || ''}
+                                            onChange={e => setManualFields({ ...manualFields, [f.key]: e.target.value })}
+                                            placeholder={f.placeholder}
+                                            className="input"
+                                            style={{ width: '100%' }}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                            <div style={{ display: 'flex', gap: 8, marginTop: 20, justifyContent: 'flex-end' }}>
+                                <button onClick={() => setManualModal(null)} className="btn btn-secondary btn-sm">Cancel</button>
+                                <button onClick={handleManualConnect} className="btn btn-primary btn-sm" disabled={saving || !platform.fields.every(f => manualFields[f.key]?.trim())}>
+                                    {saving ? 'Connecting...' : 'Connect'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            })()}
+        </DashboardLayout>
     );
+}
+
+function timeAgo(date) {
+    const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+    if (seconds < 60) return 'just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
 }

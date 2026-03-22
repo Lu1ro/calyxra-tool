@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
+import DashboardLayout from '@/components/DashboardLayout';
 
 const GREEN = '#00b894';
 
@@ -104,38 +105,22 @@ export default function BrandingSettingsPage() {
         setTimeout(() => setSaved(false), 3000);
     };
 
-    if (status === 'loading') return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>Loading...</div>;
-
     return (
-        <>
-            <Head>
-                <title>Settings — Calyxra</title>
-                <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-            </Head>
-            <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter', sans-serif" }}>
-                {/* Navbar */}
-                <div style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '12px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <span onClick={() => router.push('/dashboard')} style={{ cursor: 'pointer', color: '#6b7280', fontSize: 13 }}>← Dashboard</span>
-                        <span style={{ color: '#d1d5db' }}>|</span>
-                        <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 18, color: GREEN }}>⚙️ Agency Settings</span>
-                    </div>
-                    {session?.user?.tier === 'pro' && (
-                        <span style={{ background: '#111827', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 11, fontWeight: 600 }}>PRO</span>
-                    )}
-                </div>
-
-                <div style={{ maxWidth: 720, margin: '0 auto', padding: '32px 24px' }}>
+        <DashboardLayout title="Settings — Calyxra">
+            {status === 'loading' ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', fontFamily: "'Inter', sans-serif" }}>Loading...</div>
+            ) : (
+                <div style={{ maxWidth: 720, margin: '0 auto', padding: '32px 24px', fontFamily: "'Inter', sans-serif" }}>
                     {/* White-Label Branding */}
                     <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', marginBottom: 24 }}>
-                        <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, margin: '0 0 4px' }}>🎨 White-Label Branding</h2>
+                        <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, margin: '0 0 4px' }}>White-Label Branding</h2>
                         <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>Customize how your reports look to clients. Replace Calyxra branding with your own.</p>
 
                         <div style={{ display: 'grid', gap: 16 }}>
                             <div>
                                 <label style={labelStyle}>Brand Name</label>
                                 <input value={brandName} onChange={e => setBrandName(e.target.value)} placeholder="Your Agency Name" style={inputStyle} />
-                                <span style={hintStyle}>Replaces "Calyxra" in all exports and reports</span>
+                                <span style={hintStyle}>Replaces &quot;Calyxra&quot; in all exports and reports</span>
                             </div>
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 16 }}>
@@ -149,7 +134,7 @@ export default function BrandingSettingsPage() {
                                             alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
                                             opacity: uploading ? 0.6 : 1,
                                         }}>
-                                            {uploading ? '⏳ Uploading...' : '📁 Upload Logo'}
+                                            {uploading ? 'Uploading...' : 'Upload Logo'}
                                             <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp"
                                                 onChange={handleLogoUpload} disabled={uploading}
                                                 style={{ display: 'none' }} />
@@ -175,7 +160,7 @@ export default function BrandingSettingsPage() {
                             <div style={{ background: '#f9fafb', borderRadius: 8, padding: 16, border: '1px dashed #d1d5db' }}>
                                 <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8, fontWeight: 600, textTransform: 'uppercase' }}>Preview</div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: 12, borderBottom: `3px solid ${brandColor}` }}>
-                                    {logoUrl && <img src={logoUrl} style={{ height: 32 }} alt="Logo" onError={(e) => e.target.style.display = 'none'} />}
+                                    {logoUrl && <img src={logoUrl} style={{ height: 32 }} alt="Logo" onError={(e) => { e.target.style.display = 'none'; }} />}
                                     <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, color: brandColor }}>{brandName || 'Your Agency'}</span>
                                 </div>
                             </div>
@@ -184,7 +169,7 @@ export default function BrandingSettingsPage() {
 
                     {/* Report Text */}
                     <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', marginBottom: 24 }}>
-                        <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, margin: '0 0 4px' }}>📄 Report Customization</h2>
+                        <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, margin: '0 0 4px' }}>Report Customization</h2>
                         <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>Add custom text to the top and bottom of exported PDF reports.</p>
 
                         <div style={{ display: 'grid', gap: 16 }}>
@@ -197,7 +182,7 @@ export default function BrandingSettingsPage() {
                             <div>
                                 <label style={labelStyle}>Report Footer Text</label>
                                 <textarea value={reportFooter} onChange={e => setReportFooter(e.target.value)}
-                                    placeholder="e.g. © 2026 Your Agency. All rights reserved."
+                                    placeholder="e.g. &copy; 2026 Your Agency. All rights reserved."
                                     rows={2} style={{ ...inputStyle, resize: 'vertical' }} />
                             </div>
                         </div>
@@ -205,18 +190,18 @@ export default function BrandingSettingsPage() {
 
                     {/* Klaviyo Integration */}
                     <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', marginBottom: 24 }}>
-                        <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, margin: '0 0 4px' }}>📧 Klaviyo Integration</h2>
+                        <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, margin: '0 0 4px' }}>Klaviyo Integration</h2>
                         <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>
                             Connect Klaviyo to reconcile email/SMS attributed revenue against Shopify.
-                            {hasKlaviyo && <span style={{ marginLeft: 8, color: GREEN, fontWeight: 600 }}>✅ Connected</span>}
+                            {hasKlaviyo && <span style={{ marginLeft: 8, color: GREEN, fontWeight: 600 }}>Connected</span>}
                         </p>
 
                         <div>
                             <label style={labelStyle}>Klaviyo Private API Key</label>
                             <input value={klaviyoKey} onChange={e => setKlaviyoKey(e.target.value)}
-                                placeholder={hasKlaviyo ? '••••••••••••••••••• (saved)' : 'pk_xxxxxxxxxxxxx'}
+                                placeholder={hasKlaviyo ? '(saved)' : 'pk_xxxxxxxxxxxxx'}
                                 type="password" style={inputStyle} />
-                            <span style={hintStyle}>Find this in Klaviyo → Settings → API Keys → Private Keys</span>
+                            <span style={hintStyle}>Find this in Klaviyo &rarr; Settings &rarr; API Keys &rarr; Private Keys</span>
                         </div>
                     </div>
 
@@ -228,13 +213,13 @@ export default function BrandingSettingsPage() {
                                 border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600,
                                 cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1,
                             }}>
-                            {saving ? 'Saving...' : '💾 Save Settings'}
+                            {saving ? 'Saving...' : 'Save Settings'}
                         </button>
-                        {saved && <span style={{ color: GREEN, fontSize: 13, fontWeight: 600 }}>✅ Settings saved!</span>}
+                        {saved && <span style={{ color: GREEN, fontSize: 13, fontWeight: 600 }}>Settings saved!</span>}
                     </div>
                 </div>
-            </div>
-        </>
+            )}
+        </DashboardLayout>
     );
 }
 

@@ -313,8 +313,10 @@ function generateReportHTML({ store, report, fullReport, agency, brandName, bran
 
     <!-- Print Button -->
     <div class="no-print" style="margin-top:32px;text-align:center">
-        <button onclick="window.print()" style="padding:12px 32px;background:${brandColor};color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">📄 Save as PDF</button>
+        <p style="color:#64748b;font-size:13px;margin-bottom:12px">Use your browser's "Save as PDF" option in the print dialog to download.</p>
+        <button onclick="window.print()" style="padding:12px 32px;background:${brandColor};color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">Print / Save as PDF</button>
     </div>
+    <script>window.addEventListener('load', function() { setTimeout(function() { window.print(); }, 500); });</script>
 </body>
 </html>`;
 }

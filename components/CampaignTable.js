@@ -1,70 +1,70 @@
 // components/CampaignTable.js
-// Sortable campaign breakdown table with flag-color indicators
+// Sortable campaign breakdown table with status dot indicators
 
 export default function CampaignTable({ campaigns, searchQuery, onSearchChange, formatCurrency }) {
-    const flagEmoji = (color) => color === 'red' ? '🔴' : color === 'amber' ? '🟡' : '🟢';
-
     return (
         <div className="card animate-fade-in" style={{ marginBottom: 'var(--space-6)' }}>
             <div className="flex-between" style={{ marginBottom: 'var(--space-4)' }}>
-                <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 600, margin: 0 }}>
-                    🎯 Campaign Breakdown
+                <h3 style={{ fontSize: 15, fontWeight: 700, margin: 0, color: 'var(--c-gray-900)', letterSpacing: '-0.01em' }}>
+                    Campaign Breakdown
                 </h3>
-                <input
-                    className="input input-sm"
-                    type="text"
-                    placeholder="🔍 Search campaigns..."
-                    value={searchQuery}
-                    onChange={(e) => onSearchChange(e.target.value)}
-                    style={{ width: 200 }}
-                />
+                <div style={{ position: 'relative' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--c-gray-400)" strokeWidth="2"
+                        style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input
+                        className="input"
+                        type="text"
+                        placeholder="Search campaigns..."
+                        value={searchQuery}
+                        onChange={(e) => onSearchChange(e.target.value)}
+                        style={{ width: 200, fontSize: 13, paddingLeft: 32, height: 34 }}
+                    />
+                </div>
             </div>
             <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-base)' }}>
+                <table className="data-table">
                     <thead>
-                        <tr style={{ borderBottom: '2px solid var(--c-gray-200)', textAlign: 'left' }}>
-                            <th style={{ padding: '10px', color: 'var(--c-gray-500)' }}>Campaign</th>
-                            <th style={{ padding: '10px', color: 'var(--c-gray-500)' }}>Channel</th>
-                            <th style={{ padding: '10px', color: 'var(--c-gray-500)', textAlign: 'right' }}>Spend</th>
-                            <th style={{ padding: '10px', color: 'var(--c-gray-500)', textAlign: 'right' }}>Reported ROAS</th>
-                            <th style={{ padding: '10px', color: 'var(--c-gray-500)', textAlign: 'right' }}>True ROAS</th>
-                            <th style={{ padding: '10px', color: 'var(--c-gray-500)', textAlign: 'center' }}>Flag</th>
+                        <tr>
+                            <th>Campaign</th>
+                            <th>Channel</th>
+                            <th style={{ textAlign: 'right' }}>Spend</th>
+                            <th style={{ textAlign: 'right' }}>Reported ROAS</th>
+                            <th style={{ textAlign: 'right' }}>True ROAS</th>
+                            <th style={{ textAlign: 'center' }}>Flag</th>
                         </tr>
                     </thead>
                     <tbody>
                         {campaigns.map((c, i) => (
-                            <tr key={i} style={{
-                                borderBottom: '1px solid var(--c-gray-100)',
-                                transition: 'background var(--transition-fast)',
-                            }}
-                                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-primary-bg)'}
-                                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                            >
-                                <td style={{ padding: '10px', fontWeight: 500, maxWidth: 200 }}>
+                            <tr key={i}>
+                                <td style={{ fontWeight: 500, maxWidth: 200 }}>
                                     <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                         {c.campaignName}
                                     </span>
                                 </td>
-                                <td style={{ padding: '10px' }}>
+                                <td>
                                     <span className={`badge badge-${c.channel === 'Meta' ? 'blue' : c.channel === 'Google' ? 'amber' : 'pink'}`}>
                                         {c.channel}
                                     </span>
                                 </td>
-                                <td style={{ padding: '10px', textAlign: 'right', color: 'var(--c-gray-500)' }}>
+                                <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
                                     {formatCurrency(c.spend)}
                                 </td>
-                                <td style={{ padding: '10px', textAlign: 'right', color: 'var(--c-gray-500)' }}>
+                                <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
                                     {c.reportedRoas}×
                                 </td>
                                 <td style={{
-                                    padding: '10px', textAlign: 'right', fontWeight: 700,
-                                    color: c.estimatedTrueRoas >= 2 ? 'var(--c-green)' : c.estimatedTrueRoas >= 1 ? 'var(--c-amber)' : 'var(--c-red)',
+                                    textAlign: 'right', fontWeight: 700, fontVariantNumeric: 'tabular-nums',
+                                    color: c.estimatedTrueRoas >= 2 ? '#059669' : c.estimatedTrueRoas >= 1 ? '#b45309' : '#dc2626',
                                 }}>
                                     {c.estimatedTrueRoas}×
                                 </td>
-                                <td style={{ padding: '10px', textAlign: 'center' }}>
-                                    {flagEmoji(c.flagColor)}
-                                    <span className="text-xs text-muted" style={{ display: 'block' }}>{c.flag}</span>
+                                <td style={{ textAlign: 'center' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+                                        <span className={`status-dot status-dot-${c.flagColor === 'red' ? 'red' : c.flagColor === 'amber' ? 'amber' : 'green'}`} />
+                                        <span style={{ fontSize: 11, color: 'var(--c-gray-400)' }}>{c.flag}</span>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
@@ -72,7 +72,7 @@ export default function CampaignTable({ campaigns, searchQuery, onSearchChange, 
                 </table>
             </div>
             {campaigns.length === 0 && (
-                <p className="text-muted text-md" style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
+                <p style={{ textAlign: 'center', padding: 'var(--space-8)', color: 'var(--c-gray-400)', fontSize: 14 }}>
                     No campaigns match your search.
                 </p>
             )}
