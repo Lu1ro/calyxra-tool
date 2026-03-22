@@ -37,6 +37,7 @@ export default function StoreDashboard() {
     const [campaignSearch, setCampaignSearch] = useState('');
     const [showBackToTop, setShowBackToTop] = useState(false);
     const [agencyTier, setAgencyTier] = useState(null);
+    const [exportingPdf, setExportingPdf] = useState(false);
     const topRef = useRef(null);
 
     useEffect(() => { if (status === 'unauthenticated') router.push('/login'); }, [status]);
@@ -49,6 +50,41 @@ export default function StoreDashboard() {
 
     const showToast = (message, type = 'success') => setToast({ message, type });
     const formatCurrency = (val) => '$' + (val || 0).toLocaleString('en-US', { minimumFractionDigits: 0 });
+
+    const handleExportPdf = async () => {
+        setExportingPdf(true);
+        try {
+            const res = await fetch(`/api/stores/${id}/export-pdf`);
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.error || 'Export failed');
+            }
+            const html = await res.text();
+            // Create a hidden container, inject the HTML, convert to PDF
+            const container = document.createElement('div');
+            container.style.position = 'fixed';
+            container.style.left = '-9999px';
+            container.style.top = '0';
+            container.style.width = '900px';
+            container.innerHTML = html.replace(/<html[^>]*>|<\/html>|<head[^>]*>[\s\S]*?<\/head>|<body[^>]*>|<\/body>/gi, '');
+            // Remove print script and no-print elements
+            container.querySelectorAll('script, .no-print').forEach(el => el.remove());
+            document.body.appendChild(container);
+            const html2pdf = (await import('html2pdf.js')).default;
+            await html2pdf().set({
+                margin: [10, 10, 10, 10],
+                filename: `${store?.name || 'Store'}_Reconciliation_Report.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            }).from(container).save();
+            document.body.removeChild(container);
+            showToast('PDF downloaded!');
+        } catch (err) {
+            showToast(err.message || 'PDF export failed', 'error');
+        }
+        setExportingPdf(false);
+    };
 
     const fetchStoreData = async () => {
         try {
@@ -188,8 +224,8 @@ export default function StoreDashboard() {
                                         Export PDF
                                     </button>
                                 ) : (
-                                    <button className="btn btn-secondary btn-sm" onClick={() => window.open(`/api/stores/${id}/export-pdf`, '_blank')}>
-                                        Export PDF
+                                    <button className="btn btn-secondary btn-sm" onClick={handleExportPdf} disabled={exportingPdf}>
+                                        {exportingPdf ? 'Generating...' : 'Export PDF'}
                                     </button>
                                 )
                             )}
@@ -207,95 +243,72 @@ export default function StoreDashboard() {
                         <EmptyState store={store} storeId={id} onTrySample={() => runReconciliation(true)} />
                     ) : latestReport && (
                         <>
-                            {/* All insights — blurred for free tier */}
-                            <div style={{ position: 'relative' }}>
-                                {/* Primary KPI Cards */}
-                                <div className="kpi-grid animate-stagger" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-                                    <KPICard
-                                        label="Phantom Revenue"
-                                        value={formatCurrency(latestReport.phantomRevenue)}
-                                        subtitle={`${latestReport.phantomPct}% overstated`}
-                                        color="#ef4444"
-                                        tint="#fef2f2"
-                                        icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>}
-                                    />
-                                    <KPICard
-                                        label="True ROAS"
-                                        value={`${latestReport.trueRoas}×`}
-                                        subtitle={`vs ${latestReport.adPlatform?.reportedRoas}× reported`}
-                                        color="#10b981"
-                                        tint="#f0fdf4"
-                                        icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>}
-                                    />
-                                    <KPICard
-                                        label="Net Revenue"
-                                        value={formatCurrency(latestReport.shopify?.netRevenue)}
-                                        subtitle="Shopify verified"
-                                        icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>}
-                                    />
-                                </div>
-
-                                {/* Secondary metrics row */}
-                                <div className="kpi-grid animate-stagger" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-                                    <KPICard label="Gross Revenue" value={formatCurrency(latestReport.shopify?.grossRevenue)} subtitle="Before deductions" />
-                                    <KPICard label="Total Orders" value={(latestReport.shopify?.totalOrders || 0).toLocaleString()} subtitle="Shopify orders" />
-                                    <KPICard label="Total Ad Spend" value={formatCurrency(latestReport.adPlatform?.totalSpend)} subtitle="Across all channels" />
-                                </div>
-
-                                {agencyTier === 'free' && (
-                                    <div style={{
-                                        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                                        backdropFilter: 'blur(8px)', display: 'flex', flexDirection: 'column',
-                                        alignItems: 'center', justifyContent: 'center',
-                                        backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 12, zIndex: 10,
-                                    }}>
-                                        <div style={{
-                                            width: 56, height: 56, borderRadius: 14,
-                                            background: 'var(--c-gray-100)', display: 'flex',
-                                            alignItems: 'center', justifyContent: 'center', marginBottom: 16,
-                                        }}>
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--c-gray-400)" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                                        </div>
-                                        <p style={{ fontWeight: 700, margin: '0 0 4px', fontSize: 18, color: 'var(--c-gray-800)' }}>Upgrade to see your results</p>
-                                        <p style={{ color: 'var(--c-gray-500)', fontSize: 14, marginBottom: 20 }}>Your reconciliation ran — unlock the data</p>
-                                        <a href="https://calyxra.com/#pricing" className="btn btn-primary" style={{ textDecoration: 'none' }}>Upgrade — $150/month</a>
-                                    </div>
-                                )}
+                            {/* Primary KPI Cards — ALWAYS visible to show the problem */}
+                            <div className="kpi-grid animate-stagger" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
+                                <KPICard
+                                    label="Phantom Revenue"
+                                    value={formatCurrency(latestReport.phantomRevenue)}
+                                    subtitle={`${latestReport.phantomPct}% overstated`}
+                                    color="#ef4444"
+                                    tint="#fef2f2"
+                                    icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>}
+                                />
+                                <KPICard
+                                    label="True ROAS"
+                                    value={`${latestReport.trueRoas}×`}
+                                    subtitle={`vs ${latestReport.adPlatform?.reportedRoas}× reported`}
+                                    color="#10b981"
+                                    tint="#f0fdf4"
+                                    icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>}
+                                />
+                                <KPICard
+                                    label="Net Revenue"
+                                    value={formatCurrency(latestReport.shopify?.netRevenue)}
+                                    subtitle="Shopify verified"
+                                    icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>}
+                                />
+                                <KPICard label="Gross Revenue" value={formatCurrency(latestReport.shopify?.grossRevenue)} subtitle="Before deductions" />
+                                <KPICard label="Total Ad Spend" value={formatCurrency(latestReport.adPlatform?.totalSpend)} subtitle="Across all channels" />
                             </div>
 
                             {/* Everything below is blurred for free tier */}
                             {agencyTier === 'free' ? (
                                 <div style={{ position: 'relative', marginTop: 8 }}>
                                     <div style={{ filter: 'blur(6px)', pointerEvents: 'none', userSelect: 'none', opacity: 0.5 }}>
-                                        {latestReport.kpis && latestReport.kpis.length > 0 && (
-                                            <div style={{ display: 'flex', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
-                                                {latestReport.kpis.slice(0, 3).map(k => (
-                                                    <div key={k.key} className="card" style={{ flex: '1 1 140px', minWidth: 140, textAlign: 'center', background: '#f0fdf4' }}>
-                                                        <div style={{ fontSize: 11, color: 'var(--c-gray-500)', fontWeight: 600, textTransform: 'uppercase' }}>{k.label}</div>
-                                                        <div style={{ fontSize: 22, fontWeight: 700 }}>***</div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                        <div className="card" style={{ height: 200, marginBottom: 24 }}>
+                                        <div className="kpi-grid" style={{ gridTemplateColumns: 'repeat(6, 1fr)' }}>
+                                            {['MER', 'Net Profit', 'CAC', 'LTV:CAC', 'AOV', 'Ad Efficiency'].map(l => (
+                                                <div key={l} className="card" style={{ textAlign: 'center', padding: 14 }}>
+                                                    <div style={{ fontSize: 11, color: 'var(--c-gray-500)', fontWeight: 600, textTransform: 'uppercase' }}>{l}</div>
+                                                    <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--c-gray-300)' }}>--</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="card" style={{ height: 200, marginBottom: 16 }}>
                                             <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 16px', color: 'var(--c-gray-900)' }}>Historical Trend</h3>
                                             <div style={{ height: 140, background: 'var(--c-gray-50)', borderRadius: 8 }} />
                                         </div>
-                                        <div className="card" style={{ height: 150, marginBottom: 24 }}>
-                                            <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 16px', color: 'var(--c-gray-900)' }}>Campaign Profitability</h3>
-                                            <div style={{ height: 80, background: 'var(--c-gray-50)', borderRadius: 8 }} />
+                                        <div style={{ display: 'grid', gridTemplateColumns: '5fr 2fr', gap: 16 }}>
+                                            <div className="card" style={{ height: 150 }}>
+                                                <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 16px', color: 'var(--c-gray-900)' }}>Campaign Performance</h3>
+                                                <div style={{ height: 80, background: 'var(--c-gray-50)', borderRadius: 8 }} />
+                                            </div>
+                                            <div className="card" style={{ height: 150 }}>
+                                                <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 16px', color: 'var(--c-gray-900)' }}>Gap Decomposition</h3>
+                                                <div style={{ height: 80, background: 'var(--c-gray-50)', borderRadius: 8 }} />
+                                            </div>
                                         </div>
                                     </div>
                                     <div style={{
                                         position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-                                        textAlign: 'center', zIndex: 10,
+                                        textAlign: 'center', zIndex: 10, background: 'rgba(255,255,255,0.95)', borderRadius: 16,
+                                        padding: '32px 48px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
                                     }}>
-                                        <div style={{ width: 48, height: 48, borderRadius: 12, background: '#fff', boxShadow: '0 4px 24px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+                                        <div style={{ width: 48, height: 48, borderRadius: 12, background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
                                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
                                         </div>
-                                        <p style={{ fontWeight: 700, fontSize: 16, color: 'var(--c-gray-800)', margin: '0 0 4px' }}>Unlock full insights</p>
-                                        <p style={{ fontSize: 13, color: 'var(--c-gray-500)', margin: '0 0 16px' }}>KPIs, trends, campaigns & action engine</p>
-                                        <a href="https://calyxra.com/#pricing" className="btn btn-primary btn-sm" style={{ textDecoration: 'none' }}>Upgrade — $150/month</a>
+                                        <p style={{ fontWeight: 700, fontSize: 18, color: 'var(--c-gray-800)', margin: '0 0 4px' }}>Unlock full insights</p>
+                                        <p style={{ fontSize: 13, color: 'var(--c-gray-500)', margin: '0 0 20px', maxWidth: 280 }}>KPIs, trends, campaigns, action engine & PDF export</p>
+                                        <a href="https://calyxra.com/#pricing" className="btn btn-primary" style={{ textDecoration: 'none', padding: '10px 28px' }}>Upgrade — $150/month</a>
                                     </div>
                                 </div>
                             ) : (
@@ -341,9 +354,9 @@ export default function StoreDashboard() {
                                         }} />
                                     </div>
                                 )}
-                                <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                                     <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 12px', color: 'var(--c-gray-900)', letterSpacing: '-0.01em', alignSelf: 'flex-start' }}>Gap Decomposition</h3>
-                                    <div style={{ maxWidth: 200, width: '100%' }}>
+                                    <div style={{ maxWidth: 180, width: '100%', margin: '0 auto' }}>
                                         <Doughnut data={{
                                             labels: ['Discount Leak', 'Refund Leak', 'Chargebacks'],
                                             datasets: [{ data: [latestReport.gapBreakdown?.discountLeak || 0, latestReport.gapBreakdown?.refundLeak || 0, latestReport.gapBreakdown?.chargebacks || 0], backgroundColor: ['#f59e0b', '#ef4444', '#94a3b8'], borderWidth: 0, borderRadius: 4 }],
