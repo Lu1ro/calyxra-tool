@@ -31,7 +31,7 @@ export default function ActionCard({ action, onExecute, executing, formatCurrenc
                     <span className={`badge ${s.badge}`} style={{ fontWeight: 700, letterSpacing: '0.03em' }}>
                         {action.action}
                     </span>
-                    <span className={`badge badge-${action.channel === 'Meta' ? 'blue' : action.channel === 'Google' ? 'amber' : 'pink'}`}>
+                    <span className="badge badge-blue">
                         {action.channel}
                     </span>
                 </div>

@@ -21,8 +21,6 @@ export default function AddStorePage() {
     const [metaToken, setMetaToken] = useState('');
     const [metaAccountId, setMetaAccountId] = useState('');
 
-    const [tiktokToken, setTiktokToken] = useState('');
-    const [tiktokAdvertiserId, setTiktokAdvertiserId] = useState('');
     const [connectedPlatforms, setConnectedPlatforms] = useState([]);
 
     useEffect(() => {

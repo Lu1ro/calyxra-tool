@@ -46,7 +46,7 @@ function CampaignTable({ campaigns }) {
           {campaigns.map((c, i) => (
             <tr key={i} style={{ borderBottom: '1px solid #f3f4f6' }}>
               <td style={{ padding: '12px' }}>
-                {c.channel === 'Google' ? '🔍 Google' : c.channel === 'TikTok' ? '📱 TikTok' : '📘 Meta'}
+                📘 {c.channel}
               </td>
               <td style={{ padding: '12px', fontWeight: 500 }}>{c.campaignName}</td>
               <td style={{ padding: '12px' }}>${c.spend.toLocaleString()}</td>
@@ -272,8 +272,6 @@ function ConnectionForm({ onSubmit, loading }) {
   const [form, setForm] = useState({
     shopifyDomain: '', shopifyApiKey: '',
     metaAccessToken: '', metaAdAccountId: '',
-    googleAdsCustomerId: '', googleAdsDeveloperToken: '',
-    tiktokAccessToken: '', tiktokAdvertiserId: '',
     dateFrom: new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10),
     dateTo: new Date().toISOString().slice(0, 10),
   });
@@ -331,22 +329,6 @@ function ConnectionForm({ onSubmit, loading }) {
 
 
 
-        <div style={{ background: '#f8fafc', borderRadius: 8, padding: 16, border: '1px solid #cbd5e1' }}>
-          <div style={{ fontWeight: 600, color: '#0f172a', margin: '0 0 12px', fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
-            <span>📱 TIKTOK ADS</span>
-            <span style={{ fontSize: 11, fontWeight: 500, opacity: 0.7 }}>(Optional)</span>
-          </div>
-          <div style={{ display: 'grid', gap: 10 }}>
-            <div>
-              <label style={{ fontSize: 12, color: '#374151', fontWeight: 500, display: 'block', marginBottom: 4 }}>Access Token</label>
-              <input style={inputStyle} type="password" placeholder="ttj_..." value={form.tiktokAccessToken} onChange={e => set('tiktokAccessToken', e.target.value)} />
-            </div>
-            <div>
-              <label style={{ fontSize: 12, color: '#374151', fontWeight: 500, display: 'block', marginBottom: 4 }}>Advertiser ID</label>
-              <input style={inputStyle} placeholder="7012345678" value={form.tiktokAdvertiserId} onChange={e => set('tiktokAdvertiserId', e.target.value)} />
-            </div>
-          </div>
-        </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div>

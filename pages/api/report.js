@@ -56,9 +56,9 @@ export default async function handler(req, res) {
                 reportedRevenue: 268440,
                 reportedRoas: 4.30,
                 campaigns: [
-                    { campaignName: 'PMax - Best Sellers', spend: 18500, impressions: 245000, clicks: 5100, purchases: 612, purchaseValue: 68500, reportedRoas: 3.70, channel: 'Google' },
-                    { campaignName: 'Search - Brand', spend: 2100, impressions: 45000, clicks: 3200, purchases: 380, purchaseValue: 35200, reportedRoas: 16.76, channel: 'Google' },
-                    { campaignName: 'TikTok - UGC Scaling', spend: 11800, impressions: 840000, clicks: 9200, purchases: 490, purchaseValue: 37400, reportedRoas: 3.17, channel: 'TikTok' },
+                    { campaignName: 'ASC - Full Catalog', spend: 15200, impressions: 312000, clicks: 6800, purchases: 612, purchaseValue: 68500, reportedRoas: 4.51, channel: 'Meta' },
+                    { campaignName: 'CBO - Top Products', spend: 8400, impressions: 145000, clicks: 4200, purchases: 380, purchaseValue: 35200, reportedRoas: 4.19, channel: 'Meta' },
+                    { campaignName: 'Dynamic Retargeting 3d', spend: 8800, impressions: 210000, clicks: 5600, purchases: 490, purchaseValue: 37400, reportedRoas: 4.25, channel: 'Meta' },
                     { campaignName: 'Prospecting - Broad', spend: 12400, impressions: 186000, clicks: 3720, purchases: 487, purchaseValue: 51520, reportedRoas: 4.15, channel: 'Meta' },
                     { campaignName: 'Retargeting - Remarketing 7d', spend: 6200, impressions: 78400, clicks: 2460, purchases: 392, purchaseValue: 52440, reportedRoas: 8.46, channel: 'Meta' },
                     { campaignName: 'Lookalike - 1%', spend: 5800, impressions: 87000, clicks: 1914, purchases: 213, purchaseValue: 15530, reportedRoas: 2.68, channel: 'Meta' },
@@ -70,8 +70,8 @@ export default async function handler(req, res) {
             if (!shopifyDomain || !shopifyApiKey || !dateFrom || !dateTo) {
                 return res.status(400).json({ error: 'Missing required Shopify fields' });
             }
-            if (!metaAccessToken && !googleAdsDeveloperToken && !tiktokAccessToken) {
-                return res.status(400).json({ error: 'Provide credentials for at least one ad platform (Meta, Google, or TikTok)' });
+            if (!metaAccessToken) {
+                return res.status(400).json({ error: 'Provide Meta Ads credentials (Access Token + Ad Account ID)' });
             }
 
             // Build fetch promises for all connected platforms

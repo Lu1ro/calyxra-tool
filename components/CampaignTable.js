@@ -44,7 +44,7 @@ export default function CampaignTable({ campaigns, searchQuery, onSearchChange, 
                                     </span>
                                 </td>
                                 <td>
-                                    <span className={`badge badge-${c.channel === 'Meta' ? 'blue' : c.channel === 'Google' ? 'amber' : 'pink'}`}>
+                                    <span className="badge badge-blue">
                                         {c.channel}
                                     </span>
                                 </td>

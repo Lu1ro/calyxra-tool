@@ -40,21 +40,6 @@ const steps = [
         ],
         notes: 'The token expires after ~60 days. We\'ll notify you when it needs renewal. For long-lived tokens, ask us about OAuth setup.',
     },
-    {
-        platform: 'TikTok Ads',
-        icon: '🎵',
-        color: '#111',
-        time: '~5 minutes',
-        fields: ['Access Token', 'Advertiser ID'],
-        steps: [
-            'Go to ads.tiktok.com → log in to your TikTok Ads Manager',
-            'Click your profile → Account Info → copy the Advertiser ID',
-            'For Access Token: go to TikTok Marketing API portal',
-            'Create an app → get the Access Token from the app dashboard',
-            'Paste both values in Calyxra',
-        ],
-        notes: 'TikTok access tokens are long-lived. We only need read access to campaign reporting data.',
-    },
 ];
 
 export default function ConnectGuide() {
@@ -82,8 +67,7 @@ export default function ConnectGuide() {
 
                     {/* Minimum requirements */}
                     <div style={{ background: '#ECFDF5', border: '1px solid #bbf7d0', borderRadius: 10, padding: 16, marginBottom: 32, fontSize: 14 }}>
-                        <strong>Minimum required:</strong> Shopify + at least 1 ad platform (Meta recommended).
-                        <br />TikTok is optional.
+                        <strong>Minimum required:</strong> Shopify + Meta Ads.
                     </div>
 
                     {steps.map((s, i) => (
