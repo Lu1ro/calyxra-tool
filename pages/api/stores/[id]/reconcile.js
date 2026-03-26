@@ -7,7 +7,7 @@ import { prisma } from '../../../../lib/db';
 import { decrypt } from '../../../../lib/crypto';
 import { fetchShopifyOrders, processShopifyOrders, fetchShopifySalesAnalytics } from '../../../../lib/shopify';
 import { fetchMetaCampaigns } from '../../../../lib/meta';
-import { fetchGoogleCampaigns } from '../../../../lib/google';
+
 import { fetchTikTokCampaigns } from '../../../../lib/tiktok';
 import { reconcile } from '../../../../lib/reconcile';
 import { evaluateAlerts, saveAlerts } from '../../../../lib/alerts';
@@ -117,10 +117,7 @@ export default async function handler(req, res) {
                 adFetchers.push(fetchMetaCampaigns(creds.meta.accessToken, creds.meta.adAccountId, dateFrom, dateTo).then(c => c.map(x => ({ ...x, channel: 'Meta' }))));
                 adLabels.push('Meta');
             }
-            if (creds.google) {
-                adFetchers.push(fetchGoogleCampaigns(creds.google.developerToken, creds.google.customerId, dateFrom, dateTo).then(c => c.map(x => ({ ...x, channel: 'Google' }))));
-                adLabels.push('Google');
-            }
+
             if (creds.tiktok) {
                 adFetchers.push(fetchTikTokCampaigns(creds.tiktok.accessToken, creds.tiktok.advertiserId, dateFrom, dateTo).then(c => c.map(x => ({ ...x, channel: 'TikTok' }))));
                 adLabels.push('TikTok');

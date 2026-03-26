@@ -2,7 +2,7 @@
 // Client-facing guide: How to get API tokens for each platform
 import Head from 'next/head';
 
-const GREEN = '#00b894';
+const GREEN = '#064E3B';
 
 const steps = [
     {
@@ -39,22 +39,6 @@ const steps = [
             'Paste both values in Calyxra',
         ],
         notes: 'The token expires after ~60 days. We\'ll notify you when it needs renewal. For long-lived tokens, ask us about OAuth setup.',
-    },
-    {
-        platform: 'Google Ads',
-        icon: '🔍',
-        color: '#ea4335',
-        time: '~10 minutes (one-time setup)',
-        fields: ['Developer Token / OAuth Token', 'Customer ID'],
-        steps: [
-            'Go to Google Ads → click Settings (gear icon) → Account number',
-            'Copy the Customer ID (format: 123-456-7890)',
-            'For OAuth token: go to developers.google.com/oauthplayground',
-            'Select Google Ads API v18 → Authorize APIs',
-            'Exchange the code for tokens → copy the Access Token',
-            'Paste both values in Calyxra',
-        ],
-        notes: 'Google Ads API access requires a Google Ads Manager account. If you don\'t have one, skip Google Ads — we support Meta as primary.',
     },
     {
         platform: 'TikTok Ads',
@@ -97,9 +81,9 @@ export default function ConnectGuide() {
                     </p>
 
                     {/* Minimum requirements */}
-                    <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, padding: 16, marginBottom: 32, fontSize: 14 }}>
+                    <div style={{ background: '#ECFDF5', border: '1px solid #bbf7d0', borderRadius: 10, padding: 16, marginBottom: 32, fontSize: 14 }}>
                         <strong>Minimum required:</strong> Shopify + at least 1 ad platform (Meta recommended).
-                        <br />Google Ads and TikTok are optional.
+                        <br />TikTok is optional.
                     </div>
 
                     {steps.map((s, i) => (

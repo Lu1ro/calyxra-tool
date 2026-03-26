@@ -21,20 +21,6 @@ const PLATFORMS = [
         icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>,
         fields: [{ key: 'accessToken', label: 'Access Token', placeholder: 'EAA...' }, { key: 'accountId', label: 'Ad Account ID', placeholder: 'act_123456789' }],
     },
-    {
-        id: 'google', name: 'Google Ads',
-        description: 'Connect Google Ads to pull PMax, Search, Shopping campaign data.',
-        color: '#ea4335', setup: 'oauth',
-        icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
-        fields: [{ key: 'developerToken', label: 'Developer Token', placeholder: 'AbCdEfGhIjKl...' }, { key: 'customerId', label: 'Customer ID', placeholder: '123-456-7890' }],
-    },
-    {
-        id: 'tiktok', name: 'TikTok Ads',
-        description: 'Connect TikTok for Business to pull campaign metrics.',
-        color: '#000000', setup: 'oauth',
-        icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M9 12a4 4 0 104 4V4a5 5 0 005 5"/></svg>,
-        fields: [{ key: 'accessToken', label: 'Access Token', placeholder: 'tok_...' }, { key: 'advertiserId', label: 'Advertiser ID', placeholder: '7123456789' }],
-    },
 ];
 
 export default function StoreSettings() {
@@ -206,7 +192,7 @@ export default function StoreSettings() {
                     <h3 style={{ margin: '0 0 6px', fontSize: 14, fontWeight: 600, color: 'var(--c-gray-700)' }}>Manual connection</h3>
                     <p style={{ margin: 0, fontSize: 13, color: 'var(--c-gray-500)', lineHeight: 1.5 }}>
                         If OAuth is unavailable, click Connect and enter your API credentials manually. You can also use the{' '}
-                        <a href="/dashboard/stores/add" style={{ color: '#10b981', fontWeight: 500 }}>setup wizard</a> for guided onboarding.
+                        <a href="/dashboard/stores/add" style={{ color: '#064E3B', fontWeight: 500 }}>setup wizard</a> for guided onboarding.
                     </p>
                 </div>
             </div>

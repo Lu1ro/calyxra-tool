@@ -103,7 +103,7 @@ export default function LoginPage() {
                 }
 
                 .hero-logo .accent {
-                    color: #00b894;
+                    color: #064E3B;
                 }
 
                 .hero-title {
@@ -134,7 +134,7 @@ export default function LoginPage() {
                 .hero-stat-value {
                     font-size: 28px;
                     font-weight: 700;
-                    color: #00b894;
+                    color: #064E3B;
                     letter-spacing: -0.5px;
                 }
 
@@ -150,7 +150,7 @@ export default function LoginPage() {
                     margin-top: 48px;
                     padding: 20px 24px;
                     background: rgba(255,255,255,0.04);
-                    border-left: 3px solid #00b894;
+                    border-left: 3px solid #064E3B;
                     border-radius: 0 8px 8px 0;
                 }
 
@@ -195,7 +195,7 @@ export default function LoginPage() {
                 }
 
                 .login-welcome p {
-                    color: #636e72;
+                    color: #78716C;
                     font-size: 14px;
                     margin: 0;
                 }
@@ -218,7 +218,7 @@ export default function LoginPage() {
                     display: block;
                     font-size: 13px;
                     font-weight: 600;
-                    color: #2d3436;
+                    color: #1C1917;
                     margin-bottom: 6px;
                 }
 
@@ -230,14 +230,14 @@ export default function LoginPage() {
                     border-radius: 8px;
                     font-size: 14px;
                     font-family: 'Inter', sans-serif;
-                    color: #2d3436;
+                    color: #1C1917;
                     outline: none;
                     transition: border-color 0.2s, box-shadow 0.2s;
                     background: #fafbfc;
                 }
 
                 .form-input:focus {
-                    border-color: #00b894;
+                    border-color: #064E3B;
                     box-shadow: 0 0 0 3px rgba(0,184,148,0.12);
                     background: #fff;
                 }
@@ -249,7 +249,7 @@ export default function LoginPage() {
                 .login-btn {
                     width: 100%;
                     padding: 12px 0;
-                    background: #00b894;
+                    background: #064E3B;
                     color: #fff;
                     border: none;
                     border-radius: 8px;
@@ -265,7 +265,7 @@ export default function LoginPage() {
                 }
 
                 .login-btn:hover:not(:disabled) {
-                    background: #007a65;
+                    background: #043927;
                     box-shadow: 0 4px 14px rgba(0,184,148,0.3);
                     transform: translateY(-1px);
                 }
@@ -282,19 +282,19 @@ export default function LoginPage() {
                 .login-footer {
                     text-align: center;
                     margin-top: 24px;
-                    color: #636e72;
+                    color: #78716C;
                     font-size: 14px;
                 }
 
                 .login-footer a {
-                    color: #00b894;
+                    color: #064E3B;
                     font-weight: 600;
                     text-decoration: none;
                     transition: color 0.2s;
                 }
 
                 .login-footer a:hover {
-                    color: #007a65;
+                    color: #043927;
                 }
 
                 .login-divider {

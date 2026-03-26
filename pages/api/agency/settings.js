@@ -33,9 +33,10 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'PATCH') {
-        const { logoUrl, brandColor, brandName, reportHeader, reportFooter, customKpis, klaviyoApiKey, cogsPercent } = req.body;
+        const { name, logoUrl, brandColor, brandName, reportHeader, reportFooter, customKpis, klaviyoApiKey, cogsPercent } = req.body;
 
         const updateData = {};
+        if (name !== undefined) updateData.name = name;
         if (logoUrl !== undefined) updateData.logoUrl = logoUrl;
         if (brandColor !== undefined) updateData.brandColor = brandColor;
         if (brandName !== undefined) updateData.brandName = brandName;

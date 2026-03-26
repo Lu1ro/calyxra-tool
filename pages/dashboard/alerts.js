@@ -118,7 +118,7 @@ export default function AlertInbox() {
                         <button key={f.key} onClick={() => setFilter(f.key)}
                             style={{
                                 padding: '6px 14px', borderRadius: 8, fontSize: 13, border: 'none',
-                                background: filter === f.key ? '#f0fdf4' : 'var(--c-white)',
+                                background: filter === f.key ? '#ECFDF5' : 'var(--c-white)',
                                 color: filter === f.key ? '#166534' : 'var(--c-gray-600)',
                                 fontWeight: filter === f.key ? 600 : 500, cursor: 'pointer',
                                 boxShadow: filter === f.key ? 'inset 0 0 0 1.5px #a7f3d0' : 'inset 0 0 0 1px var(--c-gray-200)',
@@ -133,8 +133,8 @@ export default function AlertInbox() {
                     <div style={{ display: 'grid', gap: 10 }}>{[1,2,3].map(i => <div key={i} className="skeleton" style={{ height: 100, borderRadius: 12 }} />)}</div>
                 ) : alerts.length === 0 ? (
                     <div className="card" style={{ padding: 48, textAlign: 'center' }}>
-                        <div style={{ width: 56, height: 56, borderRadius: 14, background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        <div style={{ width: 56, height: 56, borderRadius: 14, background: '#ECFDF5', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#064E3B" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                         </div>
                         <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 8px', color: 'var(--c-gray-800)' }}>All clear!</h2>
                         <p style={{ color: 'var(--c-gray-500)', fontSize: 14 }}>No {filter === 'critical' ? 'critical ' : filter === 'unresolved' ? 'unresolved ' : ''}alerts right now.</p>
@@ -173,8 +173,8 @@ export default function AlertInbox() {
                                                 <a href={`/dashboard/stores/${alert.storeId}`} className="btn btn-ghost btn-xs" style={{ textDecoration: 'none' }}>View</a>
                                                 {!alert.resolved && (
                                                     <button onClick={() => resolveAlert(alert.id)} className="btn btn-xs"
-                                                        style={{ background: 'transparent', border: '1px solid #a7f3d0', color: '#059669', transition: 'all 150ms' }}
-                                                        onMouseEnter={e => { e.currentTarget.style.background = '#f0fdf4'; }}
+                                                        style={{ background: 'transparent', border: '1px solid #a7f3d0', color: '#043927', transition: 'all 150ms' }}
+                                                        onMouseEnter={e => { e.currentTarget.style.background = '#ECFDF5'; }}
                                                         onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
                                                     >Resolve</button>
                                                 )}

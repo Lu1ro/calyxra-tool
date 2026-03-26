@@ -9,7 +9,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, T
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
-const GREEN = '#00b894';
+const GREEN = '#064E3B';
 
 // Generate mock customer data based on the campaign report
 function generateCustomerData(report) {
@@ -95,7 +95,7 @@ export default function CustomerQuality() {
             {
                 label: 'Returning Customers',
                 data: sortedData.map(c => c.returningCustomers),
-                backgroundColor: '#10b981',
+                backgroundColor: '#064E3B',
             }
         ]
     };
@@ -124,9 +124,9 @@ export default function CustomerQuality() {
                             <div style={{ fontSize: 12, color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', marginBottom: 6 }}>New Customers</div>
                             <div style={{ fontSize: 26, fontWeight: 700, color: '#3730a3' }}>{totalNew.toLocaleString()}</div>
                         </div>
-                        <div style={{ background: '#fff', borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', borderTop: '3px solid #10b981' }}>
+                        <div style={{ background: '#fff', borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', borderTop: '3px solid #064E3B' }}>
                             <div style={{ fontSize: 12, color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', marginBottom: 6 }}>Returning Customers</div>
-                            <div style={{ fontSize: 26, fontWeight: 700, color: '#10b981' }}>{totalReturning.toLocaleString()}</div>
+                            <div style={{ fontSize: 26, fontWeight: 700, color: '#064E3B' }}>{totalReturning.toLocaleString()}</div>
                         </div>
                         <div style={{ background: '#fff', borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
                             <div style={{ fontSize: 12, color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', marginBottom: 6 }}>Avg Repeat Rate</div>
@@ -144,7 +144,7 @@ export default function CustomerQuality() {
                             <div style={{ width: 200, margin: '0 auto' }}>
                                 <Doughnut data={{
                                     labels: ['New', 'Returning'],
-                                    datasets: [{ data: [totalNew, totalReturning], backgroundColor: ['#3730a3', '#10b981'] }]
+                                    datasets: [{ data: [totalNew, totalReturning], backgroundColor: ['#3730a3', '#064E3B'] }]
                                 }} />
                             </div>
                         </div>
@@ -168,8 +168,8 @@ export default function CustomerQuality() {
                                         <td style={{ padding: '10px', fontWeight: 500 }}>{c.campaignName}</td>
                                         <td style={{ padding: '10px', textAlign: 'right', fontWeight: 600 }}>{c.totalCustomers.toLocaleString()}</td>
                                         <td style={{ padding: '10px', textAlign: 'right', color: '#3730a3' }}>{c.newCustomers.toLocaleString()}</td>
-                                        <td style={{ padding: '10px', textAlign: 'right', color: '#10b981' }}>{c.returningCustomers.toLocaleString()}</td>
-                                        <td style={{ padding: '10px', textAlign: 'right', fontWeight: 600, color: parseFloat(c.returningPct) > 10 ? '#10b981' : '#111827' }}>{c.returningPct}%</td>
+                                        <td style={{ padding: '10px', textAlign: 'right', color: '#064E3B' }}>{c.returningCustomers.toLocaleString()}</td>
+                                        <td style={{ padding: '10px', textAlign: 'right', fontWeight: 600, color: parseFloat(c.returningPct) > 10 ? '#064E3B' : '#111827' }}>{c.returningPct}%</td>
                                     </tr>
                                 ))}
                             </tbody>

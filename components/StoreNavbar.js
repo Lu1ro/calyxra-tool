@@ -88,7 +88,7 @@ export default function StoreNavbar({ store, storeId, currentPage }) {
                 }
                 .store-subnav-tab-active {
                     color: var(--c-gray-900);
-                    border-bottom-color: #10b981;
+                    border-bottom-color: #064E3B;
                     font-weight: 600;
                 }
                 .store-subnav-badges {
@@ -132,7 +132,7 @@ export default function StoreNavbar({ store, storeId, currentPage }) {
                     .store-subnav-mobile a:hover { background: var(--c-gray-50) !important; }
                     .store-subnav-mobile .store-subnav-tab-active {
                         color: var(--c-gray-900) !important;
-                        background: #f0fdf4 !important;
+                        background: #ECFDF5 !important;
                     }
                 }
             `}</style>

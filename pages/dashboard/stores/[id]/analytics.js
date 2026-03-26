@@ -124,7 +124,7 @@ export default function EmbeddedAnalytics() {
                         <button key={dash.id} onClick={() => setSelectedDash(dash)}
                             style={{
                                 padding: '8px 16px', borderRadius: 8, fontSize: 13, border: 'none',
-                                background: selectedDash?.id === dash.id ? '#f0fdf4' : '#fff',
+                                background: selectedDash?.id === dash.id ? '#ECFDF5' : '#fff',
                                 color: selectedDash?.id === dash.id ? '#166534' : 'var(--c-gray-600)',
                                 fontWeight: selectedDash?.id === dash.id ? 600 : 500, cursor: 'pointer',
                                 boxShadow: selectedDash?.id === dash.id ? 'inset 0 0 0 1.5px #a7f3d0' : 'inset 0 0 0 1px var(--c-gray-200)',
@@ -176,14 +176,14 @@ export default function EmbeddedAnalytics() {
                             <div style={{ padding: '60px 40px', textAlign: 'center', background: 'linear-gradient(180deg, var(--c-gray-50) 0%, #fff 100%)' }}>
                                 <div style={{
                                     width: 64, height: 64, borderRadius: 16,
-                                    background: selectedDash.type === 'powerbi' ? '#fff7ed' : '#f0fdf4',
+                                    background: selectedDash.type === 'powerbi' ? '#fff7ed' : '#ECFDF5',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     margin: '0 auto 20px',
                                 }}>
                                     {selectedDash.type === 'powerbi' ? (
                                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="1.5"><rect x="3" y="12" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="12" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg>
                                     ) : (
-                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#064E3B" strokeWidth="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
                                     )}
                                 </div>
                                 <h3 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 8px', color: 'var(--c-gray-800)' }}>{selectedDash.name}</h3>

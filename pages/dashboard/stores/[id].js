@@ -190,8 +190,8 @@ export default function StoreDashboard() {
             borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#ef4444',
         }, {
             label: 'True ROAS', data: reports.slice().reverse().map(r => r.trueRoas),
-            borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.06)', fill: true, tension: 0.4,
-            yAxisID: 'y1', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#10b981',
+            borderColor: '#064E3B', backgroundColor: 'rgba(16, 185, 129, 0.06)', fill: true, tension: 0.4,
+            yAxisID: 'y1', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#064E3B',
         }],
     } : null;
 
@@ -262,8 +262,8 @@ export default function StoreDashboard() {
                                     label="True ROAS"
                                     value={`${latestReport.trueRoas}×`}
                                     subtitle={`vs ${latestReport.adPlatform?.reportedRoas}× reported`}
-                                    color="#10b981"
-                                    tint="#f0fdf4"
+                                    color="#064E3B"
+                                    tint="#ECFDF5"
                                     icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>}
                                 />
                                 <KPICard
@@ -276,44 +276,143 @@ export default function StoreDashboard() {
                                 <KPICard label="Total Ad Spend" value={formatCurrency(latestReport.adPlatform?.totalSpend)} subtitle="Across all channels" />
                             </div>
 
-                            {/* Everything below is blurred for free tier */}
+                            {/* Free tier — show enough to prove the problem, then upsell */}
                             {agencyTier === 'free' ? (
-                                <div style={{ position: 'relative', marginTop: 8 }}>
-                                    <div style={{ filter: 'blur(6px)', pointerEvents: 'none', userSelect: 'none', opacity: 0.5 }}>
-                                        <div className="kpi-grid" style={{ gridTemplateColumns: 'repeat(6, 1fr)' }}>
-                                            {['MER', 'Net Profit', 'CAC', 'LTV:CAC', 'AOV', 'Ad Efficiency'].map(l => (
-                                                <div key={l} className="card" style={{ textAlign: 'center', padding: 14 }}>
-                                                    <div style={{ fontSize: 11, color: 'var(--c-gray-500)', fontWeight: 600, textTransform: 'uppercase' }}>{l}</div>
-                                                    <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--c-gray-300)' }}>--</div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                        <div className="card" style={{ height: 200, marginBottom: 16 }}>
-                                            <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 16px', color: 'var(--c-gray-900)' }}>Historical Trend</h3>
-                                            <div style={{ height: 140, background: 'var(--c-gray-50)', borderRadius: 8 }} />
-                                        </div>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '5fr 2fr', gap: 16 }}>
-                                            <div className="card" style={{ height: 150 }}>
-                                                <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 16px', color: 'var(--c-gray-900)' }}>Campaign Performance</h3>
-                                                <div style={{ height: 80, background: 'var(--c-gray-50)', borderRadius: 8 }} />
+                                <div style={{ marginTop: 8 }}>
+                                    {/* Revenue Leak Alert — hard-hitting insight */}
+                                    <div className="card animate-fade-in" style={{
+                                        marginBottom: 20, padding: 24,
+                                        background: 'linear-gradient(135deg, #fef2f2 0%, #fff5f5 50%, #fefce8 100%)',
+                                        border: '1px solid #fecaca',
+                                    }}>
+                                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+                                            <div style={{
+                                                width: 44, height: 44, borderRadius: 12,
+                                                background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                                            }}>
+                                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                                             </div>
-                                            <div className="card" style={{ height: 150 }}>
-                                                <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 16px', color: 'var(--c-gray-900)' }}>Gap Decomposition</h3>
-                                                <div style={{ height: 80, background: 'var(--c-gray-50)', borderRadius: 8 }} />
+                                            <div style={{ flex: 1 }}>
+                                                <h3 style={{ margin: '0 0 4px', fontSize: 17, fontWeight: 700, color: '#991b1b' }}>
+                                                    Your ad platforms are overstating revenue by {latestReport.phantomPct}%
+                                                </h3>
+                                                <p style={{ margin: 0, fontSize: 14, color: '#7f1d1d', lineHeight: 1.5 }}>
+                                                    That&apos;s <strong>{formatCurrency(latestReport.phantomRevenue)}</strong> in phantom revenue this period alone.
+                                                    At this rate, you&apos;re losing approximately <strong>{formatCurrency(Math.round((latestReport.phantomRevenue || 0) * 12))}/year</strong> in misattributed spend.
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
-                                    <div style={{
-                                        position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-                                        textAlign: 'center', zIndex: 10, background: 'rgba(255,255,255,0.95)', borderRadius: 16,
-                                        padding: '32px 48px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-                                    }}>
-                                        <div style={{ width: 48, height: 48, borderRadius: 12, background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
-                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+
+                                    {/* Gap Breakdown — visible, shows WHERE the money leaks */}
+                                    <div className="card animate-fade-in" style={{ marginBottom: 20, padding: 24 }}>
+                                        <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700, color: 'var(--c-gray-900)' }}>Where Your Revenue Leaks</h3>
+                                        <p style={{ margin: '0 0 20px', fontSize: 13, color: 'var(--c-gray-500)' }}>Breakdown of the gap between reported and actual revenue</p>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+                                            {[
+                                                { label: 'Refund Leak', value: latestReport.gapBreakdown?.refundLeak || 0, color: '#ef4444', bg: '#fef2f2', icon: '↩' },
+                                                { label: 'Discount Leak', value: latestReport.gapBreakdown?.discountLeak || 0, color: '#f59e0b', bg: '#fffbeb', icon: '%' },
+                                                { label: 'Chargebacks', value: latestReport.gapBreakdown?.chargebacks || 0, color: '#6366f1', bg: '#eef2ff', icon: '⚡' },
+                                            ].map((item, i) => (
+                                                <div key={i} style={{
+                                                    padding: 20, borderRadius: 12, background: item.bg,
+                                                    border: `1px solid ${item.color}20`, textAlign: 'center',
+                                                }}>
+                                                    <div style={{ fontSize: 24, marginBottom: 8 }}>{item.icon}</div>
+                                                    <div style={{ fontSize: 22, fontWeight: 700, color: item.color, fontVariantNumeric: 'tabular-nums' }}>
+                                                        {formatCurrency(item.value)}
+                                                    </div>
+                                                    <div style={{ fontSize: 12, color: 'var(--c-gray-500)', fontWeight: 600, marginTop: 4 }}>{item.label}</div>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <p style={{ fontWeight: 700, fontSize: 18, color: 'var(--c-gray-800)', margin: '0 0 4px' }}>Unlock full insights</p>
-                                        <p style={{ fontSize: 13, color: 'var(--c-gray-500)', margin: '0 0 20px', maxWidth: 280 }}>KPIs, trends, campaigns, action engine & PDF export</p>
-                                        <a href="https://calyxra.com/#pricing" className="btn btn-primary" style={{ textDecoration: 'none', padding: '10px 28px' }}>Upgrade — $150/month</a>
+                                    </div>
+
+                                    {/* Reported vs Actual comparison — visual proof */}
+                                    <div className="card animate-fade-in" style={{ marginBottom: 20, padding: 24 }}>
+                                        <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 700, color: 'var(--c-gray-900)' }}>Reported vs Actual Revenue</h3>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                            <div>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                                                    <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-gray-600)' }}>Ad Platform Reports</span>
+                                                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--c-gray-800)' }}>{formatCurrency(latestReport.adPlatform?.reportedRevenue || latestReport.shopify?.grossRevenue)}</span>
+                                                </div>
+                                                <div style={{ height: 32, borderRadius: 8, background: '#fee2e2', position: 'relative', overflow: 'hidden' }}>
+                                                    <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(45deg, #fecaca, #fecaca 10px, #fee2e2 10px, #fee2e2 20px)', borderRadius: 8 }} />
+                                                    <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 11, fontWeight: 700, color: '#dc2626' }}>Inflated</div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                                                    <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-gray-600)' }}>Shopify Verified</span>
+                                                    <span style={{ fontSize: 13, fontWeight: 700, color: '#043927' }}>{formatCurrency(latestReport.shopify?.netRevenue)}</span>
+                                                </div>
+                                                <div style={{
+                                                    height: 32, borderRadius: 8, background: '#064E3B',
+                                                    width: `${Math.min(100, Math.round(((latestReport.shopify?.netRevenue || 0) / (latestReport.adPlatform?.reportedRevenue || latestReport.shopify?.grossRevenue || 1)) * 100))}%`,
+                                                }} />
+                                            </div>
+                                        </div>
+                                        <div style={{
+                                            marginTop: 16, padding: 12, borderRadius: 8, background: '#fef2f2',
+                                            border: '1px solid #fecaca', display: 'flex', alignItems: 'center', gap: 8,
+                                        }}>
+                                            <span style={{ fontSize: 16 }}>💸</span>
+                                            <span style={{ fontSize: 13, color: '#991b1b', fontWeight: 500 }}>
+                                                <strong>{formatCurrency(latestReport.phantomRevenue)}</strong> gap — this is money you <em>think</em> you earned but didn&apos;t
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Blurred advanced sections + CTA */}
+                                    <div style={{ position: 'relative' }}>
+                                        <div style={{ filter: 'blur(5px)', pointerEvents: 'none', userSelect: 'none', opacity: 0.4 }}>
+                                            <div className="kpi-grid" style={{ gridTemplateColumns: 'repeat(6, 1fr)' }}>
+                                                {['MER', 'Net Profit', 'CAC', 'LTV:CAC', 'AOV', 'Ad Efficiency'].map(l => (
+                                                    <div key={l} className="card" style={{ textAlign: 'center', padding: 14 }}>
+                                                        <div style={{ fontSize: 11, color: 'var(--c-gray-500)', fontWeight: 600, textTransform: 'uppercase' }}>{l}</div>
+                                                        <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--c-gray-300)' }}>--</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <div className="card" style={{ height: 140, marginBottom: 16 }} />
+                                            <div className="card" style={{ height: 120 }} />
+                                        </div>
+                                        <div style={{
+                                            position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                                            textAlign: 'center', zIndex: 10, background: 'rgba(255,255,255,0.97)', borderRadius: 20,
+                                            padding: '36px 52px', boxShadow: '0 12px 48px rgba(0,0,0,0.12)', border: '1px solid #e2e8f0',
+                                            maxWidth: 440,
+                                        }}>
+                                            <div style={{ width: 52, height: 52, borderRadius: 14, background: 'linear-gradient(135deg, #064E3B, #043927)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                                            </div>
+                                            <p style={{ fontWeight: 700, fontSize: 20, color: 'var(--c-gray-900)', margin: '0 0 6px' }}>Get the full picture</p>
+                                            <p style={{ fontSize: 13, color: 'var(--c-gray-500)', margin: '0 0 6px', lineHeight: 1.5 }}>
+                                                Campaign-level analysis, action engine, trend monitoring, PDF reports & white-label
+                                            </p>
+                                            <ul style={{ textAlign: 'left', margin: '16px 0 20px', padding: 0, listStyle: 'none', fontSize: 13, color: 'var(--c-gray-700)' }}>
+                                                {[
+                                                    'Per-campaign True ROAS breakdown',
+                                                    'AI budget optimizer (pause/scale/reduce)',
+                                                    'Monthly trend tracking & alerts',
+                                                    'White-label PDF reports for clients',
+                                                ].map((item, i) => (
+                                                    <li key={i} style={{ padding: '5px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#064E3B" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+                                                        {item}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                            <a href="https://calyxra.com/#pricing" className="btn btn-primary" style={{
+                                                textDecoration: 'none', padding: '12px 32px', fontSize: 15, fontWeight: 700,
+                                                background: 'linear-gradient(135deg, #064E3B, #043927)',
+                                                display: 'inline-block', borderRadius: 10,
+                                            }}>
+                                                Upgrade — $150/month
+                                            </a>
+                                            <p style={{ fontSize: 11, color: 'var(--c-gray-400)', marginTop: 10, marginBottom: 0 }}>Cancel anytime · Setup in 2 minutes</p>
+                                        </div>
                                     </div>
                                 </div>
                             ) : (
@@ -324,11 +423,11 @@ export default function StoreDashboard() {
                                     {latestReport.kpis.map(k => (
                                         <div key={k.key} className="card" style={{
                                             flex: '1 1 140px', minWidth: 140, textAlign: 'center',
-                                            background: k.statusColor === 'green' ? '#f0fdf4' : k.statusColor === 'amber' ? '#fffbeb' : '#fef2f2',
-                                            border: `1px solid ${k.statusColor === 'green' ? '#a7f3d0' : k.statusColor === 'amber' ? '#fde68a' : '#fecaca'}`,
+                                            background: k.statusColor === 'green' ? '#ECFDF5' : k.statusColor === 'amber' ? '#fffbeb' : '#fef2f2',
+                                            border: `1px solid ${k.statusColor === 'green' ? '#A7F3D0' : k.statusColor === 'amber' ? '#fde68a' : '#fecaca'}`,
                                         }}>
                                             <div style={{ fontSize: 11, color: 'var(--c-gray-500)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>{k.label}</div>
-                                            <div style={{ fontSize: 22, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: k.statusColor === 'green' ? '#059669' : k.statusColor === 'amber' ? '#b45309' : '#dc2626' }}>
+                                            <div style={{ fontSize: 22, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: k.statusColor === 'green' ? '#043927' : k.statusColor === 'amber' ? '#b45309' : '#dc2626' }}>
                                                 {k.format === 'currency' ? formatCurrency(k.value) : k.format === 'ratio' ? `${k.value}×` : `${k.value}%`}
                                             </div>
                                             <div style={{ fontSize: 11, color: 'var(--c-gray-400)', marginTop: 4 }}>{k.fullName}</div>
@@ -387,7 +486,7 @@ export default function StoreDashboard() {
                                             <div style={{ fontSize: 11, color: 'var(--c-gray-500)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>GA4 Agreement Score</div>
                                             <div style={{
                                                 fontSize: 36, fontWeight: 700, fontVariantNumeric: 'tabular-nums',
-                                                color: latestReport.ga4.ga4AgreementPct >= 90 ? '#059669' : latestReport.ga4.ga4AgreementPct >= 70 ? '#b45309' : '#dc2626',
+                                                color: latestReport.ga4.ga4AgreementPct >= 90 ? '#043927' : latestReport.ga4.ga4AgreementPct >= 70 ? '#b45309' : '#dc2626',
                                             }}>
                                                 {latestReport.ga4.ga4AgreementPct}%
                                             </div>
@@ -427,7 +526,7 @@ export default function StoreDashboard() {
                                                             <td style={{ fontWeight: 500 }}>{ch.channel}</td>
                                                             <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(ch.ga4Revenue)}</td>
                                                             <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(ch.adPlatformRevenue)}</td>
-                                                            <td style={{ textAlign: 'right', fontWeight: 600, color: ch.inflationVsGA4 >= 1.5 ? '#dc2626' : ch.inflationVsGA4 >= 1.2 ? '#b45309' : '#059669' }}>{ch.inflationVsGA4}×</td>
+                                                            <td style={{ textAlign: 'right', fontWeight: 600, color: ch.inflationVsGA4 >= 1.5 ? '#dc2626' : ch.inflationVsGA4 >= 1.2 ? '#b45309' : '#043927' }}>{ch.inflationVsGA4}×</td>
                                                             <td style={{ textAlign: 'right', color: 'var(--c-gray-400)' }}>{ch.shopifyShare}%</td>
                                                         </tr>
                                                     ))}
@@ -472,14 +571,14 @@ export default function StoreDashboard() {
                                         {[
                                             { bg: '#fef2f2', value: latestReport.optimizer.summary.pauseCount, label: 'Pause', color: '#ef4444' },
                                             { bg: '#fffbeb', value: latestReport.optimizer.summary.reduceCount, label: 'Reduce', color: '#f59e0b' },
-                                            { bg: '#f0fdf4', value: latestReport.optimizer.summary.scaleCount, label: 'Scale', color: '#10b981' },
+                                            { bg: '#ECFDF5', value: latestReport.optimizer.summary.scaleCount, label: 'Scale', color: '#064E3B' },
                                             { bg: '#f5f3ff', value: formatCurrency(latestReport.optimizer.summary.freedBudget), label: 'Budget Freed', color: '#7c3aed' },
-                                            { bg: '#f0fdf4', value: `${latestReport.optimizer.summary.projectedRoas}×`, label: 'Projected ROAS', color: '#059669' },
-                                            { bg: '#f0fdf4', value: `+${formatCurrency(latestReport.optimizer.summary.estimatedAdditionalRevenue)}`, label: 'Est. Revenue Gain', color: '#059669', border: true },
+                                            { bg: '#ECFDF5', value: `${latestReport.optimizer.summary.projectedRoas}×`, label: 'Projected ROAS', color: '#043927' },
+                                            { bg: '#ECFDF5', value: `+${formatCurrency(latestReport.optimizer.summary.estimatedAdditionalRevenue)}`, label: 'Est. Revenue Gain', color: '#043927', border: true },
                                         ].map((item, i) => (
                                             <div key={i} style={{
                                                 background: item.bg, borderRadius: 10, padding: 12, textAlign: 'center',
-                                                border: item.border ? '1px solid #a7f3d0' : 'none',
+                                                border: item.border ? '1px solid #A7F3D0' : 'none',
                                             }}>
                                                 <div style={{ fontSize: 22, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: item.color }}>{item.value}</div>
                                                 <div style={{ fontSize: 11, color: 'var(--c-gray-400)' }}>{item.label}</div>
@@ -508,12 +607,12 @@ export default function StoreDashboard() {
                                     {latestReport.optimizer.summary.estimatedAnnualImpact > 0 && (
                                         <div style={{
                                             marginTop: 16, padding: 16, borderRadius: 10,
-                                            background: 'linear-gradient(135deg, #f0fdf4, #ecfdf5)',
-                                            border: '1px solid #a7f3d0',
+                                            background: 'linear-gradient(135deg, #ECFDF5, #ecfdf5)',
+                                            border: '1px solid #A7F3D0',
                                             textAlign: 'center',
                                         }}>
-                                            <div style={{ fontSize: 11, color: '#059669', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Estimated Annual Impact</div>
-                                            <div style={{ fontSize: 28, fontWeight: 700, color: '#059669', fontVariantNumeric: 'tabular-nums' }}>+{formatCurrency(latestReport.optimizer.summary.estimatedAnnualImpact)}</div>
+                                            <div style={{ fontSize: 11, color: '#043927', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Estimated Annual Impact</div>
+                                            <div style={{ fontSize: 28, fontWeight: 700, color: '#043927', fontVariantNumeric: 'tabular-nums' }}>+{formatCurrency(latestReport.optimizer.summary.estimatedAnnualImpact)}</div>
                                             <div style={{ fontSize: 12, color: 'var(--c-gray-500)', marginTop: 4 }}>Based on reallocating ${latestReport.optimizer.summary.freedBudget} from underperformers to proven winners</div>
                                         </div>
                                     )}
@@ -539,10 +638,10 @@ export default function StoreDashboard() {
                                         </thead>
                                         <tbody>
                                             {deduplicatedReports.map((r, i) => (
-                                                <tr key={r.id} style={{ background: i === 0 ? '#f0fdf4' : undefined }}>
+                                                <tr key={r.id} style={{ background: i === 0 ? '#ECFDF5' : undefined }}>
                                                     <td>{new Date(r.createdAt).toLocaleString()}</td>
                                                     <td style={{ textAlign: 'right', color: '#ef4444', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{r.phantomPct}%</td>
-                                                    <td style={{ textAlign: 'right', color: '#10b981', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{r.trueRoas}×</td>
+                                                    <td style={{ textAlign: 'right', color: '#064E3B', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{r.trueRoas}×</td>
                                                     <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(r.netRevenue)}</td>
                                                     <td style={{ textAlign: 'center' }}>
                                                         <span className={`badge ${r.isDemo ? 'badge-gray' : 'badge-green'}`}>{r.isDemo ? 'Demo' : 'Live'}</span>

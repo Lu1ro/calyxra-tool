@@ -139,7 +139,7 @@ export default function ReportsPage() {
                                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                                 <div style={{
                                                     width: 28, height: 28, borderRadius: 7,
-                                                    background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)',
+                                                    background: 'linear-gradient(135deg, #ECFDF5, #dcfce7)',
                                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                     flexShrink: 0, color: '#166534',
                                                 }}>
@@ -153,7 +153,7 @@ export default function ReportsPage() {
                                             <div style={{ fontSize: 11, color: 'var(--c-gray-400)' }}>{fmtTime(r.createdAt)}</div>
                                         </td>
                                         <td style={{ padding: '12px 16px', textAlign: 'right', color: '#ef4444', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{r.phantomPct}%</td>
-                                        <td style={{ padding: '12px 16px', textAlign: 'right', color: '#10b981', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{r.trueRoas}&times;</td>
+                                        <td style={{ padding: '12px 16px', textAlign: 'right', color: '#064E3B', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{r.trueRoas}&times;</td>
                                         <td style={{ padding: '12px 16px', textAlign: 'right', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{fmt(r.netRevenue)}</td>
                                         <td style={{ padding: '12px 16px', textAlign: 'center' }}>
                                             <span className={`badge ${r.isDemo ? 'badge-gray' : 'badge-green'}`} style={{ fontSize: 10 }}>{r.isDemo ? 'Demo' : 'Live'}</span>
@@ -171,7 +171,7 @@ export default function ReportsPage() {
                                                         padding: '4px 10px', cursor: 'pointer', fontSize: 11, fontWeight: 600,
                                                         color: 'var(--c-gray-600)', transition: 'all 150ms', fontFamily: 'var(--font-sans)',
                                                     }}
-                                                    onMouseEnter={e => { e.target.style.borderColor = '#10b981'; e.target.style.color = '#10b981'; }}
+                                                    onMouseEnter={e => { e.target.style.borderColor = '#064E3B'; e.target.style.color = '#064E3B'; }}
                                                     onMouseLeave={e => { e.target.style.borderColor = 'var(--c-gray-200)'; e.target.style.color = 'var(--c-gray-600)'; }}
                                                 >
                                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ verticalAlign: '-2px', marginRight: 4 }}><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>

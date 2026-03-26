@@ -329,22 +329,7 @@ function ConnectionForm({ onSubmit, loading }) {
           </div>
         </div>
 
-        <div style={{ background: '#fdf2f8', borderRadius: 8, padding: 16, border: '1px solid #fbcfe8' }}>
-          <div style={{ fontWeight: 600, color: '#db2777', margin: '0 0 12px', fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
-            <span>🔍 GOOGLE ADS</span>
-            <span style={{ fontSize: 11, fontWeight: 500, opacity: 0.7 }}>(Optional)</span>
-          </div>
-          <div style={{ display: 'grid', gap: 10 }}>
-            <div>
-              <label style={{ fontSize: 12, color: '#374151', fontWeight: 500, display: 'block', marginBottom: 4 }}>Developer Token</label>
-              <input style={inputStyle} type="password" placeholder="ABcDeF..." value={form.googleAdsDeveloperToken} onChange={e => set('googleAdsDeveloperToken', e.target.value)} />
-            </div>
-            <div>
-              <label style={{ fontSize: 12, color: '#374151', fontWeight: 500, display: 'block', marginBottom: 4 }}>Customer ID</label>
-              <input style={inputStyle} placeholder="123-456-7890" value={form.googleAdsCustomerId} onChange={e => set('googleAdsCustomerId', e.target.value)} />
-            </div>
-          </div>
-        </div>
+
 
         <div style={{ background: '#f8fafc', borderRadius: 8, padding: 16, border: '1px solid #cbd5e1' }}>
           <div style={{ fontWeight: 600, color: '#0f172a', margin: '0 0 12px', fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
@@ -609,7 +594,7 @@ export default function Home() {
     <>
       <Head>
         <title>Calyxra — Revenue Reconciliation</title>
-        <meta name="description" content="Reconcile your Meta/Google reported revenue against Shopify net revenue. Find phantom revenue in minutes." />
+        <meta name="description" content="Reconcile your Meta reported revenue against Shopify net revenue. Find phantom revenue in minutes." />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </Head>

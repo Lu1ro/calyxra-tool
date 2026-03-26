@@ -5,7 +5,7 @@ export default function ActionCard({ action, onExecute, executing, formatCurrenc
     const styles = {
         PAUSE: { border: '#ef4444', bg: '#fef2f2', label: 'var(--c-red)', badge: 'badge-red' },
         REDUCE: { border: '#f59e0b', bg: '#fffbeb', label: '#92400e', badge: 'badge-amber' },
-        SCALE: { border: '#10b981', bg: '#f0fdf4', label: '#059669', badge: 'badge-green' },
+        SCALE: { border: '#064E3B', bg: '#ECFDF5', label: '#043927', badge: 'badge-green' },
         MAINTAIN: { border: 'var(--c-gray-300)', bg: 'var(--c-gray-50)', label: 'var(--c-gray-600)', badge: 'badge-gray' },
     };
 

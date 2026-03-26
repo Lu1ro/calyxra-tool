@@ -117,7 +117,7 @@ export default function RegisterPage() {
 
                 .register-hero-content .hero-logo img { height: 40px; }
                 .register-hero-content .hero-logo span { font-size: 22px; font-weight: 700; color: #e8e8f0; }
-                .register-hero-content .hero-logo .accent { color: #00b894; }
+                .register-hero-content .hero-logo .accent { color: #064E3B; }
 
                 .register-hero-content h1 {
                     font-family: 'DM Serif Display', serif;
@@ -186,7 +186,7 @@ export default function RegisterPage() {
                 }
 
                 .register-form-inner > p {
-                    color: #636e72;
+                    color: #78716C;
                     font-size: 14px;
                     margin: 0 0 28px;
                 }
@@ -216,25 +216,25 @@ export default function RegisterPage() {
                         <ul className="feature-list">
                             <li>
                                 <span className="feature-check">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00b894" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#064E3B" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
                                 </span>
                                 Free tier — 1 store, full reconciliation
                             </li>
                             <li>
                                 <span className="feature-check">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00b894" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#064E3B" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
                                 </span>
                                 Read-only API access — your data stays safe
                             </li>
                             <li>
                                 <span className="feature-check">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00b894" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#064E3B" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
                                 </span>
                                 White-label PDF reports under your brand
                             </li>
                             <li>
                                 <span className="feature-check">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00b894" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#064E3B" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
                                 </span>
                                 No credit card required
                             </li>
@@ -254,19 +254,19 @@ export default function RegisterPage() {
 
                         <form onSubmit={handleSubmit}>
                             <div style={{ marginBottom: 16 }}>
-                                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#2d3436', marginBottom: 6 }}>Agency Name</label>
+                                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#1C1917', marginBottom: 6 }}>Agency Name</label>
                                 <input
                                     style={{ width: '100%', boxSizing: 'border-box', padding: '11px 14px', border: '1px solid #dfe6e9', borderRadius: 8, fontSize: 14, fontFamily: "'Inter', sans-serif", outline: 'none', background: '#fafbfc', transition: 'border-color 0.2s, box-shadow 0.2s' }}
                                     value={form.name}
                                     onChange={e => set('name', e.target.value)}
                                     required
                                     placeholder="Your Agency"
-                                    onFocus={e => { e.target.style.borderColor = '#00b894'; e.target.style.boxShadow = '0 0 0 3px rgba(0,184,148,0.12)'; e.target.style.background = '#fff'; }}
+                                    onFocus={e => { e.target.style.borderColor = '#064E3B'; e.target.style.boxShadow = '0 0 0 3px rgba(0,184,148,0.12)'; e.target.style.background = '#fff'; }}
                                     onBlur={e => { e.target.style.borderColor = '#dfe6e9'; e.target.style.boxShadow = 'none'; e.target.style.background = '#fafbfc'; }}
                                 />
                             </div>
                             <div style={{ marginBottom: 16 }}>
-                                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#2d3436', marginBottom: 6 }}>Email</label>
+                                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#1C1917', marginBottom: 6 }}>Email</label>
                                 <input
                                     type="email"
                                     style={{ width: '100%', boxSizing: 'border-box', padding: '11px 14px', border: '1px solid #dfe6e9', borderRadius: 8, fontSize: 14, fontFamily: "'Inter', sans-serif", outline: 'none', background: '#fafbfc', transition: 'border-color 0.2s, box-shadow 0.2s' }}
@@ -274,13 +274,13 @@ export default function RegisterPage() {
                                     onChange={e => set('email', e.target.value)}
                                     required
                                     placeholder="you@agency.com"
-                                    onFocus={e => { e.target.style.borderColor = '#00b894'; e.target.style.boxShadow = '0 0 0 3px rgba(0,184,148,0.12)'; e.target.style.background = '#fff'; }}
+                                    onFocus={e => { e.target.style.borderColor = '#064E3B'; e.target.style.boxShadow = '0 0 0 3px rgba(0,184,148,0.12)'; e.target.style.background = '#fff'; }}
                                     onBlur={e => { e.target.style.borderColor = '#dfe6e9'; e.target.style.boxShadow = 'none'; e.target.style.background = '#fafbfc'; }}
                                 />
                             </div>
                             <div className="form-row" style={{ marginBottom: 20 }}>
                                 <div>
-                                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#2d3436', marginBottom: 6 }}>Password</label>
+                                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#1C1917', marginBottom: 6 }}>Password</label>
                                     <input
                                         type="password"
                                         style={{ width: '100%', boxSizing: 'border-box', padding: '11px 14px', border: '1px solid #dfe6e9', borderRadius: 8, fontSize: 14, fontFamily: "'Inter', sans-serif", outline: 'none', background: '#fafbfc', transition: 'border-color 0.2s, box-shadow 0.2s' }}
@@ -288,12 +288,12 @@ export default function RegisterPage() {
                                         onChange={e => set('password', e.target.value)}
                                         required
                                         placeholder="Min 8 chars"
-                                        onFocus={e => { e.target.style.borderColor = '#00b894'; e.target.style.boxShadow = '0 0 0 3px rgba(0,184,148,0.12)'; e.target.style.background = '#fff'; }}
+                                        onFocus={e => { e.target.style.borderColor = '#064E3B'; e.target.style.boxShadow = '0 0 0 3px rgba(0,184,148,0.12)'; e.target.style.background = '#fff'; }}
                                         onBlur={e => { e.target.style.borderColor = '#dfe6e9'; e.target.style.boxShadow = 'none'; e.target.style.background = '#fafbfc'; }}
                                     />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#2d3436', marginBottom: 6 }}>Confirm</label>
+                                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#1C1917', marginBottom: 6 }}>Confirm</label>
                                     <input
                                         type="password"
                                         style={{ width: '100%', boxSizing: 'border-box', padding: '11px 14px', border: '1px solid #dfe6e9', borderRadius: 8, fontSize: 14, fontFamily: "'Inter', sans-serif", outline: 'none', background: '#fafbfc', transition: 'border-color 0.2s, box-shadow 0.2s' }}
@@ -301,27 +301,27 @@ export default function RegisterPage() {
                                         onChange={e => set('confirm', e.target.value)}
                                         required
                                         placeholder="Repeat"
-                                        onFocus={e => { e.target.style.borderColor = '#00b894'; e.target.style.boxShadow = '0 0 0 3px rgba(0,184,148,0.12)'; e.target.style.background = '#fff'; }}
+                                        onFocus={e => { e.target.style.borderColor = '#064E3B'; e.target.style.boxShadow = '0 0 0 3px rgba(0,184,148,0.12)'; e.target.style.background = '#fff'; }}
                                         onBlur={e => { e.target.style.borderColor = '#dfe6e9'; e.target.style.boxShadow = 'none'; e.target.style.background = '#fafbfc'; }}
                                     />
                                 </div>
                             </div>
                             <button type="submit" disabled={loading} style={{
-                                width: '100%', padding: '12px 0', background: '#00b894', color: '#fff',
+                                width: '100%', padding: '12px 0', background: '#064E3B', color: '#fff',
                                 border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600,
                                 cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1,
                                 fontFamily: "'Inter', sans-serif", transition: 'all 0.2s',
                             }}
-                            onMouseEnter={e => { if (!loading) { e.target.style.background = '#007a65'; e.target.style.boxShadow = '0 4px 14px rgba(0,184,148,0.3)'; } }}
-                            onMouseLeave={e => { e.target.style.background = '#00b894'; e.target.style.boxShadow = 'none'; }}
+                            onMouseEnter={e => { if (!loading) { e.target.style.background = '#043927'; e.target.style.boxShadow = '0 4px 14px rgba(0,184,148,0.3)'; } }}
+                            onMouseLeave={e => { e.target.style.background = '#064E3B'; e.target.style.boxShadow = 'none'; }}
                             >
                                 {loading ? 'Creating account...' : 'Create Free Account →'}
                             </button>
                         </form>
 
-                        <p style={{ textAlign: 'center', marginTop: 20, color: '#636e72', fontSize: 14 }}>
+                        <p style={{ textAlign: 'center', marginTop: 20, color: '#78716C', fontSize: 14 }}>
                             Already have an account?{' '}
-                            <a href="/login" style={{ color: '#00b894', fontWeight: 600, textDecoration: 'none' }}>Sign in</a>
+                            <a href="/login" style={{ color: '#064E3B', fontWeight: 600, textDecoration: 'none' }}>Sign in</a>
                         </p>
 
                         <p style={{ textAlign: 'center', marginTop: 12, color: '#b2bec3', fontSize: 11 }}>

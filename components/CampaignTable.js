@@ -56,7 +56,7 @@ export default function CampaignTable({ campaigns, searchQuery, onSearchChange, 
                                 </td>
                                 <td style={{
                                     textAlign: 'right', fontWeight: 700, fontVariantNumeric: 'tabular-nums',
-                                    color: c.estimatedTrueRoas >= 2 ? '#059669' : c.estimatedTrueRoas >= 1 ? '#b45309' : '#dc2626',
+                                    color: c.estimatedTrueRoas >= 2 ? '#043927' : c.estimatedTrueRoas >= 1 ? '#b45309' : '#dc2626',
                                 }}>
                                     {c.estimatedTrueRoas}×
                                 </td>

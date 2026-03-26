@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 
-const GREEN = '#00b894';
+const GREEN = '#064E3B';
 
 const DB_TYPES = [
     {
@@ -299,7 +299,7 @@ export default function DatabaseConnector() {
                                 <div key={layer.id} style={{
                                     padding: 16, marginBottom: 12, borderRadius: 10,
                                     border: tableMappings[layer.id] ? `1px solid ${GREEN}` : '1px solid #e5e7eb',
-                                    background: tableMappings[layer.id] ? '#f0fdf4' : '#fff',
+                                    background: tableMappings[layer.id] ? '#ECFDF5' : '#fff',
                                 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                                         <span style={{ fontSize: 20 }}>{layer.icon}</span>
@@ -365,7 +365,7 @@ export default function DatabaseConnector() {
                             {testResult && (
                                 <div style={{
                                     borderRadius: 10, padding: 16, marginBottom: 20,
-                                    background: testResult.success ? '#f0fdf4' : '#fef2f2',
+                                    background: testResult.success ? '#ECFDF5' : '#fef2f2',
                                     border: `1px solid ${testResult.success ? '#bbf7d0' : '#fecaca'}`,
                                 }}>
                                     <div style={{ fontWeight: 600, fontSize: 14, color: testResult.success ? GREEN : '#dc2626', marginBottom: 8 }}>

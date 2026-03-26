@@ -8,7 +8,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
-const GREEN = '#00b894';
+const GREEN = '#064E3B';
 const AMBER = '#f59e0b';
 const RED = '#dc2626';
 
@@ -155,7 +155,7 @@ export default function LtvRoas() {
                             <h1 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, margin: '0 0 4px', display: 'flex', alignItems: 'center', gap: 12 }}>
                                 90-Day LTV-Adjusted ROAS
                                 {isLiveQuery && (
-                                    <span style={{ fontSize: 11, background: '#10b981', color: '#fff', padding: '2px 8px', borderRadius: 12, fontFamily: "'Inter', sans-serif" }}>Live BigQuery Data</span>
+                                    <span style={{ fontSize: 11, background: '#064E3B', color: '#fff', padding: '2px 8px', borderRadius: 12, fontFamily: "'Inter', sans-serif" }}>Live BigQuery Data</span>
                                 )}
                             </h1>
                             <p style={{ color: '#6b7280', fontSize: 13, margin: 0 }}>Stop pausing campaigns that lose money day 1 but become highly profitable by day 90.</p>

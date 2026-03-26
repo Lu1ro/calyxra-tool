@@ -9,7 +9,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
-const GREEN = '#00b894';
+const GREEN = '#064E3B';
 const RED = '#dc2626';
 const AMBER = '#f59e0b';
 

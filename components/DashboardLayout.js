@@ -10,7 +10,7 @@ const TIER_LABELS = { free: 'FREE', pilot: 'PILOT', scale: 'SCALE', pro: 'PRO' }
 
 const TIER_COLORS = {
     free: { bg: 'rgba(148,163,184,0.1)', text: '#94a3b8', border: 'rgba(148,163,184,0.2)' },
-    pilot: { bg: 'rgba(16,185,129,0.1)', text: '#10b981', border: 'rgba(16,185,129,0.2)' },
+    pilot: { bg: 'rgba(6,78,59,0.1)', text: '#064E3B', border: 'rgba(6,78,59,0.2)' },
     scale: { bg: 'rgba(99,102,241,0.1)', text: '#818cf8', border: 'rgba(99,102,241,0.2)' },
     pro: { bg: 'rgba(245,158,11,0.1)', text: '#fbbf24', border: 'rgba(245,158,11,0.2)' },
 };
@@ -203,8 +203,8 @@ export default function DashboardLayout({ title, children }) {
                     border-bottom: 1px solid #f1f5f9; margin-bottom: 8px;
                 }
                 .cx-logo-mark { flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-                .cx-logo-text { font-size: 17px; font-weight: 700; color: #1e293b; letter-spacing: -0.3px; white-space: nowrap; }
-                .cx-logo-accent { color: #10b981; }
+                .cx-logo-text { font-size: 17px; font-weight: 700; color: #1C1917; letter-spacing: -0.3px; white-space: nowrap; }
+                .cx-logo-accent { color: #064E3B; }
 
                 .cx-sidebar-toggle {
                     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
@@ -228,16 +228,16 @@ export default function DashboardLayout({ title, children }) {
                 .cx-nav { flex: 1; padding: 0 8px; display: flex; flex-direction: column; gap: 2px; }
                 .cx-nav-item {
                     display: flex; align-items: center; gap: 10px; padding: 9px 12px;
-                    border-radius: 8px; color: #64748b; text-decoration: none;
+                    border-radius: 8px; color: #78716C; text-decoration: none;
                     font-size: 13.5px; font-weight: 500; transition: all 150ms ease;
                     position: relative; white-space: nowrap;
                 }
-                .cx-nav-item:hover { color: #1e293b; background: #f8fafc; }
+                .cx-nav-item:hover { color: #1C1917; background: #f5f5f4; }
                 .cx-nav-item-active {
-                    color: #166534; background: #f0fdf4;
-                    border-left: 3px solid #10b981; margin-left: -3px;
+                    color: #064E3B; background: #ECFDF5;
+                    border-left: 3px solid #064E3B; margin-left: -3px;
                 }
-                .cx-nav-item-active .cx-nav-icon { color: #10b981; }
+                .cx-nav-item-active .cx-nav-icon { color: #064E3B; }
                 .cx-nav-icon { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; transition: color 200ms; }
                 .cx-nav-text { flex: 1; }
                 .cx-alert-badge {
@@ -260,14 +260,14 @@ export default function DashboardLayout({ title, children }) {
                 .cx-upgrade-btn {
                     display: flex; align-items: center; justify-content: center; gap: 6px;
                     padding: 8px 12px; border-radius: 8px;
-                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                    background: #064E3B;
                     color: #fff; font-size: 12px; font-weight: 600; text-decoration: none;
                     transition: all 200ms; white-space: nowrap;
-                    box-shadow: 0 2px 8px rgba(16,185,129,0.25);
+                    box-shadow: 0 2px 8px rgba(6,78,59,0.25);
                 }
                 .cx-upgrade-btn:hover {
-                    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-                    box-shadow: 0 4px 16px rgba(16,185,129,0.35);
+                    background: #043927;
+                    box-shadow: 0 4px 16px rgba(6,78,59,0.35);
                     transform: translateY(-1px);
                 }
 
@@ -294,7 +294,7 @@ export default function DashboardLayout({ title, children }) {
                     transition: border-color 200ms, box-shadow 200ms, background 200ms;
                 }
                 .cx-search:focus-within {
-                    border-color: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,0.08);
+                    border-color: #064E3B; box-shadow: 0 0 0 3px rgba(6,78,59,0.08);
                     background: #fff;
                 }
                 .cx-search-input {
@@ -314,7 +314,7 @@ export default function DashboardLayout({ title, children }) {
                 .cx-user-info { display: flex; align-items: center; gap: 8px; }
                 .cx-avatar {
                     width: 30px; height: 30px; border-radius: 50%;
-                    background: linear-gradient(135deg, #166534, #10b981);
+                    background: linear-gradient(135deg, #064E3B, #065F46);
                     color: #fff; display: flex; align-items: center; justify-content: center;
                     font-size: 12px; font-weight: 700; flex-shrink: 0;
                 }
@@ -344,7 +344,7 @@ export default function DashboardLayout({ title, children }) {
                     gap: 12px; font-size: 13px; color: #92400e;
                 }
                 .cx-free-banner a {
-                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                    background: #064E3B;
                     color: #fff; padding: 5px 14px; border-radius: 6px; text-decoration: none;
                     font-weight: 600; font-size: 12px; white-space: nowrap; transition: all 150ms; flex-shrink: 0;
                 }

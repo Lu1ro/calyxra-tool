@@ -116,8 +116,8 @@ export default function DashboardPage() {
                                 label="Net Revenue"
                                 value={fmt(portfolioStats.totalNetRevenue)}
                                 subtitle="Shopify verified"
-                                color="#10b981"
-                                tint="#f0fdf4"
+                                color="#064E3B"
+                                tint="#ECFDF5"
                                 icon={revenueIcon}
                             />
                             <KPICard
@@ -131,7 +131,7 @@ export default function DashboardPage() {
                                 label="Needs Attention"
                                 value={portfolioStats.worstStore ? portfolioStats.worstStore.name : 'All healthy'}
                                 subtitle={portfolioStats.worstStore ? `${portfolioStats.worstStore.phantomPct}% phantom` : 'No issues detected'}
-                                color={portfolioStats.worstStore ? '#f59e0b' : '#10b981'}
+                                color={portfolioStats.worstStore ? '#f59e0b' : '#064E3B'}
                                 tint={portfolioStats.worstStore ? '#fffbeb' : undefined}
                                 icon={alertIcon}
                             />
@@ -162,7 +162,7 @@ export default function DashboardPage() {
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 16, fontSize: 13 }}>
                                             <span style={{ color: '#ef4444', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{run.phantomPct}%</span>
-                                            <span style={{ color: '#10b981', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{run.trueRoas}\u00d7</span>
+                                            <span style={{ color: '#064E3B', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{run.trueRoas}\u00d7</span>
                                             <span style={{ color: 'var(--c-gray-400)', fontSize: 12 }}>{new Date(run.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--c-gray-300)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
                                         </div>
@@ -204,7 +204,7 @@ export default function DashboardPage() {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                     <div style={{
                                         width: 40, height: 40, borderRadius: 10,
-                                        background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)',
+                                        background: 'linear-gradient(135deg, #ECFDF5, #dcfce7)',
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                         flexShrink: 0, color: '#166534',
                                     }}>

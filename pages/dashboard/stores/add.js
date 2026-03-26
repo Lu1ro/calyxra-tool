@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 
-const GREEN = '#00b894';
+const GREEN = '#064E3B';
 
 export default function AddStorePage() {
     const { data: session, status } = useSession();
@@ -20,8 +20,7 @@ export default function AddStorePage() {
     const [shopifyKey, setShopifyKey] = useState('');
     const [metaToken, setMetaToken] = useState('');
     const [metaAccountId, setMetaAccountId] = useState('');
-    const [googleToken, setGoogleToken] = useState('');
-    const [googleCustomerId, setGoogleCustomerId] = useState('');
+
     const [tiktokToken, setTiktokToken] = useState('');
     const [tiktokAdvertiserId, setTiktokAdvertiserId] = useState('');
     const [connectedPlatforms, setConnectedPlatforms] = useState([]);
@@ -175,46 +174,11 @@ export default function AddStorePage() {
                                 )}
                             </div>
 
-                            {/* Google */}
-                            <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 16, marginBottom: 12 }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: connectedPlatforms.includes('google') ? 0 : 12 }}>
-                                    <span style={{ fontWeight: 600, fontSize: 14 }}>🔍 Google Ads</span>
-                                    {connectedPlatforms.includes('google') && <span style={{ color: GREEN, fontSize: 13, fontWeight: 600 }}>✓ Connected</span>}
-                                </div>
-                                {!connectedPlatforms.includes('google') && (
-                                    <>
-                                        <input type="text" value={googleToken} onChange={e => setGoogleToken(e.target.value)} placeholder="Developer Token / OAuth Token"
-                                            style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 13, marginBottom: 8, boxSizing: 'border-box' }} />
-                                        <input type="text" value={googleCustomerId} onChange={e => setGoogleCustomerId(e.target.value)} placeholder="Customer ID (123-456-7890)"
-                                            style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 13, marginBottom: 8, boxSizing: 'border-box' }} />
-                                        <button onClick={() => connectPlatform('google', { developerToken: googleToken, customerId: googleCustomerId })}
-                                            disabled={(!googleToken.trim() && !googleCustomerId.trim()) || connecting === 'google'}
-                                            style={{ padding: '6px 14px', background: (!googleToken.trim() && !googleCustomerId.trim()) ? '#d1d5db' : '#ea4335', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, cursor: (!googleToken.trim() && !googleCustomerId.trim()) ? 'not-allowed' : 'pointer', opacity: connecting === 'google' ? 0.7 : 1 }}>{connecting === 'google' ? 'Validating...' : 'Connect'}</button>
-                                    </>
-                                )}
-                            </div>
 
-                            {/* TikTok */}
-                            <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 16, marginBottom: 24 }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: connectedPlatforms.includes('tiktok') ? 0 : 12 }}>
-                                    <span style={{ fontWeight: 600, fontSize: 14 }}>🎵 TikTok Ads</span>
-                                    {connectedPlatforms.includes('tiktok') && <span style={{ color: GREEN, fontSize: 13, fontWeight: 600 }}>✓ Connected</span>}
-                                </div>
-                                {!connectedPlatforms.includes('tiktok') && (
-                                    <>
-                                        <input type="text" value={tiktokToken} onChange={e => setTiktokToken(e.target.value)} placeholder="Access Token"
-                                            style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 13, marginBottom: 8, boxSizing: 'border-box' }} />
-                                        <input type="text" value={tiktokAdvertiserId} onChange={e => setTiktokAdvertiserId(e.target.value)} placeholder="Advertiser ID"
-                                            style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 13, marginBottom: 8, boxSizing: 'border-box' }} />
-                                        <button onClick={() => connectPlatform('tiktok', { accessToken: tiktokToken, advertiserId: tiktokAdvertiserId })}
-                                            disabled={(!tiktokToken.trim() && !tiktokAdvertiserId.trim()) || connecting === 'tiktok'}
-                                            style={{ padding: '6px 14px', background: (!tiktokToken.trim() && !tiktokAdvertiserId.trim()) ? '#d1d5db' : '#111', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, cursor: (!tiktokToken.trim() && !tiktokAdvertiserId.trim()) ? 'not-allowed' : 'pointer', opacity: connecting === 'tiktok' ? 0.7 : 1 }}>{connecting === 'tiktok' ? 'Validating...' : 'Connect'}</button>
-                                    </>
-                                )}
-                            </div>
+
 
                             {/* Security note */}
-                            <div style={{ background: '#f0fdf4', borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 12, color: '#00b894' }}>
+                            <div style={{ background: '#ECFDF5', borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 12, color: '#064E3B' }}>
                                 🔒 All credentials are encrypted with AES-256 before storage. We never store plain-text tokens.
                             </div>
 
