@@ -113,17 +113,29 @@ export default function StoreDashboard() {
     };
 
     const runReconciliation = async (useSample = false) => {
-        setReconciling(true); setError('');
+        // 1. Immediately clear ALL previous state to prevent contamination
+        setLatestReport(null);
+        setIsDemoPreview(false);
+        setError('');
+        setActionResults(null);
+        setExecutingAction(null);
+        setCampaignSearch('');
+        setReconciling(true);
+
         try {
             const res = await fetch(`/api/stores/${id}/reconcile`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ useSampleData: useSample }) });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
-            setLatestReport(data.report);
+
+            // 2. Set mode flag BEFORE setting data so render is consistent
             setIsDemoPreview(useSample);
-            // Only refetch store data for live runs (demo runs don't save to DB)
+            setLatestReport(data.report);
+
+            // 3. Only refetch store data for live runs (demo runs don't save to DB)
             if (!useSample) {
                 await fetchStoreData();
             }
+
             // Show warnings from the API
             if (data.warnings?.length > 0) {
                 const warningMsgs = data.warnings.filter(w => w.type === 'warning').map(w => w.message);
