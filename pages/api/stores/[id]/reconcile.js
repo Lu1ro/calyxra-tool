@@ -7,8 +7,8 @@ import { prisma } from '../../../../lib/db';
 import { decrypt } from '../../../../lib/crypto';
 import { fetchShopifyOrders, processShopifyOrders, fetchShopifySalesAnalytics } from '../../../../lib/shopify';
 import { fetchMetaCampaigns } from '../../../../lib/meta';
-
 import { fetchTikTokCampaigns } from '../../../../lib/tiktok';
+import { fetchGoogleCampaigns } from '../../../../lib/google';
 import { reconcile } from '../../../../lib/reconcile';
 import { evaluateAlerts, saveAlerts } from '../../../../lib/alerts';
 import { fetchGA4Data, refreshAccessToken, generateSampleGA4Data } from '../../../../lib/ga4';
@@ -123,6 +123,11 @@ export default async function handler(req, res) {
                 adLabels.push('TikTok');
             }
 
+            if (creds.google) {
+                adFetchers.push(fetchGoogleCampaigns(creds.google, dateFrom, dateTo).then(c => c.map(x => ({ ...x, channel: 'Google' }))));
+                adLabels.push('Google');
+            }
+
             const adResults = await Promise.allSettled(adFetchers);
             const allCampaigns = [];
 
@@ -158,6 +163,22 @@ export default async function handler(req, res) {
             };
             adData.reportedRoas = adData.totalSpend > 0 ? +(adData.reportedRevenue / adData.totalSpend).toFixed(2) : 0;
 
+            // Warn if no ad platforms are connected
+            if (allCampaigns.length === 0) {
+                const connectedPlatforms = store.connections.map(c => c.platform).filter(p => p !== 'shopify' && p !== 'ga4');
+                if (connectedPlatforms.length === 0) {
+                    warnings.push({
+                        type: 'warning',
+                        message: 'No ad platforms connected. Connect Meta, Google, or TikTok to calculate phantom revenue and True ROAS.',
+                    });
+                } else {
+                    warnings.push({
+                        type: 'warning',
+                        message: `Ad platforms connected (${connectedPlatforms.join(', ')}) but returned no campaign data. Check your credentials and date range.`,
+                    });
+                }
+            }
+
             // Update connection sync times (only for successful ones)
             for (const conn of store.connections) {
                 try {
@@ -167,9 +188,13 @@ export default async function handler(req, res) {
         }
 
         // Fetch GA4 data if available
+        // Only show GA4 data in demo mode if GA4 is actually connected
         let ga4Data = null;
         if (useSampleData) {
-            ga4Data = generateSampleGA4Data();
+            const hasGA4 = store.connections.some(c => c.platform === 'ga4');
+            if (hasGA4) {
+                ga4Data = generateSampleGA4Data();
+            }
         } else {
             const ga4Conn = store.connections.find(c => c.platform === 'ga4');
             if (ga4Conn) {
@@ -237,13 +262,18 @@ export default async function handler(req, res) {
             })(),
         };
 
-        // Save to database
+        // Demo runs: return report without saving to database
+        if (useSampleData) {
+            return res.status(200).json({ report, savedReportId: null, isDemo: true, alerts: [], warnings: warnings || [] });
+        }
+
+        // Live runs: save to database
         const savedReport = await prisma.report.create({
             data: {
                 storeId: id,
                 dateFrom: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
                 dateTo: new Date().toISOString().split('T')[0],
-                isDemo: !!useSampleData,
+                isDemo: false,
                 grossRevenue: report.shopify.grossRevenue,
                 netRevenue: report.shopify.netRevenue,
                 totalDiscounts: report.shopify.totalDiscounts,
@@ -262,7 +292,7 @@ export default async function handler(req, res) {
                         campaignName: c.campaignName,
                         channel: c.channel || 'Meta',
                         spend: c.spend,
-                        reportedRoas: c.reportedRoas,
+                        reportedRoas: c.reportedRoas || 0,
                         estimatedTrueRoas: c.estimatedTrueRoas,
                         inflationRatio: c.inflationRatio,
                         flag: c.flag,

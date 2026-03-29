@@ -38,6 +38,7 @@ export default function StoreDashboard() {
     const [showBackToTop, setShowBackToTop] = useState(false);
     const [agencyTier, setAgencyTier] = useState(null);
     const [exportingPdf, setExportingPdf] = useState(false);
+    const [isDemoPreview, setIsDemoPreview] = useState(false);
     const topRef = useRef(null);
 
     useEffect(() => { if (status === 'unauthenticated') router.push('/login'); }, [status]);
@@ -96,6 +97,8 @@ export default function StoreDashboard() {
             const storesRes = await fetch('/api/stores');
             const storesData = await storesRes.json();
             setStore(storesData.stores?.find(s => s.id === id));
+            // Clean up old demo reports from DB — must complete before fetching reports
+            await fetch(`/api/stores/${id}/reports`, { method: 'DELETE' }).catch(() => {});
             const reportsRes = await fetch(`/api/stores/${id}/reports`);
             const reportsData = await reportsRes.json();
             setReports(reportsData.reports || []);
@@ -116,8 +119,20 @@ export default function StoreDashboard() {
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
             setLatestReport(data.report);
-            await fetchStoreData();
-            showToast(useSample ? 'Demo reconciliation complete!' : 'Reconciliation complete!');
+            setIsDemoPreview(useSample);
+            // Only refetch store data for live runs (demo runs don't save to DB)
+            if (!useSample) {
+                await fetchStoreData();
+            }
+            // Show warnings from the API
+            if (data.warnings?.length > 0) {
+                const warningMsgs = data.warnings.filter(w => w.type === 'warning').map(w => w.message);
+                if (warningMsgs.length > 0) {
+                    showToast(warningMsgs[0], 'warning');
+                    return;
+                }
+            }
+            showToast(useSample ? 'Demo preview loaded (not saved)' : 'Reconciliation complete!');
         } catch (err) { setError(err.message); showToast('Reconciliation failed: ' + err.message, 'error'); }
         finally { setReconciling(false); }
     };
@@ -176,20 +191,22 @@ export default function StoreDashboard() {
         !campaignSearch || c.campaignName?.toLowerCase().includes(campaignSearch.toLowerCase()) || c.channel?.toLowerCase().includes(campaignSearch.toLowerCase())
     );
 
-    const deduplicatedReports = reports.reduce((acc, r) => {
+    // Filter out demo reports and deduplicate for both chart and history table
+    const liveReports = reports.filter(r => !r.isDemo);
+    const deduplicatedReports = liveReports.reduce((acc, r) => {
         const last = acc[acc.length - 1];
-        if (last && last.phantomPct === r.phantomPct && last.trueRoas === r.trueRoas && last.netRevenue === r.netRevenue && last.isDemo === r.isDemo) return acc;
+        if (last && last.phantomPct === r.phantomPct && last.trueRoas === r.trueRoas && last.netRevenue === r.netRevenue) return acc;
         acc.push(r); return acc;
     }, []).slice(0, 10);
 
-    const trendData = reports.length > 1 ? {
-        labels: reports.slice().reverse().map(r => new Date(r.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })),
+    const trendData = deduplicatedReports.length > 1 ? {
+        labels: deduplicatedReports.slice().reverse().map(r => new Date(r.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })),
         datasets: [{
-            label: 'Phantom Revenue %', data: reports.slice().reverse().map(r => r.phantomPct),
+            label: 'Phantom Revenue %', data: deduplicatedReports.slice().reverse().map(r => r.phantomPct),
             borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.06)', fill: true, tension: 0.4,
             borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#ef4444',
         }, {
-            label: 'True ROAS', data: reports.slice().reverse().map(r => r.trueRoas),
+            label: 'True ROAS', data: deduplicatedReports.slice().reverse().map(r => r.trueRoas),
             borderColor: '#064E3B', backgroundColor: 'rgba(16, 185, 129, 0.06)', fill: true, tension: 0.4,
             yAxisID: 'y1', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#064E3B',
         }],
@@ -248,6 +265,23 @@ export default function StoreDashboard() {
                         <EmptyState store={store} storeId={id} onTrySample={() => runReconciliation(true)} />
                     ) : latestReport && (
                         <>
+                            {/* Demo banner */}
+                            {isDemoPreview && (
+                                <div className="animate-fade-in" style={{
+                                    padding: '12px 20px', marginBottom: 16, borderRadius: 10,
+                                    background: '#fffbeb', border: '1px solid #fde68a',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                }}>
+                                    <span style={{ fontSize: 13, color: '#92400e', fontWeight: 500 }}>
+                                        This is a <strong>demo preview</strong> with sample data. It is not saved to your report history.
+                                    </span>
+                                    <button className="btn btn-sm btn-outline" style={{ fontSize: 12, padding: '4px 12px' }}
+                                        onClick={() => { setIsDemoPreview(false); setLatestReport(null); }}>
+                                        Dismiss demo
+                                    </button>
+                                </div>
+                            )}
+
                             {/* Primary KPI Cards — ALWAYS visible to show the problem */}
                             <div className="kpi-grid animate-stagger" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
                                 <KPICard
@@ -436,7 +470,8 @@ export default function StoreDashboard() {
                                 </div>
                             )}
 
-                            {/* Trend Chart + Gap Breakdown */}
+                            {/* Trend Chart + Gap Breakdown — hidden during demo preview */}
+                            {!isDemoPreview && (
                             <div className="animate-fade-in" style={{ display: 'grid', gridTemplateColumns: trendData ? '5fr 2fr' : '1fr', gap: 16, marginBottom: 24 }}>
                                 {trendData && (
                                     <div className="card">
@@ -476,6 +511,7 @@ export default function StoreDashboard() {
                                     </div>
                                 </div>
                             </div>
+                            )}
 
                             {/* GA4 3-Way Reconciliation Panel */}
                             {latestReport.ga4 && (
@@ -619,8 +655,8 @@ export default function StoreDashboard() {
                                 </div>
                             )}
 
-                            {/* Report History */}
-                            {deduplicatedReports.length > 0 && (
+                            {/* Report History — hidden during demo preview */}
+                            {!isDemoPreview && deduplicatedReports.length > 0 && (
                                 <div className="card animate-fade-in" style={{ marginTop: 24 }}>
                                     <div className="flex-between" style={{ marginBottom: 16 }}>
                                         <h3 style={{ fontSize: 15, fontWeight: 700, margin: 0, color: 'var(--c-gray-900)', letterSpacing: '-0.01em' }}>Report History</h3>

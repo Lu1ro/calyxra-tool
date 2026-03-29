@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../../auth/[...nextauth]';
 import { prisma } from '../../../../lib/db';
 import { encrypt } from '../../../../lib/crypto';
-import { validateShopify, validateMeta, validateTikTok } from '../../../../lib/validate';
+import { validateShopify, validateMeta, validateTikTok, validateGoogle } from '../../../../lib/validate';
 
 export default async function handler(req, res) {
     const session = await getServerSession(req, res, authOptions);
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Please provide valid credentials. All fields are empty.' });
         }
 
-        const validPlatforms = ['shopify', 'meta', 'tiktok'];
+        const validPlatforms = ['shopify', 'meta', 'tiktok', 'google'];
         if (!validPlatforms.includes(platform)) {
             return res.status(400).json({ error: `Invalid platform. Must be one of: ${validPlatforms.join(', ')}` });
         }
@@ -52,6 +52,10 @@ export default async function handler(req, res) {
 
                 case 'tiktok':
                     await validateTikTok(credentials.accessToken, credentials.advertiserId);
+                    break;
+
+                case 'google':
+                    await validateGoogle(credentials.developerToken, credentials.customerId, credentials.clientId, credentials.clientSecret, credentials.refreshToken, credentials.loginCustomerId);
                     break;
             }
         } catch (validationError) {
