@@ -49,12 +49,24 @@ export const authOptions = {
                 token.agencyId = user.id;
                 token.tier = user.tier;
             }
+            // Refresh name and tier from DB on every token refresh
+            if (token.agencyId) {
+                const agency = await prisma.agency.findUnique({
+                    where: { id: token.agencyId },
+                    select: { name: true, tier: true },
+                });
+                if (agency) {
+                    token.name = agency.name;
+                    token.tier = agency.tier;
+                }
+            }
             return token;
         },
         async session({ session, token }) {
             if (session.user) {
                 session.user.agencyId = token.agencyId;
                 session.user.tier = token.tier;
+                session.user.name = token.name;
             }
             return session;
         },

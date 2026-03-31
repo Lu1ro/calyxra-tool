@@ -10,7 +10,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 const GREEN = '#064E3B';
 
 export default function BrandingSettingsPage() {
-    const { data: session, status } = useSession();
+    const { data: session, status, update: updateSession } = useSession();
     const router = useRouter();
     const [settings, setSettings] = useState(null);
     const [saving, setSaving] = useState(false);
@@ -106,6 +106,8 @@ export default function BrandingSettingsPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
         });
+        // Refresh session so navbar picks up the new name immediately
+        await updateSession();
         setSaving(false);
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
