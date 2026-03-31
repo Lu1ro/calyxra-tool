@@ -41,11 +41,10 @@ export default async function handler(req, res) {
         where: { storeId: id, isDemo: false },
         include: { campaigns: true },
         orderBy: { createdAt: 'desc' },
-        take: 30, // Last 30 live reports (exclude demo runs)
+        take: 100,
     });
 
-    // Deduplicate at API level: keep only one report per calendar day
-    // If multiple runs happened on the same day, keep the latest one
+    // Deduplicate: keep only one report per calendar day (latest per day)
     const seenDays = new Set();
     const deduplicated = reports.filter(r => {
         const day = new Date(r.createdAt).toISOString().split('T')[0];
@@ -54,5 +53,16 @@ export default async function handler(req, res) {
         return true;
     });
 
-    return res.status(200).json({ reports: deduplicated });
+    // Delete excess duplicates from DB (keep only the deduped ones)
+    if (reports.length > deduplicated.length) {
+        const keepIds = new Set(deduplicated.map(r => r.id));
+        const deleteIds = reports.filter(r => !keepIds.has(r.id)).map(r => r.id);
+        if (deleteIds.length > 0) {
+            await prisma.campaign.deleteMany({ where: { reportId: { in: deleteIds } } });
+            await prisma.report.deleteMany({ where: { id: { in: deleteIds } } });
+        }
+    }
+
+    // Return max 10 most recent unique days for the chart
+    return res.status(200).json({ reports: deduplicated.slice(0, 10) });
 }

@@ -203,13 +203,8 @@ export default function StoreDashboard() {
         !campaignSearch || c.campaignName?.toLowerCase().includes(campaignSearch.toLowerCase()) || c.channel?.toLowerCase().includes(campaignSearch.toLowerCase())
     );
 
-    // Filter out demo reports and deduplicate for both chart and history table
-    const liveReports = reports.filter(r => !r.isDemo);
-    const deduplicatedReports = liveReports.reduce((acc, r) => {
-        const last = acc[acc.length - 1];
-        if (last && last.phantomPct === r.phantomPct && last.trueRoas === r.trueRoas && last.netRevenue === r.netRevenue) return acc;
-        acc.push(r); return acc;
-    }, []).slice(0, 10);
+    // Server already returns deduped (1 per day, max 10, live only)
+    const deduplicatedReports = reports;
 
     const trendData = deduplicatedReports.length > 1 ? {
         labels: deduplicatedReports.slice().reverse().map(r => new Date(r.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })),
