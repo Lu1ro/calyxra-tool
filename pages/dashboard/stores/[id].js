@@ -92,17 +92,20 @@ export default function StoreDashboard() {
         setExportingPdf(false);
     };
 
-    const fetchStoreData = async () => {
+    const fetchStoreData = async ({ skipReport } = {}) => {
         try {
             const storesRes = await fetch('/api/stores');
             const storesData = await storesRes.json();
             setStore(storesData.stores?.find(s => s.id === id));
-            // Clean up old demo reports from DB — must complete before fetching reports
+            // Clean up old demo + duplicate reports from DB
             await fetch(`/api/stores/${id}/reports`, { method: 'DELETE' }).catch(() => {});
             const reportsRes = await fetch(`/api/stores/${id}/reports`);
             const reportsData = await reportsRes.json();
             setReports(reportsData.reports || []);
-            if (reportsData.reports?.length > 0) setLatestReport(JSON.parse(reportsData.reports[0].fullReport));
+            // Only set latestReport if not in demo mode (skipReport prevents overwriting demo data)
+            if (!skipReport && reportsData.reports?.length > 0) {
+                setLatestReport(JSON.parse(reportsData.reports[0].fullReport));
+            }
             try {
                 const agencyRes = await fetch('/api/agency');
                 const agencyData = await agencyRes.json();
