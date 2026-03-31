@@ -480,10 +480,9 @@ export default function StoreDashboard() {
                                 </div>
                             )}
 
-                            {/* Trend Chart + Gap Breakdown — hidden during demo preview */}
-                            {!isDemoPreview && (
-                            <div className="animate-fade-in" style={{ display: 'grid', gridTemplateColumns: trendData ? '5fr 2fr' : '1fr', gap: 16, marginBottom: 24 }}>
-                                {trendData && (
+                            {/* Trend Chart + Gap Breakdown */}
+                            <div className="animate-fade-in" style={{ display: 'grid', gridTemplateColumns: (!isDemoPreview && trendData) ? '5fr 2fr' : '1fr', gap: 16, marginBottom: 24 }}>
+                                {!isDemoPreview && trendData && (
                                     <div className="card">
                                         <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 16px', color: 'var(--c-gray-900)', letterSpacing: '-0.01em' }}>Historical Trend</h3>
                                         <Line data={trendData} options={{
@@ -521,7 +520,6 @@ export default function StoreDashboard() {
                                     </div>
                                 </div>
                             </div>
-                            )}
 
                             {/* GA4 3-Way Reconciliation Panel */}
                             {latestReport.ga4 && (
