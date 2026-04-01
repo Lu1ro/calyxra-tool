@@ -29,8 +29,8 @@ export default async function handler(req, res) {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({
                 code,
-                client_id: process.env.GOOGLE_CLIENT_ID,
-                client_secret: process.env.GOOGLE_CLIENT_SECRET,
+                client_id: process.env.GOOGLE_OAUTH_CLIENT_ID,
+                client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
                 redirect_uri: redirectUri,
                 grant_type: 'authorization_code',
             }),
@@ -44,31 +44,41 @@ export default async function handler(req, res) {
         }
 
         // Fetch accessible Google Ads customer IDs
+        const apiVersion = process.env.GOOGLE_ADS_API_VERSION || 'v18';
         let customerId = '';
+        let loginCustomerId = '';
         try {
             const customerRes = await fetch(
-                'https://googleads.googleapis.com/v16/customers:listAccessibleCustomers',
+                `https://googleads.googleapis.com/${apiVersion}/customers:listAccessibleCustomers`,
                 {
                     headers: {
                         'Authorization': `Bearer ${tokenData.access_token}`,
-                        'developer-token': process.env.GOOGLE_DEVELOPER_TOKEN,
+                        'developer-token': process.env.GOOGLE_ADS_DEVELOPER_TOKEN,
                     },
                 }
             );
             const customerData = await customerRes.json();
             // resourceNames look like "customers/1234567890"
-            customerId = customerData.resourceNames?.[0]?.split('/')?.[1] || '';
+            if (customerData.resourceNames?.length > 0) {
+                customerId = customerData.resourceNames[0].split('/')[1] || '';
+                // If multiple accounts, first is typically MCC (loginCustomerId)
+                if (customerData.resourceNames.length > 1) {
+                    loginCustomerId = customerId;
+                    customerId = customerData.resourceNames[1].split('/')[1] || customerId;
+                }
+            }
         } catch (e) {
             console.warn('Could not fetch Google Ads customers:', e.message);
         }
 
-        // Encrypt and save
+        // Encrypt and save — include clientId/clientSecret so lib/google.js can refresh tokens
         const encryptedCreds = encrypt(JSON.stringify({
-            accessToken: tokenData.access_token,
             refreshToken: tokenData.refresh_token,
+            clientId: process.env.GOOGLE_OAUTH_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
             customerId,
-            developerToken: process.env.GOOGLE_DEVELOPER_TOKEN,
-            expiresAt: new Date(Date.now() + tokenData.expires_in * 1000).toISOString(),
+            loginCustomerId,
+            developerToken: process.env.GOOGLE_ADS_DEVELOPER_TOKEN,
         }));
 
         const existing = await prisma.connection.findFirst({

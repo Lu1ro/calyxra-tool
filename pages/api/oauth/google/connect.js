@@ -11,8 +11,8 @@ export default async function handler(req, res) {
     const { storeId } = req.query;
     if (!storeId) return res.status(400).json({ error: 'storeId is required' });
 
-    const clientId = process.env.GOOGLE_CLIENT_ID;
-    if (!clientId) return res.status(500).json({ error: 'Google OAuth not configured. Set GOOGLE_CLIENT_ID in .env' });
+    const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
+    if (!clientId) return res.status(500).json({ error: 'Google OAuth not configured. Set GOOGLE_OAUTH_CLIENT_ID in .env' });
 
     const state = Buffer.from(JSON.stringify({
         storeId,
