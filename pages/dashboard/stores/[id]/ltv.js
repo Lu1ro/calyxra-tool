@@ -187,7 +187,7 @@ export default function LtvRoas() {
                         </div>
                         <div style={{ background: '#111827', borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
                             <div style={{ fontSize: 12, color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', marginBottom: 6 }}>Portfolio Lift</div>
-                            <div style={{ fontSize: 28, fontWeight: 700, color: '#fff' }}>+{(((portfolioLtvRoas / portfolioImmediateRoas) - 1) * 100).toFixed(1)}%</div>
+                            <div style={{ fontSize: 28, fontWeight: 700, color: '#fff' }}>+{portfolioImmediateRoas > 0 ? (((portfolioLtvRoas / portfolioImmediateRoas) - 1) * 100).toFixed(1) : '0.0'}%</div>
                             <div style={{ fontSize: 11, color: '#e5e7eb', marginTop: 4 }}>Additional revenue from repeat purchases</div>
                         </div>
                     </div>
