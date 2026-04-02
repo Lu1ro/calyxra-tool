@@ -7,7 +7,6 @@ import { prisma } from '../../../../lib/db';
 import { decrypt } from '../../../../lib/crypto';
 import { fetchShopifyOrders, processShopifyOrders, fetchShopifySalesAnalytics } from '../../../../lib/shopify';
 import { fetchMetaCampaigns } from '../../../../lib/meta';
-import { fetchTikTokCampaigns } from '../../../../lib/tiktok';
 import { fetchGoogleCampaigns } from '../../../../lib/google';
 import { reconcile } from '../../../../lib/reconcile';
 import { evaluateAlerts, saveAlerts } from '../../../../lib/alerts';
@@ -52,14 +51,13 @@ export default async function handler(req, res) {
                 totalOrders: 3842,
             };
             adData = {
-                totalSpend: 62452,
-                reportedPurchases: 2685,
-                reportedRevenue: 268440,
-                reportedRoas: 4.30,
+                totalSpend: 50652,
+                reportedPurchases: 2195,
+                reportedRevenue: 231040,
+                reportedRoas: 4.56,
                 campaigns: [
                     { campaignName: 'PMax - Best Sellers', spend: 18500, impressions: 245000, clicks: 5100, purchases: 612, purchaseValue: 68500, reportedRoas: 3.70, channel: 'Google' },
                     { campaignName: 'Search - Brand', spend: 2100, impressions: 45000, clicks: 3200, purchases: 380, purchaseValue: 35200, reportedRoas: 16.76, channel: 'Google' },
-                    { campaignName: 'TikTok - UGC Scaling', spend: 11800, impressions: 840000, clicks: 9200, purchases: 490, purchaseValue: 37400, reportedRoas: 3.17, channel: 'TikTok' },
                     { campaignName: 'Prospecting - Broad', spend: 12400, impressions: 186000, clicks: 3720, purchases: 487, purchaseValue: 51520, reportedRoas: 4.15, channel: 'Meta' },
                     { campaignName: 'Retargeting - Remarketing 7d', spend: 6200, impressions: 78400, clicks: 2460, purchases: 392, purchaseValue: 52440, reportedRoas: 8.46, channel: 'Meta' },
                     { campaignName: 'Lookalike - 1%', spend: 5800, impressions: 87000, clicks: 1914, purchases: 213, purchaseValue: 15530, reportedRoas: 2.68, channel: 'Meta' },
@@ -118,11 +116,6 @@ export default async function handler(req, res) {
                 adLabels.push('Meta');
             }
 
-            if (creds.tiktok) {
-                adFetchers.push(fetchTikTokCampaigns(creds.tiktok.accessToken, creds.tiktok.advertiserId, dateFrom, dateTo).then(c => c.map(x => ({ ...x, channel: 'TikTok' }))));
-                adLabels.push('TikTok');
-            }
-
             if (creds.google) {
                 adFetchers.push(fetchGoogleCampaigns(creds.google, dateFrom, dateTo).then(c => c.map(x => ({ ...x, channel: 'Google' }))));
                 adLabels.push('Google');
@@ -169,7 +162,7 @@ export default async function handler(req, res) {
                 if (connectedPlatforms.length === 0) {
                     warnings.push({
                         type: 'warning',
-                        message: 'No ad platforms connected. Connect Meta, Google, or TikTok to calculate phantom revenue and True ROAS.',
+                        message: 'No ad platforms connected. Connect Meta or Google to calculate phantom revenue and True ROAS.',
                     });
                 } else {
                     warnings.push({
