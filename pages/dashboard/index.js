@@ -1,4 +1,5 @@
 // pages/dashboard/index.js
+// Agency dashboard — overview with KPIs, quick actions, and recent activity
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -83,9 +84,13 @@ export default function DashboardPage() {
         return <DashboardLayout title="Dashboard — Calyxra"><div className="flex-center" style={{ minHeight: '60vh' }}>Loading...</div></DashboardLayout>;
     }
 
+    const userName = session.user?.name || 'there';
+    const hour = new Date().getHours();
+    const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
     const tierLimits = { free: 1, pilot: 2, scale: 5, pro: 10 };
     const maxStores = tierLimits[session.user.tier] || 1;
     const fmt = (v) => '$' + (v || 0).toLocaleString('en-US', { minimumFractionDigits: 0 });
+    const hasData = portfolioStats && portfolioStats.totalReports > 0;
 
     const phantomIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>;
     const revenueIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>;
@@ -100,9 +105,22 @@ export default function DashboardPage() {
             )}
 
             <div className="container" style={{ maxWidth: 1000 }}>
-                {/* Portfolio KPIs */}
-                {portfolioStats && portfolioStats.totalReports > 0 && (
-                    <div style={{ marginBottom: 32 }} className="animate-stagger">
+                {/* Greeting */}
+                <div className="animate-fade-in" style={{ marginBottom: 28, paddingTop: 4 }}>
+                    <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--c-gray-900)', margin: 0, letterSpacing: '-0.02em' }}>
+                        {greeting}, {userName}
+                    </h1>
+                    <p style={{ color: 'var(--c-gray-500)', fontSize: 14, marginTop: 4 }}>
+                        {hasData
+                            ? `You have ${stores.length} store${stores.length !== 1 ? 's' : ''} and ${portfolioStats.totalReports} report${portfolioStats.totalReports !== 1 ? 's' : ''}.`
+                            : `Here's your command center. Let's get started.`
+                        }
+                    </p>
+                </div>
+
+                {/* Portfolio KPIs — only if there's data */}
+                {hasData && (
+                    <div style={{ marginBottom: 28 }} className="animate-stagger">
                         <div className="kpi-grid kpi-grid-4" style={{ marginBottom: 20 }}>
                             <KPICard
                                 label="Phantom Revenue"
@@ -139,7 +157,7 @@ export default function DashboardPage() {
 
                         {/* Recent Reconciliations */}
                         {portfolioStats.recentRuns.length > 0 && (
-                            <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20 }}>
+                            <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
                                 <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--c-gray-100)' }}>
                                     <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: 'var(--c-gray-800)' }}>Recent Reconciliations</h4>
                                 </div>
@@ -162,7 +180,7 @@ export default function DashboardPage() {
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 16, fontSize: 13 }}>
                                             <span style={{ color: '#ef4444', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{run.phantomPct}%</span>
-                                            <span style={{ color: '#064E3B', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{run.trueRoas}\u00d7</span>
+                                            <span style={{ color: '#064E3B', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{run.trueRoas}{'\u00d7'}</span>
                                             <span style={{ color: 'var(--c-gray-400)', fontSize: 12 }}>{new Date(run.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--c-gray-300)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
                                         </div>
@@ -173,57 +191,104 @@ export default function DashboardPage() {
                     </div>
                 )}
 
-                {/* Your Stores */}
-                <div className="animate-fade-in" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                    <div>
-                        <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--c-gray-900)', margin: 0, letterSpacing: '-0.02em' }}>Your Stores</h1>
-                        <p style={{ color: 'var(--c-gray-500)', fontSize: 14, marginTop: 4 }}>{stores.length} of {maxStores} stores connected</p>
-                    </div>
-                    {stores.length < maxStores && (
-                        <button className="btn btn-primary" onClick={() => router.push('/dashboard/stores/add')}>+ Add Store</button>
-                    )}
-                </div>
+                {/* Quick Actions — always visible */}
+                {!hasData && !loading && (
+                    <div className="animate-fade-in" style={{ marginBottom: 28 }}>
+                        <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--c-gray-800)', margin: '0 0 12px' }}>Quick Actions</h3>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+                            <div className="card card-clickable" onClick={() => router.push('/dashboard/stores/add')} style={{ padding: '20px', textAlign: 'center' }}>
+                                <div style={{
+                                    width: 44, height: 44, borderRadius: 12, margin: '0 auto 12px',
+                                    background: 'linear-gradient(135deg, #ECFDF5, #dcfce7)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#166534',
+                                }}>
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                </div>
+                                <h4 style={{ margin: '0 0 4px', fontSize: 14, fontWeight: 600, color: 'var(--c-gray-800)' }}>Add Store</h4>
+                                <p style={{ margin: 0, fontSize: 12, color: 'var(--c-gray-400)' }}>Connect a Shopify store</p>
+                            </div>
 
-                {loading ? (
-                    <div style={{ display: 'grid', gap: 12 }}><Skeleton height={80} /><Skeleton height={80} /></div>
-                ) : stores.length === 0 ? (
+                            {stores.length > 0 && (
+                                <div className="card card-clickable" onClick={() => router.push(`/dashboard/stores/${stores[0].id}/settings`)} style={{ padding: '20px', textAlign: 'center' }}>
+                                    <div style={{
+                                        width: 44, height: 44, borderRadius: 12, margin: '0 auto 12px',
+                                        background: 'linear-gradient(135deg, #eff6ff, #dbeafe)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1e40af',
+                                    }}>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                                    </div>
+                                    <h4 style={{ margin: '0 0 4px', fontSize: 14, fontWeight: 600, color: 'var(--c-gray-800)' }}>Connect Ads</h4>
+                                    <p style={{ margin: 0, fontSize: 12, color: 'var(--c-gray-400)' }}>Link Meta or Google Ads</p>
+                                </div>
+                            )}
+
+                            {stores.length > 0 && (
+                                <div className="card card-clickable" onClick={() => router.push(`/dashboard/stores/${stores[0].id}`)} style={{ padding: '20px', textAlign: 'center' }}>
+                                    <div style={{
+                                        width: 44, height: 44, borderRadius: 12, margin: '0 auto 12px',
+                                        background: 'linear-gradient(135deg, #fdf2f8, #fce7f3)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9d174d',
+                                    }}>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                    </div>
+                                    <h4 style={{ margin: '0 0 4px', fontSize: 14, fontWeight: 600, color: 'var(--c-gray-800)' }}>Run Reconciliation</h4>
+                                    <p style={{ margin: 0, fontSize: 12, color: 'var(--c-gray-400)' }}>Detect phantom revenue</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Stores overview — compact version, not the full list */}
+                {stores.length > 0 && (
+                    <div className="animate-fade-in">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                            <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--c-gray-800)', margin: 0 }}>Your Stores</h3>
+                            <button className="btn btn-ghost btn-sm" onClick={() => router.push('/dashboard/stores')} style={{ fontSize: 13 }}>
+                                View all →
+                            </button>
+                        </div>
+                        <div style={{ display: 'grid', gap: 8 }}>
+                            {stores.slice(0, 5).map(store => (
+                                <div key={store.id} className="card card-clickable"
+                                    onClick={() => router.push(`/dashboard/stores/${store.id}`)}
+                                    style={{ padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                        <div style={{
+                                            width: 36, height: 36, borderRadius: 9,
+                                            background: 'linear-gradient(135deg, #ECFDF5, #dcfce7)',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            flexShrink: 0, color: '#166534',
+                                        }}>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+                                        </div>
+                                        <div>
+                                            <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: 'var(--c-gray-800)' }}>{store.name}</h3>
+                                            <p style={{ margin: '1px 0 0', color: 'var(--c-gray-400)', fontSize: 12 }}>{store.domain}</p>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        {store.connections?.map(c => (
+                                            <span key={c.id} className={`badge ${c.status === 'connected' ? 'badge-green' : 'badge-red'}`} style={{ fontSize: 10 }}>{c.platform}</span>
+                                        ))}
+                                        <span className={`status-dot ${store.status === 'active' ? 'status-dot-green' : store.status === 'error' ? 'status-dot-red' : 'status-dot-gray'}`} />
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--c-gray-300)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Empty state when no stores */}
+                {!loading && stores.length === 0 && (
                     <div className="card animate-fade-in" style={{ padding: 60, textAlign: 'center' }}>
-                        <div style={{ width: 64, height: 64, borderRadius: 16, background: 'var(--c-gray-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 28 }}>
+                        <div style={{ width: 64, height: 64, borderRadius: 16, background: 'var(--c-gray-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--c-gray-400)" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                         </div>
                         <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 8px', color: 'var(--c-gray-800)' }}>No stores connected yet</h2>
                         <p style={{ color: 'var(--c-gray-500)', fontSize: 14, marginBottom: 24 }}>Add your first Shopify store to start reconciling revenue.</p>
                         <button className="btn btn-primary btn-lg" onClick={() => router.push('/dashboard/stores/add')}>+ Add Your First Store</button>
-                    </div>
-                ) : (
-                    <div style={{ display: 'grid', gap: 10 }} className="animate-stagger">
-                        {stores.map(store => (
-                            <div key={store.id} className="card card-clickable"
-                                onClick={() => router.push(`/dashboard/stores/${store.id}`)}
-                                style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                    <div style={{
-                                        width: 40, height: 40, borderRadius: 10,
-                                        background: 'linear-gradient(135deg, #ECFDF5, #dcfce7)',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        flexShrink: 0, color: '#166534',
-                                    }}>
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-                                    </div>
-                                    <div>
-                                        <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: 'var(--c-gray-800)' }}>{store.name}</h3>
-                                        <p style={{ margin: '2px 0 0', color: 'var(--c-gray-500)', fontSize: 13 }}>{store.domain}</p>
-                                    </div>
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    {store.connections?.map(c => (
-                                        <span key={c.id} className={`badge ${c.status === 'connected' ? 'badge-green' : 'badge-red'}`} style={{ fontSize: 10 }}>{c.platform}</span>
-                                    ))}
-                                    <span className={`status-dot ${store.status === 'active' ? 'status-dot-green' : store.status === 'error' ? 'status-dot-red' : 'status-dot-gray'}`} />
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--c-gray-300)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
-                                </div>
-                            </div>
-                        ))}
                     </div>
                 )}
 
