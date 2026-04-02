@@ -1,12 +1,18 @@
 // components/EmptyState.js
 // Onboarding empty state with progress checklist
 
+import { useRouter } from 'next/router';
+
 export default function EmptyState({ store, storeId, onTrySample }) {
+    const router = useRouter();
+    const hasShopify = store?.connections?.some(c => c.platform === 'shopify');
+    const hasAdPlatforms = store?.connections?.some(c => ['meta', 'google'].includes(c.platform));
+
     const steps = [
-        { label: 'Connect Store', done: true, icon: (
+        { label: 'Connect Store', done: hasShopify, link: !hasShopify ? `/dashboard/stores/${storeId}/settings` : null, icon: (
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
         )},
-        { label: 'Connect Ad Platforms', done: (store?.connections?.length || 0) > 0, icon: (
+        { label: 'Connect Ad Platforms', done: hasAdPlatforms, link: !hasAdPlatforms ? `/dashboard/stores/${storeId}/settings` : null, icon: (
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>
         )},
         { label: 'Run First Reconciliation', done: false, icon: (
@@ -107,26 +113,34 @@ export default function EmptyState({ store, storeId, onTrySample }) {
                             {step.label}
                         </span>
                         {step.link && !step.done && (
-                            <a href={step.link} style={{
+                            <a href={step.link} onClick={(e) => { e.preventDefault(); router.push(step.link); }} style={{
                                 marginLeft: 'auto', fontSize: 12, fontWeight: 600,
                                 color: 'var(--color-primary)', textDecoration: 'none',
+                                cursor: 'pointer',
                             }}>
-                                Set up
+                                Set up →
                             </a>
                         )}
                     </div>
                 ))}
             </div>
 
-            <div style={{ textAlign: 'center' }}>
-                <button className="btn btn-primary" onClick={onTrySample} style={{
+            <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+                <button className="btn btn-primary" onClick={() => router.push(`/dashboard/stores/${storeId}/settings`)} style={{
                     padding: '10px 24px', fontSize: 14, borderRadius: 10,
                     boxShadow: '0 2px 8px rgba(0,184,148,0.2)',
+                    width: 220,
+                }}>
+                    Connect Platforms
+                </button>
+                <button className="btn btn-secondary" onClick={onTrySample} style={{
+                    padding: '10px 24px', fontSize: 14, borderRadius: 10,
+                    width: 220,
                 }}>
                     Try with Sample Data
                 </button>
                 <p style={{
-                    marginTop: 10, fontSize: 12, color: 'var(--c-gray-400)',
+                    marginTop: 4, fontSize: 12, color: 'var(--c-gray-400)',
                 }}>
                     No API keys needed — we generate realistic demo data.
                 </p>
