@@ -48,16 +48,23 @@ export const authOptions = {
             if (user) {
                 token.agencyId = user.id;
                 token.tier = user.tier;
+                token.name = user.name;
+                token.lastRefresh = Date.now();
             }
-            // Refresh name and tier from DB on every token refresh
-            if (token.agencyId) {
-                const agency = await prisma.agency.findUnique({
-                    where: { id: token.agencyId },
-                    select: { name: true, tier: true },
-                });
-                if (agency) {
-                    token.name = agency.name;
-                    token.tier = agency.tier;
+            // Refresh name and tier from DB every 5 minutes (not every request)
+            if (token.agencyId && (!token.lastRefresh || Date.now() - token.lastRefresh > 5 * 60 * 1000)) {
+                try {
+                    const agency = await prisma.agency.findUnique({
+                        where: { id: token.agencyId },
+                        select: { name: true, tier: true },
+                    });
+                    if (agency) {
+                        token.name = agency.name;
+                        token.tier = agency.tier;
+                    }
+                    token.lastRefresh = Date.now();
+                } catch {
+                    // DB error — keep cached values
                 }
             }
             return token;

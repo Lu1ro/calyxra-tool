@@ -2,9 +2,31 @@
 import bcrypt from 'bcryptjs';
 import { prisma } from '../../../lib/db';
 
+// Simple in-memory rate limiter for registration
+const attempts = new Map();
+const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+const MAX_ATTEMPTS = 5; // max 5 registrations per IP per window
+
+function isRateLimited(ip) {
+    const now = Date.now();
+    const record = attempts.get(ip);
+    if (!record || now - record.firstAttempt > WINDOW_MS) {
+        attempts.set(ip, { count: 1, firstAttempt: now });
+        return false;
+    }
+    record.count++;
+    return record.count > MAX_ATTEMPTS;
+}
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    // Rate limit by IP
+    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+    if (isRateLimited(ip)) {
+        return res.status(429).json({ error: 'Too many registration attempts. Please try again later.' });
     }
 
     const { name, email, password } = req.body;
