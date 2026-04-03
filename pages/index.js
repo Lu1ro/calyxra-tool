@@ -200,7 +200,8 @@ function PricingSection() {
     boxShadow: '0 4px 24px rgba(0,0,0,0.08)', border: '1px solid #e5e7eb',
     flex: 1, minWidth: 280,
   };
-  const checkStyle = { fontSize: 14, color: '#374151', padding: '6px 0', lineHeight: 1.5 };
+  const checkStyle = { fontSize: 14, color: '#374151', padding: '6px 0', lineHeight: 1.5, display: 'flex', alignItems: 'center', gap: 10 };
+  const dot = (color = GREEN) => <span style={{ width: 6, height: 6, borderRadius: '50%', background: color, flexShrink: 0 }} />;
 
   return (
     <div style={{ maxWidth: 960, margin: '0 auto 48px' }}>
@@ -220,11 +221,11 @@ function PricingSection() {
           </div>
           <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>1 store, forever free</div>
           <div style={{ display: 'grid', gap: 2, marginBottom: 24 }}>
-            <div style={checkStyle}>✅ Phantom revenue detection</div>
-            <div style={checkStyle}>✅ True ROAS (aggregate)</div>
-            <div style={checkStyle}>✅ Gap breakdown (refunds, discounts)</div>
-            <div style={checkStyle}>✅ Shopify + Meta connection</div>
-            <div style={checkStyle}>✅ Revenue leak alert</div>
+            <div style={checkStyle}>{dot('#94a3b8')} Phantom revenue detection</div>
+            <div style={checkStyle}>{dot('#94a3b8')} True ROAS (aggregate)</div>
+            <div style={checkStyle}>{dot('#94a3b8')} Gap breakdown (refunds, discounts)</div>
+            <div style={checkStyle}>{dot('#94a3b8')} Shopify + Meta connection</div>
+            <div style={checkStyle}>{dot('#94a3b8')} Revenue leak alert</div>
           </div>
           <a href="/register" style={{
             display: 'block', textAlign: 'center', background: '#fff', color: GREEN,
@@ -250,15 +251,15 @@ function PricingSection() {
           </div>
           <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>$119/mo billed annually</div>
           <div style={{ display: 'grid', gap: 2, marginBottom: 24 }}>
-            <div style={checkStyle}>✅ Everything in Free</div>
-            <div style={checkStyle}>✅ Up to 3 stores</div>
-            <div style={checkStyle}>✅ Per-campaign True ROAS breakdown</div>
-            <div style={checkStyle}>✅ AI budget optimizer (pause/scale/reduce)</div>
-            <div style={checkStyle}>✅ Google Ads connection</div>
-            <div style={checkStyle}>✅ Revenue waterfall & trend charts</div>
-            <div style={checkStyle}>✅ LTV-based ROAS & cohort analysis</div>
-            <div style={checkStyle}>✅ PDF report export</div>
-            <div style={checkStyle}>✅ Real-time alerts</div>
+            <div style={checkStyle}>{dot()} Everything in Free</div>
+            <div style={checkStyle}>{dot()} Up to 3 stores</div>
+            <div style={checkStyle}>{dot()} Per-campaign True ROAS breakdown</div>
+            <div style={checkStyle}>{dot()} AI budget optimizer (pause/scale/reduce)</div>
+            <div style={checkStyle}>{dot()} Google Ads connection</div>
+            <div style={checkStyle}>{dot()} Revenue waterfall & trend charts</div>
+            <div style={checkStyle}>{dot()} LTV-based ROAS & cohort analysis</div>
+            <div style={checkStyle}>{dot()} PDF report export</div>
+            <div style={checkStyle}>{dot()} Real-time alerts</div>
           </div>
           <a href="/register" style={{
             display: 'block', textAlign: 'center', background: GREEN, color: '#fff',
@@ -277,14 +278,14 @@ function PricingSection() {
           </div>
           <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>$319/mo billed annually</div>
           <div style={{ display: 'grid', gap: 2, marginBottom: 24 }}>
-            <div style={checkStyle}>✅ Everything in Paid</div>
-            <div style={checkStyle}>✅ Up to 50 stores</div>
-            <div style={checkStyle}>✅ Multi-store portfolio dashboard</div>
-            <div style={checkStyle}>✅ White-label PDF reports</div>
-            <div style={checkStyle}>✅ Cross-store benchmarking</div>
-            <div style={checkStyle}>✅ Aggregated portfolio KPIs</div>
-            <div style={checkStyle}>✅ Custom branding (logo, colors)</div>
-            <div style={checkStyle}>✅ Direct founder support (Slack)</div>
+            <div style={checkStyle}>{dot('#818cf8')} Everything in Paid</div>
+            <div style={checkStyle}>{dot('#818cf8')} Up to 50 stores</div>
+            <div style={checkStyle}>{dot('#818cf8')} Multi-store portfolio dashboard</div>
+            <div style={checkStyle}>{dot('#818cf8')} White-label PDF reports</div>
+            <div style={checkStyle}>{dot('#818cf8')} Cross-store benchmarking</div>
+            <div style={checkStyle}>{dot('#818cf8')} Aggregated portfolio KPIs</div>
+            <div style={checkStyle}>{dot('#818cf8')} Custom branding (logo, colors)</div>
+            <div style={checkStyle}>{dot('#818cf8')} Direct founder support (Slack)</div>
           </div>
           <a href="/register" style={{
             display: 'block', textAlign: 'center', background: '#fff', color: '#818cf8',
