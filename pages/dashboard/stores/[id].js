@@ -3,8 +3,8 @@
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState, useRef } from 'react';
-import { Line, Doughnut } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import { Line, Doughnut, Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 
 import DashboardLayout from '@/components/DashboardLayout';
 import StoreNavbar from '@/components/StoreNavbar';
@@ -16,7 +16,7 @@ import EmptyState from '@/components/EmptyState';
 import CampaignTable from '@/components/CampaignTable';
 import ActionCard from '@/components/ActionCard';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend, Filler);
 
 function KPISmall({ kpi: k, formatCurrency }) {
     const [showTip, setShowTip] = useState(false);
@@ -633,6 +633,155 @@ export default function StoreDashboard() {
                                     </div>
                                 </div>
                             )}
+
+                            {/* Revenue Waterfall + Spend by Channel */}
+                            <div className="animate-fade-in" style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 16, marginBottom: 24 }}>
+                                <div className="card">
+                                    <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 16px', color: 'var(--c-gray-900)', letterSpacing: '-0.01em' }}>Revenue Waterfall</h3>
+                                    <Bar data={{
+                                        labels: ['Gross Revenue', 'Discounts', 'Refunds', 'Chargebacks', 'Net Revenue'],
+                                        datasets: [{
+                                            data: [
+                                                latestReport.shopify?.grossRevenue || 0,
+                                                -(latestReport.shopify?.totalDiscounts || latestReport.gapBreakdown?.discountLeak || 0),
+                                                -(latestReport.shopify?.totalRefunds || latestReport.gapBreakdown?.refundLeak || 0),
+                                                -(latestReport.shopify?.chargebacks || latestReport.gapBreakdown?.chargebacks || 0),
+                                                latestReport.shopify?.netRevenue || 0,
+                                            ],
+                                            backgroundColor: [
+                                                '#064E3B',
+                                                '#f59e0b',
+                                                '#ef4444',
+                                                '#6366f1',
+                                                '#10b981',
+                                            ],
+                                            borderRadius: 6,
+                                            borderSkipped: false,
+                                        }],
+                                    }} options={{
+                                        responsive: true,
+                                        plugins: {
+                                            legend: { display: false },
+                                            tooltip: {
+                                                backgroundColor: '#0f172a', titleFont: { size: 12, family: 'Inter' }, bodyFont: { size: 12, family: 'Inter' }, padding: 10, cornerRadius: 8,
+                                                callbacks: { label: (ctx) => { const v = ctx.raw; return (v < 0 ? '-' : '') + '$' + Math.abs(v).toLocaleString(); } },
+                                            },
+                                        },
+                                        scales: {
+                                            x: { ticks: { font: { size: 11, family: 'Inter' }, color: '#94a3b8' }, grid: { display: false } },
+                                            y: { ticks: { font: { size: 11 }, color: '#94a3b8', callback: (v) => '$' + (v / 1000).toFixed(0) + 'k' }, grid: { color: '#f1f5f9' } },
+                                        },
+                                    }} />
+                                </div>
+                                <div className="card">
+                                    <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 16px', color: 'var(--c-gray-900)', letterSpacing: '-0.01em' }}>Spend by Channel</h3>
+                                    {(() => {
+                                        const channels = {};
+                                        (latestReport.campaigns || []).forEach(c => {
+                                            channels[c.channel] = (channels[c.channel] || 0) + (c.spend || 0);
+                                        });
+                                        const labels = Object.keys(channels);
+                                        const values = Object.values(channels);
+                                        const colors = labels.map(l => l === 'Google' ? '#4285F4' : l === 'Meta' ? '#0668E1' : '#6366f1');
+                                        const total = values.reduce((a, b) => a + b, 0) || 1;
+                                        return (
+                                            <div>
+                                                <Doughnut data={{
+                                                    labels,
+                                                    datasets: [{ data: values, backgroundColor: colors, borderWidth: 0, borderRadius: 4 }],
+                                                }} options={{
+                                                    responsive: true, cutout: '65%',
+                                                    plugins: {
+                                                        legend: { position: 'bottom', labels: { font: { size: 12, weight: '500', family: 'Inter' }, padding: 12, usePointStyle: true, pointStyleWidth: 8, boxHeight: 6 } },
+                                                        tooltip: { backgroundColor: '#0f172a', padding: 10, cornerRadius: 8, bodyFont: { size: 12, family: 'Inter' } },
+                                                    },
+                                                }} />
+                                                <div style={{ marginTop: 12 }}>
+                                                    {labels.map((l, i) => (
+                                                        <div key={l} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: i < labels.length - 1 ? '1px solid var(--c-gray-100)' : 'none' }}>
+                                                            <span style={{ fontSize: 13, color: 'var(--c-gray-600)' }}>{l}</span>
+                                                            <span style={{ fontSize: 13, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(values[i])} <span style={{ color: 'var(--c-gray-400)', fontWeight: 400 }}>({Math.round(values[i] / total * 100)}%)</span></span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        );
+                                    })()}
+                                </div>
+                            </div>
+
+                            {/* Campaign ROAS Comparison */}
+                            <div className="card animate-fade-in" style={{ marginBottom: 24 }}>
+                                <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px', color: 'var(--c-gray-900)', letterSpacing: '-0.01em' }}>Campaign ROAS: Reported vs True</h3>
+                                <p style={{ margin: '0 0 16px', fontSize: 13, color: 'var(--c-gray-500)' }}>See which campaigns overstate their performance the most</p>
+                                <Bar data={{
+                                    labels: (latestReport.campaigns || []).map(c => c.campaignName?.length > 20 ? c.campaignName.substring(0, 18) + '…' : c.campaignName),
+                                    datasets: [
+                                        {
+                                            label: 'Reported ROAS',
+                                            data: (latestReport.campaigns || []).map(c => c.reportedRoas || 0),
+                                            backgroundColor: '#fecaca',
+                                            borderColor: '#ef4444',
+                                            borderWidth: 1,
+                                            borderRadius: 4,
+                                        },
+                                        {
+                                            label: 'True ROAS',
+                                            data: (latestReport.campaigns || []).map(c => c.trueRoas || 0),
+                                            backgroundColor: '#A7F3D0',
+                                            borderColor: '#064E3B',
+                                            borderWidth: 1,
+                                            borderRadius: 4,
+                                        },
+                                    ],
+                                }} options={{
+                                    responsive: true,
+                                    plugins: {
+                                        legend: { position: 'top', labels: { font: { size: 12, family: 'Inter' }, usePointStyle: true, pointStyleWidth: 8, boxHeight: 6, padding: 16 } },
+                                        tooltip: { backgroundColor: '#0f172a', titleFont: { size: 12, family: 'Inter' }, bodyFont: { size: 12, family: 'Inter' }, padding: 10, cornerRadius: 8 },
+                                    },
+                                    scales: {
+                                        x: { ticks: { font: { size: 11, family: 'Inter' }, color: '#94a3b8', maxRotation: 45, minRotation: 45 }, grid: { display: false } },
+                                        y: { title: { display: true, text: 'ROAS ×', font: { size: 11, family: 'Inter' }, color: '#94a3b8' }, beginAtZero: true, ticks: { font: { size: 11 }, color: '#94a3b8' }, grid: { color: '#f1f5f9' } },
+                                    },
+                                }} />
+                            </div>
+
+                            {/* Spend vs Revenue per Campaign */}
+                            <div className="card animate-fade-in" style={{ marginBottom: 24 }}>
+                                <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px', color: 'var(--c-gray-900)', letterSpacing: '-0.01em' }}>Spend vs Revenue per Campaign</h3>
+                                <p style={{ margin: '0 0 16px', fontSize: 13, color: 'var(--c-gray-500)' }}>Budget allocation vs actual revenue generated</p>
+                                <Bar data={{
+                                    labels: (latestReport.campaigns || []).map(c => c.campaignName?.length > 20 ? c.campaignName.substring(0, 18) + '…' : c.campaignName),
+                                    datasets: [
+                                        {
+                                            label: 'Ad Spend',
+                                            data: (latestReport.campaigns || []).map(c => c.spend || 0),
+                                            backgroundColor: '#94a3b8',
+                                            borderRadius: 4,
+                                        },
+                                        {
+                                            label: 'True Revenue',
+                                            data: (latestReport.campaigns || []).map(c => c.trueRevenue || (c.spend * (c.trueRoas || 0)) || 0),
+                                            backgroundColor: '#064E3B',
+                                            borderRadius: 4,
+                                        },
+                                    ],
+                                }} options={{
+                                    responsive: true,
+                                    plugins: {
+                                        legend: { position: 'top', labels: { font: { size: 12, family: 'Inter' }, usePointStyle: true, pointStyleWidth: 8, boxHeight: 6, padding: 16 } },
+                                        tooltip: {
+                                            backgroundColor: '#0f172a', titleFont: { size: 12, family: 'Inter' }, bodyFont: { size: 12, family: 'Inter' }, padding: 10, cornerRadius: 8,
+                                            callbacks: { label: (ctx) => ctx.dataset.label + ': $' + ctx.raw.toLocaleString() },
+                                        },
+                                    },
+                                    scales: {
+                                        x: { ticks: { font: { size: 11, family: 'Inter' }, color: '#94a3b8', maxRotation: 45, minRotation: 45 }, grid: { display: false } },
+                                        y: { ticks: { font: { size: 11 }, color: '#94a3b8', callback: (v) => '$' + (v / 1000).toFixed(0) + 'k' }, grid: { color: '#f1f5f9' } },
+                                    },
+                                }} />
+                            </div>
 
                             {/* Campaign Table */}
                             <CampaignTable campaigns={filteredCampaigns} searchQuery={campaignSearch} onSearchChange={setCampaignSearch} formatCurrency={formatCurrency} />
