@@ -129,6 +129,7 @@ export default function DashboardPage() {
                                 color="#ef4444"
                                 tint="#fef2f2"
                                 icon={phantomIcon}
+                                tooltip="Revenue that ad platforms claim but never arrived in Shopify. The gap between reported and real sales."
                             />
                             <KPICard
                                 label="Net Revenue"
@@ -137,6 +138,7 @@ export default function DashboardPage() {
                                 color="#064E3B"
                                 tint="#ECFDF5"
                                 icon={revenueIcon}
+                                tooltip="Total revenue after discounts, refunds, and chargebacks. Verified directly from Shopify."
                             />
                             <KPICard
                                 label="Portfolio MER"
@@ -144,6 +146,7 @@ export default function DashboardPage() {
                                 subtitle="Marketing Efficiency Ratio"
                                 color="#6366f1"
                                 icon={merIcon}
+                                tooltip="Marketing Efficiency Ratio — total net revenue divided by total ad spend across all stores. Higher means your marketing is more efficient."
                             />
                             <KPICard
                                 label="Needs Attention"
@@ -152,6 +155,7 @@ export default function DashboardPage() {
                                 color={portfolioStats.worstStore ? '#f59e0b' : '#064E3B'}
                                 tint={portfolioStats.worstStore ? '#fffbeb' : undefined}
                                 icon={alertIcon}
+                                tooltip="The store with the highest phantom revenue percentage. This is where ad platforms overstate results the most."
                             />
                         </div>
 

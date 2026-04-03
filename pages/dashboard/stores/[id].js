@@ -18,6 +18,53 @@ import ActionCard from '@/components/ActionCard';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler);
 
+function KPISmall({ kpi: k, formatCurrency }) {
+    const [showTip, setShowTip] = useState(false);
+    return (
+        <div className="card" style={{
+            flex: '1 1 140px', minWidth: 140, textAlign: 'center', position: 'relative', overflow: 'visible',
+            background: k.statusColor === 'green' ? '#ECFDF5' : k.statusColor === 'amber' ? '#fffbeb' : '#fef2f2',
+            border: `1px solid ${k.statusColor === 'green' ? '#A7F3D0' : k.statusColor === 'amber' ? '#fde68a' : '#fecaca'}`,
+        }}>
+            <div style={{ fontSize: 11, color: 'var(--c-gray-500)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                {k.label}
+                {k.description && (
+                    <span
+                        onMouseEnter={() => setShowTip(true)}
+                        onMouseLeave={() => setShowTip(false)}
+                        style={{
+                            width: 14, height: 14, borderRadius: '50%',
+                            background: 'rgba(0,0,0,0.08)', display: 'inline-flex',
+                            alignItems: 'center', justifyContent: 'center',
+                            fontSize: 8, fontWeight: 700, color: 'var(--c-gray-500)',
+                            cursor: 'help', position: 'relative',
+                        }}
+                    >
+                        ?
+                        {showTip && (
+                            <span style={{
+                                position: 'absolute', bottom: '100%', left: '50%', transform: 'translateX(-50%)',
+                                marginBottom: 6, padding: '8px 12px', borderRadius: 8,
+                                background: '#1f2937', color: '#f9fafb', fontSize: 12, fontWeight: 400,
+                                lineHeight: 1.4, whiteSpace: 'normal', width: 200, textAlign: 'left',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 50,
+                                textTransform: 'none', letterSpacing: 0,
+                            }}>
+                                {k.description}
+                                {k.formula && <span style={{ display: 'block', marginTop: 4, fontSize: 11, color: '#9ca3af', fontFamily: 'monospace' }}>{k.formula}</span>}
+                            </span>
+                        )}
+                    </span>
+                )}
+            </div>
+            <div style={{ fontSize: 22, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: k.statusColor === 'green' ? '#043927' : k.statusColor === 'amber' ? '#b45309' : '#dc2626' }}>
+                {k.format === 'currency' ? formatCurrency(k.value) : k.format === 'ratio' ? `${k.value}×` : `${k.value}%`}
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--c-gray-400)', marginTop: 4 }}>{k.fullName}</div>
+        </div>
+    );
+}
+
 export default function StoreDashboard() {
     const { data: session, status } = useSession();
     const router = useRouter();
@@ -300,6 +347,7 @@ export default function StoreDashboard() {
                                     subtitle={`${latestReport.phantomPct}% overstated`}
                                     color="#ef4444"
                                     tint="#fef2f2"
+                                    tooltip="Revenue that ad platforms claim they generated but never actually arrived in your Shopify. The gap between reported and real sales."
                                     icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>}
                                 />
                                 <KPICard
@@ -308,16 +356,18 @@ export default function StoreDashboard() {
                                     subtitle={`vs ${latestReport.adPlatform?.reportedRoas}× reported`}
                                     color="#064E3B"
                                     tint="#ECFDF5"
+                                    tooltip="Return on Ad Spend based on actual Shopify revenue, not what ad platforms report. Formula: Net Revenue / Total Ad Spend."
                                     icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>}
                                 />
                                 <KPICard
                                     label="Net Revenue"
                                     value={formatCurrency(latestReport.shopify?.netRevenue)}
                                     subtitle="Shopify verified"
+                                    tooltip="Total revenue after discounts, refunds, and chargebacks. This is the money that actually stayed in your account."
                                     icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>}
                                 />
-                                <KPICard label="Gross Revenue" value={formatCurrency(latestReport.shopify?.grossRevenue)} subtitle="Before deductions" />
-                                <KPICard label="Total Ad Spend" value={formatCurrency(latestReport.adPlatform?.totalSpend)} subtitle="Across all channels" />
+                                <KPICard label="Gross Revenue" value={formatCurrency(latestReport.shopify?.grossRevenue)} subtitle="Before deductions" tooltip="Total sales before any discounts, refunds, or chargebacks are subtracted. The top-line number." />
+                                <KPICard label="Total Ad Spend" value={formatCurrency(latestReport.adPlatform?.totalSpend)} subtitle="Across all channels" tooltip="Total money spent on ads across all connected platforms (Meta, Google, etc.) during this period." />
                             </div>
 
                             {/* Free tier — show enough to prove the problem, then upsell */}
@@ -465,17 +515,7 @@ export default function StoreDashboard() {
                             {latestReport.kpis && latestReport.kpis.length > 0 && (
                                 <div className="animate-stagger" style={{ display: 'flex', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
                                     {latestReport.kpis.map(k => (
-                                        <div key={k.key} className="card" style={{
-                                            flex: '1 1 140px', minWidth: 140, textAlign: 'center',
-                                            background: k.statusColor === 'green' ? '#ECFDF5' : k.statusColor === 'amber' ? '#fffbeb' : '#fef2f2',
-                                            border: `1px solid ${k.statusColor === 'green' ? '#A7F3D0' : k.statusColor === 'amber' ? '#fde68a' : '#fecaca'}`,
-                                        }}>
-                                            <div style={{ fontSize: 11, color: 'var(--c-gray-500)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>{k.label}</div>
-                                            <div style={{ fontSize: 22, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: k.statusColor === 'green' ? '#043927' : k.statusColor === 'amber' ? '#b45309' : '#dc2626' }}>
-                                                {k.format === 'currency' ? formatCurrency(k.value) : k.format === 'ratio' ? `${k.value}×` : `${k.value}%`}
-                                            </div>
-                                            <div style={{ fontSize: 11, color: 'var(--c-gray-400)', marginTop: 4 }}>{k.fullName}</div>
-                                        </div>
+                                        <KPISmall key={k.key} kpi={k} formatCurrency={formatCurrency} />
                                     ))}
                                 </div>
                             )}
