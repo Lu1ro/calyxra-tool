@@ -503,9 +503,9 @@ export default function StoreDashboard() {
                                                 background: 'linear-gradient(135deg, #064E3B, #043927)',
                                                 display: 'inline-block', borderRadius: 10,
                                             }}>
-                                                Upgrade — $150/month
+                                                Upgrade — $149/month
                                             </a>
-                                            <p style={{ fontSize: 11, color: 'var(--c-gray-400)', marginTop: 10, marginBottom: 0 }}>Cancel anytime · Setup in 2 minutes</p>
+                                            <p style={{ fontSize: 11, color: 'var(--c-gray-400)', marginTop: 10, marginBottom: 0 }}>$119/mo billed annually · Cancel anytime</p>
                                         </div>
                                     </div>
                                 </div>

@@ -34,7 +34,7 @@ export default function StoresPage() {
         return <DashboardLayout title="Stores — Calyxra"><div className="flex-center" style={{ minHeight: '60vh' }}>Loading...</div></DashboardLayout>;
     }
 
-    const tierLimits = { free: 1, pilot: 2, scale: 5, pro: 10 };
+    const tierLimits = { free: 1, paid: 3, agency: 50 };
     const maxStores = tierLimits[session.user?.tier] || 1;
 
     return (

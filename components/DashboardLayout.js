@@ -6,13 +6,12 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-const TIER_LABELS = { free: 'FREE', pilot: 'PILOT', scale: 'SCALE', pro: 'PRO' };
+const TIER_LABELS = { free: 'FREE', paid: 'PAID', agency: 'AGENCY' };
 
 const TIER_COLORS = {
     free: { bg: 'rgba(148,163,184,0.1)', text: '#94a3b8', border: 'rgba(148,163,184,0.2)' },
-    pilot: { bg: 'rgba(6,78,59,0.1)', text: '#064E3B', border: 'rgba(6,78,59,0.2)' },
-    scale: { bg: 'rgba(99,102,241,0.1)', text: '#818cf8', border: 'rgba(99,102,241,0.2)' },
-    pro: { bg: 'rgba(245,158,11,0.1)', text: '#fbbf24', border: 'rgba(245,158,11,0.2)' },
+    paid: { bg: 'rgba(6,78,59,0.1)', text: '#064E3B', border: 'rgba(6,78,59,0.2)' },
+    agency: { bg: 'rgba(99,102,241,0.1)', text: '#818cf8', border: 'rgba(99,102,241,0.2)' },
 };
 
 const NAV_ITEMS = [
@@ -420,7 +419,7 @@ export default function DashboardLayout({ title, children }) {
                     {tier === 'free' && (
                         <div className="cx-free-banner">
                             <span>You&apos;re on the <strong>Free Plan</strong> &mdash; 1 store, results locked</span>
-                            <a href="https://calyxra.com/#pricing" target="_blank" rel="noopener noreferrer">Upgrade &mdash; $150/mo</a>
+                            <a href="https://calyxra.com/#pricing" target="_blank" rel="noopener noreferrer">Upgrade &mdash; $149/mo</a>
                         </div>
                     )}
 

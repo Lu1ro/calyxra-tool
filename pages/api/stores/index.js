@@ -40,7 +40,7 @@ async function handler(req, res) {
         const domain = sanitize(req.body.domain).replace('https://', '').replace('http://', '');
 
         // Check tier limits
-        const tierLimits = { free: 1, pilot: 2, scale: 5, pro: 10 };
+        const tierLimits = { free: 1, paid: 3, agency: 50 };
         const agency = await prisma.agency.findUnique({ where: { id: agencyId } });
 
         // Free tier: enforce lifetime store limit

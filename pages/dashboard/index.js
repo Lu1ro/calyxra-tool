@@ -87,7 +87,7 @@ export default function DashboardPage() {
     const userName = session.user?.name || 'there';
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-    const tierLimits = { free: 1, pilot: 2, scale: 5, pro: 10 };
+    const tierLimits = { free: 1, paid: 3, agency: 50 };
     const maxStores = tierLimits[session.user.tier] || 1;
     const fmt = (v) => '$' + (v || 0).toLocaleString('en-US', { minimumFractionDigits: 0 });
     const hasData = portfolioStats && portfolioStats.totalReports > 0;

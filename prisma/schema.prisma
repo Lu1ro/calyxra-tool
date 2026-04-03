@@ -17,7 +17,7 @@ model Agency {
   name      String
   email     String   @unique
   password  String
-  tier             String   @default("free") // free | pilot | scale | pro
+  tier             String   @default("free") // free | paid | agency
   totalStoresEver  Int      @default(0)
 
   // White-label branding

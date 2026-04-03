@@ -203,63 +203,95 @@ function PricingSection() {
   const checkStyle = { fontSize: 14, color: '#374151', padding: '6px 0', lineHeight: 1.5 };
 
   return (
-    <div style={{ maxWidth: 720, margin: '0 auto 48px' }}>
+    <div style={{ maxWidth: 960, margin: '0 auto 48px' }}>
       <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 26, color: '#111827', textAlign: 'center', margin: '0 0 8px' }}>
         Simple pricing. Real numbers.
       </h2>
       <p style={{ color: '#6b7280', fontSize: 14, textAlign: 'center', marginBottom: 32 }}>
-        No contracts. Cancel anytime.
+        No contracts. No pixels. Cancel anytime.
       </p>
 
       <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-        {/* Audit */}
+        {/* Free */}
         <div style={cardStyle}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: GREEN, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Source-of-Truth Audit</div>
-          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 40, fontWeight: 700, color: '#111827', marginBottom: 4 }}>$249</div>
-          <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>one-time</div>
-          <div style={{ display: 'grid', gap: 2, marginBottom: 24 }}>
-            <div style={checkStyle}>✅ Full Shopify + Meta reconciliation</div>
-            <div style={checkStyle}>✅ Exact phantom revenue breakdown</div>
-            <div style={checkStyle}>✅ PDF report with waterfall analysis</div>
-            <div style={checkStyle}>✅ 3 actionable recommendations</div>
-            <div style={checkStyle}>✅ 30-min walkthrough call</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Free</div>
+          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 40, fontWeight: 700, color: '#111827', marginBottom: 4 }}>
+            $0<span style={{ fontSize: 18, fontWeight: 400, color: '#6b7280' }}>/mo</span>
           </div>
-          <a href={(process.env.NEXT_PUBLIC_MARKETING_SITE_URL || 'https://www.calyxra.com') + '/#pricing'} style={{
+          <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>1 store, forever free</div>
+          <div style={{ display: 'grid', gap: 2, marginBottom: 24 }}>
+            <div style={checkStyle}>✅ Phantom revenue detection</div>
+            <div style={checkStyle}>✅ True ROAS (aggregate)</div>
+            <div style={checkStyle}>✅ Gap breakdown (refunds, discounts)</div>
+            <div style={checkStyle}>✅ Shopify + Meta connection</div>
+            <div style={checkStyle}>✅ Revenue leak alert</div>
+          </div>
+          <a href="/register" style={{
             display: 'block', textAlign: 'center', background: '#fff', color: GREEN,
             padding: '14px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', fontSize: 14,
             border: `2px solid ${GREEN}`, transition: 'all 0.2s',
           }}>
-            Book Audit →
+            Get Started Free →
           </a>
         </div>
 
-        {/* Monthly */}
+        {/* Paid */}
         <div style={{ ...cardStyle, borderColor: GREEN, borderWidth: 2, position: 'relative' }}>
           <div style={{
             position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)',
             background: GREEN, color: '#fff', padding: '4px 16px', borderRadius: 99,
             fontSize: 11, fontWeight: 700, letterSpacing: '0.05em',
           }}>
-            FIRST 5 AGENCIES ONLY
+            MOST POPULAR
           </div>
-          <div style={{ fontSize: 12, fontWeight: 700, color: GREEN, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Monthly Reconciliation</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: GREEN, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Paid</div>
           <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 40, fontWeight: 700, color: '#111827', marginBottom: 4 }}>
-            $150<span style={{ fontSize: 18, fontWeight: 400, color: '#6b7280' }}>/mo</span>
+            $149<span style={{ fontSize: 18, fontWeight: 400, color: '#6b7280' }}>/mo</span>
           </div>
-          <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>price increases after 5 clients</div>
+          <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>$119/mo billed annually</div>
           <div style={{ display: 'grid', gap: 2, marginBottom: 24 }}>
-            <div style={checkStyle}>✅ Automated monthly reconciliation</div>
-            <div style={checkStyle}>✅ Campaign-level phantom revenue alerts</div>
-            <div style={checkStyle}>✅ White-label PDF reports for your clients</div>
-            <div style={checkStyle}>✅ Action Engine: PAUSE / SCALE recommendations</div>
-            <div style={checkStyle}>✅ Direct founder support (Slack)</div>
+            <div style={checkStyle}>✅ Everything in Free</div>
+            <div style={checkStyle}>✅ Up to 3 stores</div>
+            <div style={checkStyle}>✅ Per-campaign True ROAS breakdown</div>
+            <div style={checkStyle}>✅ AI budget optimizer (pause/scale/reduce)</div>
+            <div style={checkStyle}>✅ Google Ads connection</div>
+            <div style={checkStyle}>✅ Revenue waterfall & trend charts</div>
+            <div style={checkStyle}>✅ LTV-based ROAS & cohort analysis</div>
+            <div style={checkStyle}>✅ PDF report export</div>
+            <div style={checkStyle}>✅ Real-time alerts</div>
           </div>
-          <a href={(process.env.NEXT_PUBLIC_MARKETING_SITE_URL || 'https://www.calyxra.com') + '/#pricing'} style={{
+          <a href="/register" style={{
             display: 'block', textAlign: 'center', background: GREEN, color: '#fff',
             padding: '14px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', fontSize: 14,
             transition: 'opacity 0.2s',
           }}>
-            Start Free Pilot →
+            Start 14-Day Free Trial →
+          </a>
+        </div>
+
+        {/* Agency */}
+        <div style={cardStyle}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#818cf8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Agency</div>
+          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 40, fontWeight: 700, color: '#111827', marginBottom: 4 }}>
+            $399<span style={{ fontSize: 18, fontWeight: 400, color: '#6b7280' }}>/mo</span>
+          </div>
+          <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 20 }}>$319/mo billed annually</div>
+          <div style={{ display: 'grid', gap: 2, marginBottom: 24 }}>
+            <div style={checkStyle}>✅ Everything in Paid</div>
+            <div style={checkStyle}>✅ Up to 50 stores</div>
+            <div style={checkStyle}>✅ Multi-store portfolio dashboard</div>
+            <div style={checkStyle}>✅ White-label PDF reports</div>
+            <div style={checkStyle}>✅ Cross-store benchmarking</div>
+            <div style={checkStyle}>✅ Aggregated portfolio KPIs</div>
+            <div style={checkStyle}>✅ Custom branding (logo, colors)</div>
+            <div style={checkStyle}>✅ Direct founder support (Slack)</div>
+          </div>
+          <a href="/register" style={{
+            display: 'block', textAlign: 'center', background: '#fff', color: '#818cf8',
+            padding: '14px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', fontSize: 14,
+            border: '2px solid #818cf8', transition: 'all 0.2s',
+          }}>
+            Contact Sales →
           </a>
         </div>
       </div>

@@ -87,7 +87,7 @@ export default function AlertInbox() {
                         </div>
                         <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 8px', color: 'var(--c-gray-800)' }}>Alerts require a paid plan</h2>
                         <p style={{ color: 'var(--c-gray-500)', fontSize: 14, marginBottom: 24, lineHeight: 1.5 }}>Upgrade to get real-time monitoring alerts when phantom revenue spikes or ROAS drops.</p>
-                        <a href="https://calyxra.com/#pricing" className="btn btn-primary" style={{ textDecoration: 'none' }}>Upgrade &mdash; $150/month</a>
+                        <a href="https://calyxra.com/#pricing" className="btn btn-primary" style={{ textDecoration: 'none' }}>Upgrade &mdash; $149/month</a>
                     </div>
                 </div>
             </DashboardLayout>

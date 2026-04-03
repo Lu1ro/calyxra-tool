@@ -202,14 +202,14 @@ export default function BrandingSettingsPage() {
                                         <div style={{ width: 44, height: 44, borderRadius: 12, background: '#ECFDF5', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#064E3B" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
                                         </div>
-                                        <p style={{ fontWeight: 700, fontSize: 16, color: '#1e293b', margin: '0 0 4px' }}>White-label is a paid feature</p>
-                                        <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 16px', lineHeight: 1.5 }}>Upgrade to replace Calyxra branding with your own logo, colors, and report text.</p>
+                                        <p style={{ fontWeight: 700, fontSize: 16, color: '#1e293b', margin: '0 0 4px' }}>White-label is an Agency feature</p>
+                                        <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 16px', lineHeight: 1.5 }}>Upgrade to the Agency plan to replace Calyxra branding with your own logo, colors, and report text.</p>
                                         <a href="https://calyxra.com/#pricing" target="_blank" rel="noopener noreferrer" style={{
                                             display: 'inline-block', padding: '10px 24px', borderRadius: 8,
                                             background: 'linear-gradient(135deg, #064E3B 0%, #043927 100%)',
                                             color: '#fff', fontSize: 13, fontWeight: 600, textDecoration: 'none',
                                             transition: 'all 200ms',
-                                        }}>Upgrade — $150/month</a>
+                                        }}>Upgrade — $399/month</a>
                                     </div>
                                 </div>
                             </div>
