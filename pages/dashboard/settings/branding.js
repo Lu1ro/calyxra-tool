@@ -99,8 +99,10 @@ export default function BrandingSettingsPage() {
 
     const save = async () => {
         setSaving(true);
-        const body = { name: agencyName, brandName, brandColor, logoUrl, reportHeader, reportFooter };
-        if (klaviyoKey) body.klaviyoApiKey = klaviyoKey;
+        const body = isFree
+            ? { name: agencyName }
+            : { name: agencyName, brandName, brandColor, logoUrl, reportHeader, reportFooter };
+        if (!isFree && klaviyoKey) body.klaviyoApiKey = klaviyoKey;
         await fetch('/api/agency/settings', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
@@ -333,11 +335,11 @@ export default function BrandingSettingsPage() {
 
                     {/* Save */}
                     <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                        <button onClick={save} disabled={saving || isFree}
+                        <button onClick={save} disabled={saving}
                             style={{
-                                padding: '12px 32px', background: isFree ? '#d1d5db' : GREEN, color: '#fff',
+                                padding: '12px 32px', background: GREEN, color: '#fff',
                                 border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600,
-                                cursor: saving || isFree ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1,
+                                cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1,
                             }}>
                             {saving ? 'Saving...' : 'Save Settings'}
                         </button>

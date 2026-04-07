@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import DashboardLayout from '@/components/DashboardLayout';
+import StoreNavbar from '@/components/StoreNavbar';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -149,7 +150,7 @@ export default function LtvRoas() {
 
     return (
         <DashboardLayout title={`LTV-Adjusted ROAS — ${store?.name || 'Store'} — Calyxra`}>
-                <a href={`/dashboard/stores/${id}`} style={{ color: 'var(--c-gray-400)', textDecoration: 'none', fontSize: 13, display: 'inline-block', marginBottom: 16 }}>← Back to {store?.name || 'Store'}</a>
+            <StoreNavbar store={store} storeId={id} currentPage={`/dashboard/stores/${id}/ltv`} />
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 24 }}>
                         <div>
                             <h1 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, margin: '0 0 4px', display: 'flex', alignItems: 'center', gap: 12 }}>

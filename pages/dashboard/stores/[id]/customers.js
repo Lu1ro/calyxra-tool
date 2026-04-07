@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
+import StoreNavbar from '@/components/StoreNavbar';
 import { Bar, Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 
@@ -102,11 +103,8 @@ export default function CustomerQuality() {
 
     return (
         <DashboardLayout title={`Customer Quality — ${store?.name || 'Store'} — Calyxra`}>
+            <StoreNavbar store={store} storeId={id} currentPage={`/dashboard/stores/${id}/customers`} />
             <div className="container" style={{ maxWidth: 1100 }}>
-                {/* Breadcrumb */}
-                <div style={{ marginBottom: 8 }}>
-                    <a href={`/dashboard/stores/${id}`} style={{ color: 'var(--c-gray-500)', fontSize: 13, textDecoration: 'none' }}>&larr; Back to {store?.name}</a>
-                </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 24 }}>
                         <div>
                             <h1 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, margin: '0 0 4px' }}>Customer Quality</h1>

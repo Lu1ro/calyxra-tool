@@ -80,6 +80,10 @@ export default async function handler(req, res) {
             });
         }
 
+        // If we came from the add wizard, return there
+        if (stateData.returnTo === 'wizard') {
+            return res.redirect(`/dashboard/stores/add?storeId=${storeId}&step=2&connected=meta`);
+        }
         return res.redirect(`/dashboard/stores/${storeId}?connected=meta`);
     } catch (err) {
         console.error('Meta OAuth error:', err);

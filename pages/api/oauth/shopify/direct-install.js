@@ -1,28 +1,26 @@
-// pages/api/oauth/shopify/install.js
-// Step 1: Redirect user to Shopify OAuth consent screen
+// pages/api/oauth/shopify/direct-install.js
+// Direct install endpoint for Custom Distribution
+// Used when a merchant clicks the install link from Shopify Partners
+// No session required — the merchant is NOT logged into our app yet
 
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../../auth/[...nextauth]';
 import crypto from 'crypto';
 
 export default async function handler(req, res) {
-    const session = await getServerSession(req, res, authOptions);
-    if (!session) return res.status(401).json({ error: 'Unauthorized' });
+    const { shop } = req.query;
 
-    const { shop, storeId, returnTo } = req.query;
-
-    if (!shop || !storeId) {
-        return res.status(400).json({ error: 'shop and storeId are required' });
+    if (!shop) {
+        return res.status(400).json({ error: 'shop parameter is required' });
     }
 
     const clientId = process.env.SHOPIFY_CLIENT_ID;
     if (!clientId) {
-        return res.status(500).json({ error: 'Shopify OAuth not configured. Set SHOPIFY_CLIENT_ID in .env' });
+        return res.status(500).json({ error: 'Shopify OAuth not configured' });
     }
 
-    // Generate a nonce (state parameter) for CSRF protection
     const nonce = crypto.randomBytes(16).toString('hex');
-    const state = JSON.stringify({ storeId, nonce, agencyId: session.user.agencyId, returnTo: returnTo || null });
+    // For direct install, we don't have storeId or agencyId yet
+    // The callback will handle matching/creating the store
+    const state = JSON.stringify({ nonce, directInstall: true });
     const encodedState = Buffer.from(state).toString('base64url');
 
     const scopes = process.env.SHOPIFY_SCOPES || 'read_orders,read_products';

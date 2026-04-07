@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     const session = await getServerSession(req, res, authOptions);
     if (!session) return res.status(401).json({ error: 'Unauthorized' });
 
-    const { storeId } = req.query;
+    const { storeId, returnTo } = req.query;
     if (!storeId) return res.status(400).json({ error: 'storeId is required' });
 
     const appId = process.env.META_APP_ID;
@@ -17,10 +17,11 @@ export default async function handler(req, res) {
     const state = Buffer.from(JSON.stringify({
         storeId,
         agencyId: session.user.agencyId,
+        returnTo: returnTo || null,
     })).toString('base64url');
 
     const redirectUri = `${process.env.NEXTAUTH_URL}/api/oauth/meta/callback`;
-    const scopes = 'ads_read,ads_management,read_insights';
+    const scopes = 'ads_read';
 
     const authUrl = `https://www.facebook.com/v19.0/dialog/oauth` +
         `?client_id=${appId}` +

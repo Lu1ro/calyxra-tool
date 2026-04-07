@@ -71,8 +71,32 @@ async function handler(req, res) {
         return res.status(201).json({ store });
     }
 
+    if (req.method === 'DELETE') {
+        const { storeId } = req.body || {};
+
+        if (!storeId) {
+            return res.status(400).json({ error: 'storeId is required' });
+        }
+
+        // Verify store belongs to this agency
+        const store = await prisma.store.findFirst({
+            where: { id: storeId, agencyId },
+        });
+
+        if (!store) {
+            return res.status(404).json({ error: 'Store not found' });
+        }
+
+        // Delete store — Prisma cascade deletes connections, reports, campaigns, alerts
+        await prisma.store.delete({
+            where: { id: storeId },
+        });
+
+        return res.status(200).json({ success: true, deletedStoreId: storeId });
+    }
+
     return res.status(405).json({ error: 'Method not allowed' });
 }
 
 // Compose middleware: auth check → rate limit (30/min) → error handler → method filter
-export default withErrorHandler(withRateLimit(withAuth(withMethods(handler, ['GET', 'POST'])), 30));
+export default withErrorHandler(withRateLimit(withAuth(withMethods(handler, ['GET', 'POST', 'DELETE'])), 30));

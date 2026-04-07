@@ -181,7 +181,7 @@ function GapCalculator() {
               padding: '16px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', fontSize: 15,
               transition: 'opacity 0.2s',
             }}>
-              See exactly where this comes from → Get $249 Audit
+              See exactly where this comes from → Start Free
             </a>
             <p style={{ textAlign: 'center', fontSize: 12, color: '#9ca3af', marginTop: 8 }}>
               Full Shopify + Meta reconciliation with waterfall breakdown
@@ -446,7 +446,7 @@ function Dashboard({ report, meta, onReset }) {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
-          <button onClick={() => alert('PDF Export requires a Pro subscription.')} style={{ background: '#fff', border: `1px solid #d1d5db`, borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 13, color: '#374151', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <button onClick={() => alert('PDF Export requires a Paid subscription — $149/mo.')} style={{ background: '#fff', border: `1px solid #d1d5db`, borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 13, color: '#374151', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ fontSize: 16 }}>📥</span> Download PDF
           </button>
           <button onClick={onReset} style={{ background: 'transparent', border: `1px solid #d1d5db`, borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 13, color: '#374151' }}>
@@ -556,7 +556,7 @@ function Dashboard({ report, meta, onReset }) {
         <a href={(process.env.NEXT_PUBLIC_MARKETING_SITE_URL || 'https://www.calyxra.com') + '/#pricing'} style={{
           display: 'inline-block', background: '#fff', color: GREEN,
           padding: '14px 28px', borderRadius: 8, fontWeight: 700, textDecoration: 'none', fontSize: 15,
-        }}>→ Book a $249 Audit</a>
+        }}>→ Start Free Scan</a>
       </div>
     </div>
   );

@@ -11,6 +11,8 @@ export default function StoresPage() {
     const router = useRouter();
     const [stores, setStores] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [deleting, setDeleting] = useState(false);
 
     useEffect(() => { if (status === 'unauthenticated') router.push('/login'); }, [status]);
 
@@ -27,6 +29,25 @@ export default function StoresPage() {
             console.error('Failed to fetch stores:', err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDeleteStore = async (storeId) => {
+        setDeleting(true);
+        try {
+            const res = await fetch('/api/stores', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ storeId }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+            setStores(stores.filter(s => s.id !== storeId));
+            setDeleteConfirm(null);
+        } catch (err) {
+            alert('Failed to delete store: ' + err.message);
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -65,9 +86,9 @@ export default function StoresPage() {
                     <div style={{ display: 'grid', gap: 10 }} className="animate-stagger">
                         {stores.map(store => (
                             <div key={store.id} className="card card-clickable"
-                                onClick={() => router.push(`/dashboard/stores/${store.id}`)}
                                 style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, cursor: 'pointer' }}
+                                    onClick={() => router.push(`/dashboard/stores/${store.id}`)}>
                                     <div style={{
                                         width: 40, height: 40, borderRadius: 10,
                                         background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)',
@@ -86,7 +107,26 @@ export default function StoresPage() {
                                         <span key={c.id} className={`badge ${c.status === 'connected' ? 'badge-green' : 'badge-red'}`} style={{ fontSize: 10 }}>{c.platform}</span>
                                     ))}
                                     <span className={`status-dot ${store.status === 'active' ? 'status-dot-green' : store.status === 'error' ? 'status-dot-red' : 'status-dot-gray'}`} />
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--c-gray-300)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setDeleteConfirm(store); }}
+                                        title="Delete store"
+                                        style={{
+                                            background: 'none', border: 'none', cursor: 'pointer', padding: 6,
+                                            borderRadius: 6, color: 'var(--c-gray-400)', transition: 'all 0.15s',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        }}
+                                        onMouseEnter={e => { e.currentTarget.style.color = '#dc2626'; e.currentTarget.style.background = '#fef2f2'; }}
+                                        onMouseLeave={e => { e.currentTarget.style.color = 'var(--c-gray-400)'; e.currentTarget.style.background = 'none'; }}
+                                    >
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                            <line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" />
+                                        </svg>
+                                    </button>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--c-gray-300)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ cursor: 'pointer' }}
+                                        onClick={() => router.push(`/dashboard/stores/${store.id}`)}>
+                                        <polyline points="9 18 15 12 9 6" />
+                                    </svg>
                                 </div>
                             </div>
                         ))}
@@ -95,6 +135,61 @@ export default function StoresPage() {
 
                 <div style={{ height: 32 }} />
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {deleteConfirm && (
+                <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }}
+                        onClick={() => !deleting && setDeleteConfirm(null)} />
+                    <div className="card animate-scale-in" style={{ position: 'relative', width: '100%', maxWidth: 420, padding: 28, zIndex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
+                            <div style={{
+                                width: 44, height: 44, borderRadius: 12,
+                                background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                            }}>
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2">
+                                    <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: 'var(--c-gray-900)' }}>Delete Store</h3>
+                                <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--c-gray-500)' }}>This action cannot be undone</p>
+                            </div>
+                        </div>
+                        <div style={{
+                            padding: '14px 16px', borderRadius: 10,
+                            background: '#fef2f2', border: '1px solid #fecaca', marginBottom: 20,
+                        }}>
+                            <p style={{ margin: 0, fontSize: 14, color: '#991b1b', lineHeight: 1.5 }}>
+                                Are you sure you want to delete <strong>{deleteConfirm.name}</strong>? All connections, reports, and alerts for this store will be permanently removed.
+                            </p>
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+                            <button
+                                className="btn btn-secondary btn-sm"
+                                onClick={() => setDeleteConfirm(null)}
+                                disabled={deleting}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => handleDeleteStore(deleteConfirm.id)}
+                                disabled={deleting}
+                                style={{
+                                    padding: '8px 20px', borderRadius: 8, fontSize: 14,
+                                    fontWeight: 600, border: 'none', cursor: deleting ? 'not-allowed' : 'pointer',
+                                    background: '#dc2626', color: '#fff',
+                                    opacity: deleting ? 0.6 : 1, transition: 'all 0.15s',
+                                    fontFamily: 'Inter, sans-serif',
+                                }}
+                            >
+                                {deleting ? 'Deleting...' : 'Delete Store'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </DashboardLayout>
     );
 }
+

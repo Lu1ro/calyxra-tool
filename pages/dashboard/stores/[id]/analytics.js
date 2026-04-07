@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
+import StoreNavbar from '@/components/StoreNavbar';
 
 const DEMO_DASHBOARDS = [
     { id: 'looker_recon', name: 'Reconciliation Layer', type: 'looker', defaultUrl: '' },
@@ -102,11 +103,8 @@ export default function EmbeddedAnalytics() {
 
     return (
         <DashboardLayout title={`BI Dashboards — ${store?.name || 'Store'} — Calyxra`}>
+            <StoreNavbar store={store} storeId={id} currentPage={`/dashboard/stores/${id}/analytics`} />
             <div className="container" style={{ maxWidth: 1100 }}>
-                {/* Breadcrumb */}
-                <div style={{ marginBottom: 8 }}>
-                    <a href={`/dashboard/stores/${id}`} style={{ color: 'var(--c-gray-500)', fontSize: 13, textDecoration: 'none' }}>&larr; Back to {store?.name}</a>
-                </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                     <div>

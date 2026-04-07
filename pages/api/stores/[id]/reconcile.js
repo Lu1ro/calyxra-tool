@@ -75,6 +75,12 @@ export default async function handler(req, res) {
                 return res.status(400).json({ error: 'Shopify connection required' });
             }
 
+            // Support both manual (apiKey) and OAuth (accessToken) credential formats
+            const shopifyToken = creds.shopify.apiKey || creds.shopify.accessToken;
+            if (!shopifyToken) {
+                return res.status(400).json({ error: 'Shopify access token missing. Please reconnect your store in Settings.' });
+            }
+
             // Determine date range (last 30 days)
             const dateTo = new Date().toISOString().split('T')[0];
             const dateFrom = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -82,7 +88,7 @@ export default async function handler(req, res) {
             // Fetch Shopify orders and process into metrics
             const shopifyOrders = await fetchShopifyOrders(
                 creds.shopify.domain || store.domain,
-                creds.shopify.apiKey,
+                shopifyToken,
                 dateFrom,
                 dateTo
             );
@@ -91,7 +97,7 @@ export default async function handler(req, res) {
             // Try ShopifyQL analytics for EXACT match with Shopify Analytics dashboard
             const analyticsData = await fetchShopifySalesAnalytics(
                 creds.shopify.domain || store.domain,
-                creds.shopify.apiKey,
+                shopifyToken,
                 dateFrom,
                 dateTo
             );

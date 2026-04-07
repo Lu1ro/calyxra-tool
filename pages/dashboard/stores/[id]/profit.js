@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { Bar, Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 import DashboardLayout from '@/components/DashboardLayout';
+import StoreNavbar from '@/components/StoreNavbar';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
@@ -133,8 +134,8 @@ export default function ProfitReconciliation() {
 
     return (
         <DashboardLayout title={`Profit Reconciliation — ${store?.name || 'Store'} — Calyxra`}>
+            <StoreNavbar store={store} storeId={id} currentPage={`/dashboard/stores/${id}/profit`} />
             <div className="container" style={{ padding: '24px' }}>
-                    <a href={`/dashboard/stores/${id}`} style={{ color: 'var(--c-gray-400)', textDecoration: 'none', fontSize: 13, display: 'inline-block', marginBottom: 16 }}>← Back to {store?.name || 'Store'}</a>
                     {!report ? (
                         <div style={{ background: '#fff', borderRadius: 12, padding: 60, textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
                             <div style={{ fontSize: 48, marginBottom: 16 }}>📊</div>

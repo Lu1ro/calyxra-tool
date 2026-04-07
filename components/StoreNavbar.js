@@ -1,18 +1,27 @@
 // components/StoreNavbar.js
 // Shared sub-navigation for store detail pages — clean tab bar design
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 
 export default function StoreNavbar({ store, storeId, currentPage }) {
     const [menuOpen, setMenuOpen] = useState(false);
+    const { data: session } = useSession();
+    const tier = session?.user?.tier || 'free';
 
-    const navItems = [
-        { href: `/dashboard/stores/${storeId}`, label: 'Overview', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> },
-        { href: `/dashboard/stores/${storeId}/profit`, label: 'Profit Recon', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
-        { href: `/dashboard/stores/${storeId}/customers`, label: 'Cust. Quality', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg> },
-        { href: `/dashboard/stores/${storeId}/ltv`, label: 'LTV ROAS', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> },
-        { href: `/dashboard/stores/${storeId}/analytics`, label: 'BI Dashboards', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="12" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="12" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg> },
-        { href: `/dashboard/stores/${storeId}/settings`, label: 'Settings', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9"/></svg> },
+    const allNavItems = [
+        { href: `/dashboard/stores/${storeId}`, label: 'Overview', minTier: 'free', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> },
+        { href: `/dashboard/stores/${storeId}/profit`, label: 'Profit Recon', minTier: 'paid', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
+        { href: `/dashboard/stores/${storeId}/customers`, label: 'Cust. Quality', minTier: 'paid', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg> },
+        { href: `/dashboard/stores/${storeId}/ltv`, label: 'LTV ROAS', minTier: 'paid', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> },
+        { href: `/dashboard/stores/${storeId}/analytics`, label: 'BI Dashboards', minTier: 'paid', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="12" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="12" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg> },
+        { href: `/dashboard/stores/${storeId}/settings`, label: 'Settings', minTier: 'free', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9"/></svg> },
     ];
+
+    const tierRank = { free: 0, paid: 1, agency: 2 };
+    const navItems = allNavItems.map(item => ({
+        ...item,
+        locked: tierRank[tier] < tierRank[item.minTier],
+    }));
 
     const isActive = (href) => {
         if (href === `/dashboard/stores/${storeId}`) {
@@ -91,6 +100,39 @@ export default function StoreNavbar({ store, storeId, currentPage }) {
                     border-bottom-color: #064E3B;
                     font-weight: 600;
                 }
+                .store-subnav-tab-locked {
+                    color: var(--c-gray-400) !important;
+                    cursor: default;
+                    position: relative;
+                }
+                .store-subnav-tab-locked:hover {
+                    color: var(--c-gray-400) !important;
+                }
+                .store-subnav-lock-icon {
+                    width: 10px;
+                    height: 10px;
+                    opacity: 0.5;
+                }
+                .store-subnav-tab-locked .store-subnav-tooltip {
+                    display: none;
+                    position: absolute;
+                    top: 100%;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    margin-top: 4px;
+                    padding: 8px 14px;
+                    border-radius: 8px;
+                    background: #1f2937;
+                    color: #f9fafb;
+                    font-size: 12px;
+                    font-weight: 500;
+                    white-space: nowrap;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    z-index: 50;
+                }
+                .store-subnav-tab-locked:hover .store-subnav-tooltip {
+                    display: block;
+                }
                 .store-subnav-badges {
                     display: flex;
                     align-items: center;
@@ -155,7 +197,16 @@ export default function StoreNavbar({ store, storeId, currentPage }) {
                     </div>
                 </div>
                 <div className="store-subnav-tabs">
-                    {navItems.map(item => (
+                    {navItems.map(item => item.locked ? (
+                        <span key={item.href}
+                            className="store-subnav-tab store-subnav-tab-locked"
+                        >
+                            {item.icon}
+                            {item.label}
+                            <svg className="store-subnav-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                            <span className="store-subnav-tooltip">Upgrade to Paid — $149/mo</span>
+                        </span>
+                    ) : (
                         <a key={item.href} href={item.href}
                             className={`store-subnav-tab ${isActive(item.href) ? 'store-subnav-tab-active' : ''}`}
                         >
@@ -170,7 +221,16 @@ export default function StoreNavbar({ store, storeId, currentPage }) {
             </nav>
 
             <div className={`store-subnav-mobile ${menuOpen ? 'open' : ''}`}>
-                {navItems.map(item => (
+                {navItems.map(item => item.locked ? (
+                    <span key={item.href}
+                        className="store-subnav-tab store-subnav-tab-locked"
+                        onClick={() => setMenuOpen(false)}
+                    >
+                        {item.icon}
+                        {item.label}
+                        <svg className="store-subnav-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                    </span>
+                ) : (
                     <a key={item.href} href={item.href}
                         className={`store-subnav-tab ${isActive(item.href) ? 'store-subnav-tab-active' : ''}`}
                         onClick={() => setMenuOpen(false)}
