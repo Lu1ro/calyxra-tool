@@ -529,7 +529,7 @@ export default function StoreDashboard() {
                                             <p style={{ margin: 0, fontSize: 12, color: 'var(--c-gray-500)' }}>What ad platforms report vs what Shopify actually records — the gap is your phantom revenue</p>
                                         </div>
                                         <span style={{ fontSize: 11, fontWeight: 600, color: '#ef4444', background: '#fef2f2', padding: '4px 10px', borderRadius: 20, whiteSpace: 'nowrap' }}>
-                                            {latestReport.phantomPct || Math.round(((latestReport.reportedRevenue || 0) - (latestReport.shopify?.netRevenue || 0)) / (latestReport.reportedRevenue || 1) * 100)}% overstated
+                                            {latestReport.phantomPct || (() => { const rep = latestReport.reportedRevenue || 0; const net = latestReport.shopify?.netRevenue || 0; if (rep <= 0) return 0; return Math.round((rep - net) / rep * 100); })()}% overstated
                                         </span>
                                     </div>
                                     {(() => {
