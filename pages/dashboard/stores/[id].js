@@ -910,8 +910,8 @@ export default function StoreDashboard() {
                                         const channels = Object.keys(channelData);
                                         const channelColors = channels.map(l => l === 'Google' ? '#ea4335' : l === 'Meta' ? '#1877F2' : l === 'TikTok' ? '#8b5cf6' : '#64748b');
                                         return (
-                                            <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 16, minWidth: 0 }}>
-                                                <div style={{ minWidth: 0, overflow: 'hidden' }}>
+                                            <div>
+                                                <div style={{ minWidth: 0, overflow: 'hidden', marginBottom: 16 }}>
                                                 <Bar data={{
                                                     labels: channels,
                                                     datasets: [
@@ -932,26 +932,26 @@ export default function StoreDashboard() {
                                                     },
                                                 }} />
                                                 </div>
-                                                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                                <div style={{ display: 'grid', gridTemplateColumns: `repeat(${channels.length}, 1fr)`, gap: 12 }}>
                                                     {channels.map((ch, i) => {
                                                         const d = channelData[ch];
                                                         const inflation = d.reported > 0 ? Math.round((d.reported - d.trueRev) / d.reported * 100) : 0;
                                                         const trueRoas = d.spend > 0 ? (d.trueRev / d.spend).toFixed(2) : '0.00';
                                                         return (
-                                                            <div key={ch} style={{ background: 'var(--c-gray-50)', borderRadius: 12, padding: 14, borderLeft: `4px solid ${channelColors[i]}`, minWidth: 0, overflow: 'hidden' }}>
-                                                                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--c-gray-900)', marginBottom: 6 }}>{ch}</div>
-                                                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 12px', fontSize: 11 }}>
+                                                            <div key={ch} style={{ background: 'var(--c-gray-50)', borderRadius: 12, padding: 14, borderLeft: `4px solid ${channelColors[i]}`, minWidth: 0 }}>
+                                                                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--c-gray-900)', marginBottom: 8 }}>{ch}</div>
+                                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, fontSize: 11 }}>
                                                                     <div>
-                                                                        <div style={{ color: 'var(--c-gray-400)', marginBottom: 1, fontSize: 10, whiteSpace: 'nowrap' }}>True ROAS</div>
-                                                                        <div style={{ fontWeight: 700, fontSize: 14, color: parseFloat(trueRoas) >= 2 ? '#064E3B' : parseFloat(trueRoas) >= 1 ? '#b45309' : '#dc2626' }}>{trueRoas}×</div>
+                                                                        <div style={{ color: 'var(--c-gray-400)', marginBottom: 2, fontSize: 10 }}>True ROAS</div>
+                                                                        <div style={{ fontWeight: 700, fontSize: 15, color: parseFloat(trueRoas) >= 2 ? '#064E3B' : parseFloat(trueRoas) >= 1 ? '#b45309' : '#dc2626' }}>{trueRoas}×</div>
                                                                     </div>
                                                                     <div>
-                                                                        <div style={{ color: 'var(--c-gray-400)', marginBottom: 1, fontSize: 10, whiteSpace: 'nowrap' }}>Inflation</div>
-                                                                        <div style={{ fontWeight: 700, fontSize: 14, color: inflation >= 30 ? '#dc2626' : inflation >= 15 ? '#b45309' : '#064E3B' }}>{inflation}%</div>
+                                                                        <div style={{ color: 'var(--c-gray-400)', marginBottom: 2, fontSize: 10 }}>Inflation</div>
+                                                                        <div style={{ fontWeight: 700, fontSize: 15, color: inflation >= 30 ? '#dc2626' : inflation >= 15 ? '#b45309' : '#064E3B' }}>{inflation}%</div>
                                                                     </div>
                                                                     <div>
-                                                                        <div style={{ color: 'var(--c-gray-400)', marginBottom: 1, fontSize: 10, whiteSpace: 'nowrap' }}>Ad Spend</div>
-                                                                        <div style={{ fontWeight: 700, fontSize: 14, fontVariantNumeric: 'tabular-nums' }}>${(d.spend / 1000).toFixed(1)}k</div>
+                                                                        <div style={{ color: 'var(--c-gray-400)', marginBottom: 2, fontSize: 10 }}>Ad Spend</div>
+                                                                        <div style={{ fontWeight: 700, fontSize: 15, fontVariantNumeric: 'tabular-nums' }}>${(d.spend / 1000).toFixed(1)}k</div>
                                                                     </div>
                                                                 </div>
                                                             </div>
