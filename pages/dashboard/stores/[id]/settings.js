@@ -54,6 +54,8 @@ export default function StoreSettings() {
     const [agencyTier, setAgencyTier] = useState(null);
     const [deleteConfirm, setDeleteConfirm] = useState(false);
     const [deletingStore, setDeletingStore] = useState(false);
+    const [disconnectConfirm, setDisconnectConfirm] = useState(null);
+    const [disconnecting, setDisconnecting] = useState(false);
 
     useEffect(() => { if (status === 'unauthenticated') router.push('/login'); }, [status]);
     useEffect(() => { if (session && id) fetchData(); }, [session, id]);
@@ -169,6 +171,27 @@ export default function StoreSettings() {
         }
     };
 
+    const disconnectPlatform = async () => {
+        if (!disconnectConfirm) return;
+        setDisconnecting(true);
+        setErrorMsg('');
+        try {
+            const res = await fetch(`/api/stores/${id}/connections?platform=${disconnectConfirm.platformId}`, {
+                method: 'DELETE',
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Disconnect failed');
+            setSuccessMsg(`${disconnectConfirm.platformName} disconnected. Access token deleted.`);
+            setTimeout(() => setSuccessMsg(''), 5000);
+            setDisconnectConfirm(null);
+            fetchData();
+        } catch (err) {
+            setErrorMsg('Failed to disconnect: ' + err.message);
+        } finally {
+            setDisconnecting(false);
+        }
+    };
+
     const getConnectionStatus = (platformId) => connections.find(c => c.platform === platformId);
 
     const isPaid = agencyTier && agencyTier !== 'free';
@@ -244,6 +267,13 @@ export default function StoreSettings() {
                                                     <span className="status-dot status-dot-green" style={{ width: 6, height: 6 }} /> Connected
                                                 </span>
                                                 <button onClick={() => connectPlatform(p)} className="btn btn-ghost btn-xs">Reconnect</button>
+                                                <button
+                                                    onClick={() => setDisconnectConfirm({ platformId: p.id, platformName: p.name })}
+                                                    className="btn btn-ghost btn-xs"
+                                                    style={{ color: '#dc2626' }}
+                                                >
+                                                    Disconnect
+                                                </button>
                                             </>
                                         ) : (
                                             <button onClick={() => connectPlatform(p)} className="btn btn-primary btn-sm">Connect</button>
@@ -265,9 +295,9 @@ export default function StoreSettings() {
                 <div style={{ marginTop: 24, padding: 18, background: 'var(--c-gray-50)', borderRadius: 12, border: '1px dashed var(--c-gray-200)' }}>
                     <h3 style={{ margin: '0 0 6px', fontSize: 14, fontWeight: 600, color: 'var(--c-gray-700)' }}>How connections work</h3>
                     <p style={{ margin: 0, fontSize: 13, color: 'var(--c-gray-500)', lineHeight: 1.5 }}>
-                        All credentials are encrypted at rest. Google Ads uses OAuth for secure one-click login.
-                        Meta uses access tokens entered manually.
-                        You can reconnect anytime to update credentials.
+                        All access tokens are encrypted at rest with AES-256. Shopify, Meta, and Google Ads
+                        all use OAuth for secure one-click authorization. You can disconnect or reconnect
+                        any platform at any time — disconnecting permanently deletes the stored access token.
                     </p>
                 </div>
 
@@ -372,6 +402,57 @@ export default function StoreSettings() {
                     </div>
                 );
             })()}
+
+            {/* Disconnect Confirmation Modal */}
+            {disconnectConfirm && (
+                <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }}
+                        onClick={() => !disconnecting && setDisconnectConfirm(null)} />
+                    <div className="card animate-scale-in" style={{ position: 'relative', width: '100%', maxWidth: 420, padding: 28, zIndex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
+                            <div style={{
+                                width: 44, height: 44, borderRadius: 12,
+                                background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                            }}>
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2">
+                                    <path d="M18.36 6.64a9 9 0 11-12.73 0" /><line x1="12" y1="2" x2="12" y2="12" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: 'var(--c-gray-900)' }}>Disconnect {disconnectConfirm.platformName}?</h3>
+                                <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--c-gray-500)' }}>You can reconnect anytime</p>
+                            </div>
+                        </div>
+                        <div style={{
+                            padding: '14px 16px', borderRadius: 10,
+                            background: '#fef2f2', border: '1px solid #fecaca', marginBottom: 20,
+                        }}>
+                            <p style={{ margin: 0, fontSize: 14, color: '#991b1b', lineHeight: 1.5 }}>
+                                The encrypted access token for <strong>{disconnectConfirm.platformName}</strong> will be permanently deleted.
+                                Reconciliation reports will stop refreshing data from this platform until you reconnect.
+                            </p>
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+                            <button className="btn btn-secondary btn-sm" onClick={() => setDisconnectConfirm(null)} disabled={disconnecting}>
+                                Cancel
+                            </button>
+                            <button
+                                onClick={disconnectPlatform}
+                                disabled={disconnecting}
+                                style={{
+                                    padding: '8px 20px', borderRadius: 8, fontSize: 14,
+                                    fontWeight: 600, border: 'none', cursor: disconnecting ? 'not-allowed' : 'pointer',
+                                    background: '#dc2626', color: '#fff',
+                                    opacity: disconnecting ? 0.6 : 1, transition: 'all 0.15s',
+                                    fontFamily: 'Inter, sans-serif',
+                                }}
+                            >
+                                {disconnecting ? 'Disconnecting...' : 'Disconnect'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Delete Store Confirmation Modal */}
             {deleteConfirm && (

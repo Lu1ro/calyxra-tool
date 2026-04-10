@@ -220,8 +220,14 @@ export default async function handler(req, res) {
         // Compute KPIs
         const kpis = computeKPIs(result);
 
+        // Date range for the report
+        const dateTo = new Date().toISOString().split('T')[0];
+        const dateFrom = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
         // Wrap in a structured format for the frontend
         const report = {
+            dateFrom,
+            dateTo,
             shopify: {
                 grossRevenue: result.grossRevenue,
                 netRevenue: result.shopifyNetRevenue,
@@ -270,8 +276,8 @@ export default async function handler(req, res) {
         const savedReport = await prisma.report.create({
             data: {
                 storeId: id,
-                dateFrom: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                dateTo: new Date().toISOString().split('T')[0],
+                dateFrom,
+                dateTo,
                 isDemo: false,
                 grossRevenue: report.shopify.grossRevenue,
                 netRevenue: report.shopify.netRevenue,

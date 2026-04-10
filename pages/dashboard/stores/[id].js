@@ -91,6 +91,17 @@ export default function StoreDashboard() {
     useEffect(() => { if (status === 'unauthenticated') router.push('/login'); }, [status]);
     useEffect(() => { if (session && id) fetchStoreData(); }, [session, id]);
     useEffect(() => {
+        const { connected, error: qError } = router.query;
+        if (connected) {
+            setToast({ message: `${connected} connected successfully!`, type: 'success' });
+            router.replace(`/dashboard/stores/${id}`, undefined, { shallow: true });
+        }
+        if (qError) {
+            setToast({ message: `Connection failed: ${qError.replace(/_/g, ' ')}`, type: 'error' });
+            router.replace(`/dashboard/stores/${id}`, undefined, { shallow: true });
+        }
+    }, [router.query]);
+    useEffect(() => {
         const onScroll = () => setShowBackToTop(window.scrollY > 600);
         window.addEventListener('scroll', onScroll);
         return () => window.removeEventListener('scroll', onScroll);
@@ -144,8 +155,6 @@ export default function StoreDashboard() {
             const storesRes = await fetch('/api/stores');
             const storesData = await storesRes.json();
             setStore(storesData.stores?.find(s => s.id === id));
-            // Clean up old demo + duplicate reports from DB
-            await fetch(`/api/stores/${id}/reports`, { method: 'DELETE' }).catch(() => {});
             const reportsRes = await fetch(`/api/stores/${id}/reports`);
             const reportsData = await reportsRes.json();
             setReports(reportsData.reports || []);
@@ -541,11 +550,14 @@ export default function StoreDashboard() {
                                         const baseReported = (latestReport.reportedRevenue || latestReport.shopify?.grossRevenue || 245320) / days;
                                         const baseTrue = (latestReport.shopify?.netRevenue || 180120) / days;
                                         const now = new Date(latestReport.dateTo || Date.now());
+                                        // Seeded PRNG for stable chart data across renders
+                                        const seed = (n) => { let s = n + 1; return () => { s = (s * 16807 + 0) % 2147483647; return (s - 1) / 2147483646; }; };
+                                        const rng = seed(42);
                                         for (let i = days - 1; i >= 0; i--) {
                                             const d = new Date(now);
                                             d.setDate(d.getDate() - i);
                                             labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-                                            const variance = 0.7 + Math.random() * 0.6;
+                                            const variance = 0.7 + rng() * 0.6;
                                             const spike = (i % 7 === 0 || i % 7 === 6) ? 1.3 : 1;
                                             const reported = Math.round(baseReported * variance * spike);
                                             const trueVal = Math.round(baseTrue * variance * spike);
@@ -836,7 +848,7 @@ export default function StoreDashboard() {
                                             },
                                             {
                                                 label: 'True ROAS',
-                                                data: (latestReport.campaigns || []).map(c => c.trueRoas || 0),
+                                                data: (latestReport.campaigns || []).map(c => c.estimatedTrueRoas || 0),
                                                 backgroundColor: '#A7F3D0',
                                                 borderColor: '#064E3B',
                                                 borderWidth: 1,
@@ -872,7 +884,7 @@ export default function StoreDashboard() {
                                             },
                                             {
                                                 label: 'True Revenue',
-                                                data: (latestReport.campaigns || []).map(c => c.trueRevenue || Math.round((c.spend || 0) * (c.trueRoas || 0))),
+                                                data: (latestReport.campaigns || []).map(c => c.trueRevenue || Math.round((c.spend || 0) * (c.estimatedTrueRoas || 0))),
                                                 backgroundColor: '#064E3B',
                                                 borderRadius: 4,
                                             },
@@ -904,7 +916,7 @@ export default function StoreDashboard() {
                                         (latestReport.campaigns || []).forEach(c => {
                                             if (!channelData[c.channel]) channelData[c.channel] = { reported: 0, trueRev: 0, spend: 0 };
                                             channelData[c.channel].reported += (c.purchaseValue || c.reportedRevenue || Math.round((c.spend || 0) * (c.reportedRoas || 0)));
-                                            channelData[c.channel].trueRev += (c.trueRevenue || Math.round((c.spend || 0) * (c.trueRoas || 0)));
+                                            channelData[c.channel].trueRev += (c.trueRevenue || Math.round((c.spend || 0) * (c.estimatedTrueRoas || 0)));
                                             channelData[c.channel].spend += (c.spend || 0);
                                         });
                                         const channels = Object.keys(channelData);
